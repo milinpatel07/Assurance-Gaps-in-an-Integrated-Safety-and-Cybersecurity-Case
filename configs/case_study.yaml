@@ -1,0 +1,79 @@
+# Case study configuration: LiDAR-based 3D object detection
+# for highly automated driving (SAE Level 4+)
+
+case_study:
+  name: "LiDAR 3D Object Detection for Highly Automated Driving"
+  sae_level: 4
+  component: "AI-based perception module"
+  architecture: "SECOND (Yan et al., 2018)"
+  sensor: "LiDAR"
+  task: "3D object detection (Car, Pedestrian, Cyclist)"
+
+# ASIL assignment from HARA (ISO 26262-3 Cl.6)
+hara:
+  hazardous_event: "Missed detection of vulnerable road user"
+  severity: "S3"
+  exposure: "E4"
+  controllability: "C3"  # No human driver at SAE Level 4+
+  asil: "D"
+
+# TARA results (ISO/SAE 21434 Cl.15)
+tara:
+  threat_scenarios:
+    - id: "TS-01"
+      name: "LiDAR spoofing"
+      description: "Injection of ghost points via laser attack"
+      impact: 4
+      attack_feasibility: 3
+      risk_value: 4
+
+    - id: "TS-02"
+      name: "Adversarial point cloud perturbation"
+      description: "PGD attack on voxel features"
+      impact: 4
+      attack_feasibility: 2
+      risk_value: 3
+
+    - id: "TS-03"
+      name: "Model poisoning"
+      description: "Manipulation of training data pipeline"
+      impact: 5
+      attack_feasibility: 1
+      risk_value: 3
+
+# SECOND detector configuration
+detector:
+  voxel_size: [0.16, 0.16, 4.0]
+  point_cloud_range: [0, -39.68, -3, 69.12, 39.68, 1]
+  max_points_per_voxel: 35
+  max_voxels: 20000
+  num_classes: 3
+  class_names: ["Car", "Pedestrian", "Cyclist"]
+
+# Deep ensemble configuration
+ensemble:
+  num_members: 5
+  training:
+    epochs: 80
+    batch_size: 4
+    learning_rate: 0.001
+    optimizer: "adam_onecycle"
+    note: "Each member trained independently with different random initialization"
+  inference:
+    nms_threshold: 0.1
+    score_threshold: 0.3
+    divergence_threshold: 0.5
+
+# CARLA evaluation configuration
+evaluation:
+  simulator: "CARLA 0.9.14"
+  map: "Town03"
+  rain_levels_mm_h: [0, 10, 25, 50, 100]
+  visibility_levels_m: [500, 200, 100, 50, 10]
+  sun_altitudes_deg: [45.0]
+  scenes_per_condition: 50
+  metrics:
+    - "mean Average Precision (mAP)"
+    - "recall per class"
+    - "geometric divergence distribution"
+    - "AUROC for OOD detection"

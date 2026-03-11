@@ -1,0 +1,47 @@
+# Applicable standards for the integrated safety and cybersecurity case
+
+standards:
+  - id: "ISO26262"
+    name: "ISO 26262:2018"
+    title: "Road vehicles — Functional safety"
+    year: 2018
+    type: "normative"
+    scope: "Functional safety of E/E systems"
+    relevance: "Perception failure can cause ASIL D hazardous event"
+    key_parts: ["Part 3 (HARA)", "Part 4 (System)", "Part 5 (HW)", "Part 6 (SW)", "Part 8 (Change)"]
+
+  - id: "ISO21448"
+    name: "ISO 21448:2022"
+    title: "Road vehicles — Safety of the intended functionality"
+    year: 2022
+    type: "normative"
+    scope: "SOTIF — intended function producing hazardous behaviour"
+    relevance: "Perception fails under adverse conditions without fault"
+    key_clauses: ["Cl.5-7 (Analysis)", "Cl.9-11 (V&V)", "Cl.13 (Monitoring)", "Annex A.1 (GSN)"]
+
+  - id: "ISO21434"
+    name: "ISO/SAE 21434:2021"
+    title: "Road vehicles — Cybersecurity engineering"
+    year: 2021
+    type: "normative"
+    scope: "Cybersecurity engineering for road vehicles"
+    relevance: "Sensor data subject to adversarial manipulation"
+    key_clauses: ["Cl.8 (Monitoring)", "Cl.9-10 (Development)", "Cl.15 (TARA)", "[RQ-15-06] (Safety bridge)"]
+
+  - id: "ISOPAS8800"
+    name: "ISO/PAS 8800:2024"
+    title: "Road vehicles — Safety and artificial intelligence"
+    year: 2024
+    type: "normative"
+    scope: "Safety of AI components in road vehicles"
+    relevance: "Detection function implemented by trained neural network"
+    key_clauses: ["Cl.5-6 (Spec)", "Cl.7-8 (Design/Training)", "Cl.9 (V&V)", "Cl.14 (Monitoring)", "Annex B (GSN)"]
+
+  - id: "TR5469"
+    name: "ISO/IEC TR 5469:2024"
+    title: "AI — Functional safety and AI systems"
+    year: 2024
+    type: "informative"
+    scope: "Assessment of functional safety techniques for AI"
+    relevance: "Supplementary guidance on AI technology classification and data quality"
+    key_clauses: ["Cl.6 (Classification)", "Cl.8.5 (Security)", "Cl.9 (Data)", "Table A.8 (Change)"]
