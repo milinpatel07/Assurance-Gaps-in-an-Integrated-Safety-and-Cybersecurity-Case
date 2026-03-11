@@ -1,0 +1,26 @@
+Weather,Rain (mm/h),Visibility (m),SOTIF Triggering,Scenes,Mean Recall,Mean Precision,Mean Divergence,False Negatives
+no_rain_clear,0,500,No,50,0.8900,0.9770,0.1123,42
+no_rain_light_fog,0,200,No,50,0.6163,0.8657,0.4177,151
+no_rain_moderate_fog,0,100,Yes,50,0.5465,0.8280,0.5136,187
+no_rain_moderate_fog,0,50,Yes,50,0.4962,0.8350,0.5530,174
+no_rain_dense_fog,0,10,Yes,50,0.4933,0.7721,0.6072,234
+light_rain_clear,10,500,No,50,0.8310,0.9658,0.1636,60
+light_rain_light_fog,10,200,No,50,0.6037,0.8317,0.4604,176
+light_rain_moderate_fog,10,100,Yes,50,0.5020,0.8209,0.5473,205
+light_rain_moderate_fog,10,50,Yes,50,0.4553,0.7819,0.6049,188
+light_rain_dense_fog,10,10,Yes,50,0.4691,0.8143,0.5942,198
+moderate_rain_clear,25,500,Yes,50,0.7840,0.9433,0.2118,86
+moderate_rain_light_fog,25,200,Yes,50,0.5224,0.8183,0.5278,187
+moderate_rain_moderate_fog,25,100,Yes,50,0.4947,0.7217,0.6248,230
+moderate_rain_moderate_fog,25,50,Yes,50,0.4671,0.7900,0.6002,207
+moderate_rain_dense_fog,25,10,Yes,50,0.4788,0.7676,0.5967,219
+moderate_rain_clear,50,500,Yes,50,0.6939,0.8657,0.3371,126
+moderate_rain_light_fog,50,200,Yes,50,0.4553,0.8040,0.6128,216
+moderate_rain_moderate_fog,50,100,Yes,50,0.4613,0.8004,0.6158,193
+moderate_rain_moderate_fog,50,50,Yes,50,0.4882,0.7760,0.5723,208
+moderate_rain_dense_fog,50,10,Yes,50,0.4591,0.7807,0.5694,218
+heavy_rain_clear,100,500,Yes,50,0.4795,0.7678,0.5719,213
+heavy_rain_light_fog,100,200,Yes,50,0.4959,0.7283,0.6109,204
+heavy_rain_moderate_fog,100,100,Yes,50,0.4781,0.7603,0.5969,224
+heavy_rain_moderate_fog,100,50,Yes,50,0.4854,0.7463,0.6088,235
+heavy_rain_dense_fog,100,10,Yes,50,0.4652,0.7630,0.5812,225
