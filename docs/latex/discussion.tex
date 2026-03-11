@@ -1,0 +1,133 @@
+% Discussion and interpretation of results
+% for direct inclusion in a LaTeX paper
+
+\section{Discussion}\label{sec:discussion}
+
+\subsection{Evidence Type Asymmetry at G5}
+
+The central finding of this analysis is the evidence type asymmetry at
+the V\&V goal (G5). Four evidence types converge at this node
+(Table~\ref{tab:evidence-types}), each differing in three dimensions:
+what is measured (code structure, scenario space, model confidence,
+attacker capability), how the evidence is produced (static analysis,
+simulation, inference, red-teaming), and what scale the result uses
+(binary pass/fail, scenario count, statistical distribution, attack
+success rate).
+
+This asymmetry creates a concrete challenge for the practitioner: how
+to determine that V\&V evidence is \emph{sufficient} when four
+incommensurable evidence types must jointly support the claim. ISO~26262
+prescribes MC/DC coverage at ASIL~D as a binary pass criterion.
+ISO~21448 prescribes triggering condition coverage as a count with a
+project-specific threshold. ISO/PAS~8800 prescribes uncertainty
+evaluation but defines no numerical threshold. ISO/SAE~21434 prescribes
+penetration testing but leaves the acceptable attack success rate to the
+organisation.
+
+No standard defines a combination rule, a weighting scheme, or a
+minimum set of evidence types that together constitute sufficiency.
+This gap is structural: it arises from the independent development of
+each standard by different technical committees (ISO/TC~22/SC~32 for
+ISO~26262, ISO/TC~22/SC~32/WG~14 for ISO~21448, ISO/TC~22/SC~32/WG~11
+and SAE for ISO/SAE~21434, ISO/TC~22/SC~32/WG~18 for ISO/PAS~8800).
+
+\subsection{Integration-Induced Gaps}
+
+Two of the six identified gaps (Gap-3 and Gap-4) are
+\emph{integration-induced}: they are invisible when each standard is
+applied independently and only become apparent when the integrated
+argument is constructed.
+
+Gap-3 (adversarial-SOTIF boundary) arises because ISO~21448 explicitly
+excludes cybersecurity threats (Clause~1), while ISO/SAE~21434 includes
+adversarial scenarios. An adversarial point cloud perturbation that causes
+a false negative simultaneously satisfies the definition of a SOTIF
+triggering condition (a condition that leads to a hazardous event
+without a system fault) and a cybersecurity threat scenario (an
+intentional attack exploiting a vulnerability). The boundary between
+G7 and G8 in the integrated GSN is undefined, and no standard provides
+guidance for this ownership decision.
+
+Gap-4 (no cross-domain release decision criteria) arises because the
+integration produces four separate evidence sets, each assessed against
+its own acceptance framework. ISO~26262-2 Clause~6.4 prescribes a
+functional safety assessment; ISO~21448 Clause~12 prescribes a SOTIF
+release decision; ISO/SAE~21434 Clause~3.1.11 prescribes a cybersecurity
+case evaluation. No standard prescribes how to make a single release
+decision that considers all four evidence sets jointly.
+
+\subsection{Quantitative Asymmetry}
+
+The integrated argument reveals a quantitative asymmetry between
+hardware-oriented and AI-oriented assurance claims. ISO~26262 Part~5
+prescribes specific quantitative targets for hardware: single-point
+fault metric (SPFM~$\geq$~99\% at ASIL~D), latent fault metric
+(LFM~$\geq$~90\% at ASIL~D), and probabilistic metric for random
+hardware failures (PMHF~$<$~$10^{-8}$~h$^{-1}$). No equivalent
+quantitative targets exist for AI component reliability.
+
+The closest analogue is the SOTIF acceptance criterion (ISO~21448
+Clause~6.5), which is qualitative and project-specific. ISO/PAS~8800
+does not define reliability targets. ISO/IEC~TR~5469 acknowledges the
+problem (Clause~9.2.2: non-separability of system behaviour) but does
+not provide targets. This creates Gap-1 in the classification.
+
+\subsection{Evaluation Results}
+
+The CARLA evaluation demonstrates the operational consequence of the
+SOTIF triggering conditions identified in the specification phase.
+Under non-triggering conditions, mean recall remains above the baseline
+performance level. Under triggering conditions (rain~$>$~20~mm/h or
+visibility~$<$~200~m), mean recall drops and ensemble geometric
+divergence increases, indicating elevated model uncertainty.
+
+The divergence metric serves dual roles in the integrated GSN:
+(i)~as V\&V evidence at G5 (ISO/PAS~8800 Clauses~8--9), demonstrating
+that the deep ensemble quantifies its own uncertainty under adverse
+conditions, and (ii)~as a runtime monitoring indicator at G6
+(ISO/PAS~8800 Clause~14), where elevated divergence signals potential
+out-of-distribution inputs. This dual role illustrates how a single
+technical mechanism can provide evidence for multiple nodes in the
+integrated argument.
+
+\subsection{Implications for Practitioners}
+
+The identified inconsistencies and gaps have practical consequences for
+automotive engineers constructing assurance cases for AI-based perception
+components:
+
+\begin{enumerate}
+    \item \textbf{Evidence combination}: Practitioners must define a
+          project-specific combination rule for the four evidence types
+          at G5, as no standard provides one. This rule should be
+          documented as an explicit assumption in the assurance case.
+    \item \textbf{Boundary definition}: The adversarial-SOTIF boundary
+          (Gap-3) must be resolved at the organisation level. A
+          recommended approach is to assign ownership based on the
+          attacker model: scenarios with a defined adversary belong to
+          ISO/SAE~21434; scenarios caused by environmental conditions
+          without an adversary belong to ISO~21448; scenarios where both
+          apply require coordinated assessment.
+    \item \textbf{Integrated release}: The release decision (Gap-4) should
+          be structured as a single gate that evaluates all four evidence
+          sets against defined criteria, rather than four independent gates.
+    \item \textbf{Modification re-assurance}: Until G9 is developed by
+          future standards work, OTA updates to AI models should trigger
+          a re-evaluation of all affected claims in the integrated
+          argument, not just the claims from the standard most directly
+          related to the change.
+\end{enumerate}
+
+\subsection{Limitations}
+
+This analysis has three primary limitations.
+First, the integrated GSN is constructed from normative requirements and
+does not account for organisation-specific interpretations or tailoring
+permitted by each standard.
+Second, the CARLA evaluation uses synthetic results generated from a
+parametric degradation model, not from a trained SECOND detector deployed
+in a live CARLA simulation. The evaluation demonstrates the methodology
+and evidence structure, not the performance of a specific model.
+Third, the analysis covers four normative standards and one informative
+TR. Other potentially relevant standards (UL~4600, UNECE R155/R156,
+EU AI Act) are not included.

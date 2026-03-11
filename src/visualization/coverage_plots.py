@@ -213,7 +213,7 @@ def plot_evidence_convergence(
 
     # Key finding text
     ax.text(7, 0.2,
-            "No standard defines how to combine these three evidence types.",
+            "No standard defines how to combine these four evidence types.",
             ha="center", va="center", fontsize=9, fontstyle="italic",
             color="#C62828")
 
@@ -270,4 +270,196 @@ def plot_weather_evaluation(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved weather evaluation plot to {output_path}")
+    plt.close()
+
+
+def plot_weather_heatmap(
+    weather_results: list,
+    output_path: Optional[str] = None,
+) -> None:
+    """Plot recall and divergence as 2D heatmaps over the rain x fog grid.
+
+    Each cell in the grid corresponds to one weather combination.
+    The left panel shows mean recall; the right shows mean divergence.
+    SOTIF triggering conditions are marked with a border.
+    """
+    if not MPL_AVAILABLE:
+        print("matplotlib not available; skipping weather heatmap")
+        return
+
+    rain_levels = sorted(set(wr.weather.rain_intensity for wr in weather_results))
+    vis_levels = sorted(set(wr.weather.fog_density for wr in weather_results), reverse=True)
+
+    recall_grid = np.full((len(vis_levels), len(rain_levels)), np.nan)
+    div_grid = np.full((len(vis_levels), len(rain_levels)), np.nan)
+    trig_grid = np.zeros((len(vis_levels), len(rain_levels)), dtype=bool)
+
+    for wr in weather_results:
+        ri = rain_levels.index(wr.weather.rain_intensity)
+        vi = vis_levels.index(wr.weather.fog_density)
+        recall_grid[vi, ri] = wr.mean_recall
+        div_grid[vi, ri] = wr.mean_divergence
+        trig_grid[vi, ri] = wr.weather.sotif_triggering
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Recall heatmap
+    im1 = ax1.imshow(recall_grid, cmap="RdYlGn", aspect="auto", vmin=0.3, vmax=1.0)
+    ax1.set_xticks(range(len(rain_levels)))
+    ax1.set_xticklabels([f"{r}" for r in rain_levels])
+    ax1.set_yticks(range(len(vis_levels)))
+    ax1.set_yticklabels([f"{v}" for v in vis_levels])
+    ax1.set_xlabel("Rain intensity (mm/h)")
+    ax1.set_ylabel("Fog visibility (m)")
+    ax1.set_title("Mean Recall")
+    fig.colorbar(im1, ax=ax1, shrink=0.8)
+
+    for i in range(len(vis_levels)):
+        for j in range(len(rain_levels)):
+            val = recall_grid[i, j]
+            if not np.isnan(val):
+                color = "white" if val < 0.6 else "black"
+                ax1.text(j, i, f"{val:.2f}", ha="center", va="center",
+                         fontsize=8, color=color)
+                if trig_grid[i, j]:
+                    rect = plt.Rectangle((j - 0.5, i - 0.5), 1, 1,
+                                          fill=False, edgecolor="red",
+                                          linewidth=2, linestyle="--")
+                    ax1.add_patch(rect)
+
+    # Divergence heatmap
+    im2 = ax2.imshow(div_grid, cmap="YlOrRd", aspect="auto", vmin=0.0, vmax=0.8)
+    ax2.set_xticks(range(len(rain_levels)))
+    ax2.set_xticklabels([f"{r}" for r in rain_levels])
+    ax2.set_yticks(range(len(vis_levels)))
+    ax2.set_yticklabels([f"{v}" for v in vis_levels])
+    ax2.set_xlabel("Rain intensity (mm/h)")
+    ax2.set_ylabel("Fog visibility (m)")
+    ax2.set_title("Mean Geometric Divergence")
+    fig.colorbar(im2, ax=ax2, shrink=0.8)
+
+    for i in range(len(vis_levels)):
+        for j in range(len(rain_levels)):
+            val = div_grid[i, j]
+            if not np.isnan(val):
+                color = "white" if val > 0.5 else "black"
+                ax2.text(j, i, f"{val:.2f}", ha="center", va="center",
+                         fontsize=8, color=color)
+                if trig_grid[i, j]:
+                    rect = plt.Rectangle((j - 0.5, i - 0.5), 1, 1,
+                                          fill=False, edgecolor="red",
+                                          linewidth=2, linestyle="--")
+                    ax2.add_patch(rect)
+
+    plt.suptitle("Detection Performance across Weather Grid\n"
+                 "(red border = SOTIF triggering condition per ISO 21448 Cl.7)",
+                 fontsize=11, fontweight="bold")
+    plt.tight_layout()
+
+    if output_path:
+        plt.savefig(output_path, dpi=150, bbox_inches="tight")
+        print(f"Saved weather heatmap to {output_path}")
+    plt.close()
+
+
+def plot_inconsistency_distribution(
+    output_path: Optional[str] = None,
+) -> None:
+    """Plot the distribution of inconsistencies across GSN nodes and types."""
+    if not MPL_AVAILABLE:
+        print("matplotlib not available; skipping inconsistency plot")
+        return
+
+    from src.analysis.inconsistencies import InconsistencyCatalogue
+    from src.standards.base import InconsistencyType
+
+    catalogue = InconsistencyCatalogue()
+
+    # Count per GSN node
+    node_counts: dict[str, dict[str, int]] = {}
+    for inc in catalogue.inconsistencies:
+        for node in inc.gsn_nodes:
+            if node not in node_counts:
+                node_counts[node] = {"S": 0, "T": 0, "M": 0}
+            if inc.inconsistency_type == InconsistencyType.STRUCTURAL:
+                node_counts[node]["S"] += 1
+            elif inc.inconsistency_type == InconsistencyType.TERMINOLOGICAL:
+                node_counts[node]["T"] += 1
+            else:
+                node_counts[node]["M"] += 1
+
+    nodes = sorted(node_counts.keys())
+    s_vals = [node_counts[n]["S"] for n in nodes]
+    t_vals = [node_counts[n]["T"] for n in nodes]
+    m_vals = [node_counts[n]["M"] for n in nodes]
+
+    x = np.arange(len(nodes))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.bar(x - width, s_vals, width, label="Structural", color="#E53935", edgecolor="black")
+    ax.bar(x, t_vals, width, label="Terminological", color="#FFA726", edgecolor="black")
+    ax.bar(x + width, m_vals, width, label="Methodological", color="#42A5F5", edgecolor="black")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(nodes)
+    ax.set_xlabel("GSN Goal Node")
+    ax.set_ylabel("Number of Inconsistencies")
+    ax.set_title("Distribution of Requirement Inconsistencies across GSN Nodes")
+    ax.legend()
+    ax.set_ylim(0, max(max(s_vals), max(t_vals), max(m_vals)) + 1)
+
+    plt.tight_layout()
+    if output_path:
+        plt.savefig(output_path, dpi=150, bbox_inches="tight")
+        print(f"Saved inconsistency distribution to {output_path}")
+    plt.close()
+
+
+def plot_gap_lifecycle_distribution(
+    output_path: Optional[str] = None,
+) -> None:
+    """Plot gap distribution across lifecycle phases."""
+    if not MPL_AVAILABLE:
+        print("matplotlib not available; skipping gap distribution plot")
+        return
+
+    from src.analysis.gaps import GapClassification
+
+    gaps_cls = GapClassification()
+
+    phase_counts: dict[str, dict[str, int]] = {}
+    for gap in gaps_cls.gaps:
+        phase = gap.lifecycle_phase.display_name
+        if phase not in phase_counts:
+            phase_counts[phase] = {"standard": 0, "integration": 0}
+        if gap.integration_induced:
+            phase_counts[phase]["integration"] += 1
+        else:
+            phase_counts[phase]["standard"] += 1
+
+    phases_present = list(phase_counts.keys())
+    std_vals = [phase_counts[p]["standard"] for p in phases_present]
+    int_vals = [phase_counts[p]["integration"] for p in phases_present]
+
+    x = np.arange(len(phases_present))
+    width = 0.35
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.bar(x - width / 2, std_vals, width, label="Standard gap",
+           color="#7E57C2", edgecolor="black")
+    ax.bar(x + width / 2, int_vals, width, label="Integration-induced",
+           color="#FF7043", edgecolor="black", hatch="//")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(phases_present, rotation=20, ha="right")
+    ax.set_xlabel("Lifecycle Phase")
+    ax.set_ylabel("Number of Gaps")
+    ax.set_title("Assurance Gap Distribution across Lifecycle Phases")
+    ax.legend()
+
+    plt.tight_layout()
+    if output_path:
+        plt.savefig(output_path, dpi=150, bbox_inches="tight")
+        print(f"Saved gap distribution to {output_path}")
     plt.close()

@@ -1,0 +1,165 @@
+% Methodology description for scientific publication
+% Assurance Gaps in an Integrated Safety and Cybersecurity Case
+% for an AI-Based Perception Component in Highly Automated Driving
+%
+% This file provides the detailed methodology description that can be
+% included directly in a LaTeX paper using \input{docs/latex/methodology.tex}
+% Requires: booktabs, amsmath, hyperref packages
+
+\section{Methodology}\label{sec:methodology}
+
+The analysis follows a five-step constructive integration methodology.
+The input is a set of applicable standards; the output is an integrated
+GSN argument pattern with identified inconsistencies and gaps.
+Each step produces a verifiable intermediate artefact.
+
+\subsection{System Definition and Standards Selection}\label{sec:system-def}
+
+The case study component is a LiDAR-based 3D object detection module for
+an SAE Level~4+ highly automated driving system. The architecture follows
+the SECOND detector~\cite{Yan2018} with a deep ensemble of five
+independently trained instances for uncertainty
+quantification~\cite{Lakshminarayanan2017}.
+
+The applicable standards are selected based on the following criteria:
+(i)~the standard addresses at least one aspect of the component's safety
+or cybersecurity assurance, (ii)~the standard is published (not draft),
+and (iii)~the standard contains normative requirements or provides the
+base assurance argument pattern. Five standards satisfy these criteria
+(Table~\ref{tab:standards}). ISO/IEC~TR~5469 is included as informative
+supplementary guidance.
+
+The system receives an ASIL~D assignment from the hazard analysis and
+risk assessment (HARA) per ISO~26262-3 Clause~6: severity S3 (life-threatening
+injuries), exposure E4 (high probability in urban driving), controllability C3
+(no human driver at SAE Level~4+). The threat analysis and risk assessment
+(TARA) per ISO/SAE~21434 Clause~15 identifies three threat scenarios:
+LiDAR spoofing (injected ghost points), adversarial point cloud perturbation,
+and model poisoning through compromised training data.
+
+\subsection{Step 1: Claim Extraction}\label{sec:step1}
+
+For each applicable standard, we extract \emph{claims}: normative
+requirements (\texttt{shall} statements), defined work products, and
+explicitly required lifecycle activities that an assurance argument for
+the AI-based perception component must address.
+
+Each claim is assigned:
+\begin{itemize}
+    \item a unique identifier (e.g., \texttt{CLM-26262-HARA-01}),
+    \item the source clause reference,
+    \item a claim type (normative requirement, work product, or lifecycle activity),
+    \item a target GSN goal node (determined in Step~3),
+    \item a primary lifecycle phase (determined in Step~2).
+\end{itemize}
+
+Informative notes and recommendations are recorded but not treated as
+normative claims. ISO/IEC~TR~5469, being a Technical Report, contributes
+informative guidance only.
+
+\subsection{Step 2: Lifecycle-Phase Mapping}\label{sec:step2}
+
+Claims and clauses are mapped to six lifecycle phases that cover the
+complete lifecycle of an AI-based perception component:
+\begin{enumerate}
+    \item \textbf{Concept / Requirements}: item definition, HARA, TARA,
+          functional safety concept, SOTIF specification.
+    \item \textbf{Design / Training}: AI model architecture, training process,
+          cybersecurity control design, SOTIF design measures.
+    \item \textbf{Verification \& Validation}: MC/DC coverage, scenario-based
+          testing, AI-specific evaluation, penetration testing.
+    \item \textbf{Integration / Deployment}: system integration, pre-deployment
+          validation, release decision.
+    \item \textbf{Operation / Monitoring}: runtime OOD detection, SOTIF field
+          monitoring, cybersecurity incident monitoring.
+    \item \textbf{Modification / Re-assurance}: OTA update management,
+          change impact analysis, re-validation.
+\end{enumerate}
+
+The mapping produces a coverage matrix (Table~\ref{tab:coverage}) showing
+how many clauses from each standard apply to each phase. Phases with low
+coverage from any single standard are candidates for gaps.
+
+\subsection{Step 3: GSN Construction}\label{sec:step3}
+
+The integrated GSN argument pattern is constructed by:
+\begin{enumerate}
+    \item Starting with ISO/PAS~8800 Annex~B as the base structure. This
+          provides goals G1--G6, strategy S1, and assumption A1.4.
+    \item Adding context nodes: C1 (ASIL~D from HARA, ISO~26262-3 Clause~6)
+          and C2 (TARA results, ISO/SAE~21434 Clause~15).
+    \item Augmenting existing goals G2, G4, G5, G6 with claims from
+          ISO~21448 and ISO/SAE~21434. The base pattern's G5 (V\&V)
+          receives claims from all four normative standards.
+    \item Adding new goals G7 (SOTIF residual risk acceptance, from
+          ISO~21448 Clause~6.5) and G8 (cybersecurity risk management,
+          from ISO/SAE~21434 Clause~3.1.11).
+    \item Identifying G9 (modification assurance) as an undeveloped goal
+          where no standard prescribes a complete re-assurance workflow
+          for AI model modifications.
+\end{enumerate}
+
+The resulting structure (Table~\ref{tab:gsn-goals}) extends the base
+pattern from 6 to 9 goals. Strategy S1 is reformulated to argue over
+four assurance domains rather than one.
+
+\subsection{Step 4: Junction-Point Analysis}\label{sec:step4}
+
+A \emph{junction point} is a goal node where claims from two or more
+standards meet. At each junction point, we analyse whether the standards
+impose compatible requirements. Three types of inconsistency are
+distinguished:
+\begin{itemize}
+    \item \textbf{Structural (S)}: different risk classification frameworks,
+          evidence structures, or architectural assumptions.
+    \item \textbf{Terminological (T)}: different terms for the same concept
+          or the same term with different definitions.
+    \item \textbf{Methodological (M)}: different methods prescribed for the
+          same assurance objective.
+\end{itemize}
+
+The analysis identifies seven inconsistencies (Table~\ref{tab:inconsistencies}).
+The central finding is I-2 (evidence type asymmetry at G5): four fundamentally
+different evidence types---MC/DC structural coverage (ISO~26262), scenario-based
+testing (ISO~21448), AI uncertainty quantification (ISO/PAS~8800), and
+penetration testing (ISO/SAE~21434)---must support a single sufficiency
+claim, yet no standard defines how they combine.
+
+\subsection{Step 5: Gap Identification}\label{sec:step5}
+
+Gaps are identified where the integrated argument requires a claim or
+evidence that no applicable standard provides. Three gap types are
+distinguished:
+\begin{itemize}
+    \item \textbf{Missing Claim (MC)}: the argument requires a claim
+          but no standard contains it.
+    \item \textbf{Missing Evidence (ME)}: a claim exists but no standard
+          prescribes how to produce evidence for AI components.
+    \item \textbf{Unresolved Inconsistency (UI)}: an inconsistency from
+          Step~4 requires resolution that no standard provides.
+\end{itemize}
+
+Gaps are further classified as \emph{integration-induced} if they appear
+only when standards are combined (not visible when each standard is applied
+independently). The analysis identifies six gaps (Table~\ref{tab:gaps}),
+of which two (Gap-3 and Gap-4) are integration-induced.
+
+\subsection{Evaluation Protocol}\label{sec:evaluation}
+
+The case study evaluation uses the CARLA simulator~\cite{Dosovitskiy2017}
+under parametrically controlled weather conditions. Rain intensity varies
+across five levels (0, 10, 25, 50, 100~mm/h) and fog visibility across
+five levels (500, 200, 100, 50, 10~m), producing a grid of 25 weather
+combinations. Each combination is evaluated over 50 scenes with randomised
+traffic configurations (seed: 42).
+
+A weather condition is classified as a \emph{SOTIF triggering condition}
+(per ISO~21448 Clause~7) if rain exceeds 20~mm/h (reducing LiDAR point
+density through absorption and scattering) or visibility falls below 200~m
+(causing spurious reflections and reduced sensor range).
+
+For each scene, we record: number of ground-truth objects, detections
+(true positives, false positives, false negatives), mean geometric
+divergence across ensemble members, and the number of uncertain detections
+(divergence exceeding 0.5). These metrics map to the four evidence types
+at G5 (Table~\ref{tab:evidence-types}).

@@ -47,6 +47,11 @@ src/
 │   ├── evidence_convergence.py # Evidence convergence at G5 (Figure 4)
 │   └── run_analysis.py        # Main analysis runner (all 5 steps)
 │
+├── results/            # Publication output generation
+│   ├── generate_all.py       # Master runner (JSON, CSV, LaTeX, figures)
+│   ├── latex_tables.py       # LaTeX tables (Tables 1-8, booktabs)
+│   └── export.py             # JSON/CSV/plain-text export
+│
 └── visualization/      # Diagram and plot generation
     ├── gsn_renderer.py       # GSN diagram via Graphviz (Figure 3)
     └── coverage_plots.py     # Coverage heatmaps, density plots, convergence
@@ -108,29 +113,38 @@ pip install -e ".[dev]"
 
 ## Usage
 
-### Run the Complete Analysis
+### Generate All Results
 
 ```bash
-python -m src.analysis.run_analysis
+python -m src.results.generate_all --seed 42 --scenes 50 --output output
 ```
 
-This executes all five steps and generates:
-- Coverage matrices and density tables
-- Integrated GSN structure with traceability
-- Inconsistency catalogue (7 items)
-- Gap classification (6 items)
-- Evidence convergence analysis
-- Synthetic CARLA evaluation results
-- Visualization outputs in `output/`
+Or using Make:
+
+```bash
+make results SEED=42 SCENES=50
+```
+
+This generates:
+- `output/analysis_results.json` — Complete structured results
+- `output/csv/` — CSV tables (coverage matrix, inconsistencies, gaps, weather evaluation)
+- `output/latex/` — LaTeX tables ready for paper inclusion (Tables 1-8)
+- `output/figures/` — All visualizations (GSN diagram, heatmaps, convergence diagram)
+- `output/summary_report.txt` — Human-readable summary
+
+See [REPRODUCING.md](REPRODUCING.md) for detailed reproduction instructions.
 
 ### Run Individual Components
 
 ```bash
-# Generate GSN diagram
+# Five-step analysis (console output)
+python -m src.analysis.run_analysis
+
+# GSN diagram only
 python -m src.visualization.gsn_renderer
 
-# Run CARLA evaluation (synthetic mode)
-python -m src.evaluation.run_evaluation --mode synthetic
+# CARLA evaluation (synthetic mode)
+python -m src.evaluation.run_evaluation --mode synthetic --seed 42
 
 # Run tests
 pytest tests/ -v
@@ -147,22 +161,23 @@ from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 
 # Step 1-2: Standards framework
 registry = StandardsRegistry()
-registry.print_coverage_summary()
+coverage = registry.compute_coverage_matrix()     # Table 2
+density = registry.compute_goal_density()          # Table 4
 
 # Step 3: Build integrated GSN
 gsn = build_integrated_gsn()
 gsn.print_structure("G1")
 
 # Step 4: Analyse inconsistencies
-catalogue = InconsistencyCatalogue()
+catalogue = InconsistencyCatalogue()               # Table 5
 catalogue.print_catalogue()
 
 # Step 5: Identify gaps
-gaps = GapClassification()
+gaps = GapClassification()                         # Table 6
 gaps.print_classification()
 
 # Central finding: evidence convergence at G5
-convergence = EvidenceConvergenceAnalysis()
+convergence = EvidenceConvergenceAnalysis()        # Figure 4
 convergence.print_analysis()
 ```
 
@@ -172,12 +187,13 @@ convergence.print_analysis()
 pytest tests/ -v --tb=short
 ```
 
-Test coverage includes:
+84 tests covering:
 - Standards instantiation and claim extraction
 - GSN construction and structural properties
 - Inconsistency and gap classification
 - Perception module (voxelization, IoU, divergence, AUROC)
 - Weather condition generation and evaluation pipeline
+- Results generation (LaTeX tables, JSON/CSV export, summary report)
 
 ## Applicable Standards
 
