@@ -60,6 +60,7 @@ dev = [
 run-gsn-analysis = "src.analysis.run_analysis:main"
 run-ensemble-eval = "src.evaluation.run_evaluation:main"
 generate-gsn-diagram = "src.visualization.gsn_renderer:main"
+generate-all-results = "src.results.generate_all:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

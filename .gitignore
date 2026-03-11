@@ -27,9 +27,9 @@ data/kitti/
 data/nuscenes/
 data/carla_output/
 
-# Output
+# Output (generated results, not source code)
 output/
-results/
+/results/
 *.log
 
 # OS
