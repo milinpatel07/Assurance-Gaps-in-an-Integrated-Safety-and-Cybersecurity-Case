@@ -147,6 +147,121 @@ class GapClassification:
             for pc in gap.partial_coverage:
                 print(f"    - {pc}")
 
+    def severity_scores(self) -> list[dict]:
+        """Compute severity scores for each gap.
+
+        Scoring dimensions (each 1-5):
+        - Safety impact: potential harm if gap is not addressed
+        - Exploitability: how likely the gap leads to a real failure
+        - Detectability: how hard the gap is to detect without integration
+        - Remediation complexity: effort needed to close the gap
+
+        Overall severity = mean of the four dimensions.
+        """
+        scores = {
+            "Gap-1": {
+                "gap_id": "Gap-1",
+                "description": "No AI-specific quantitative reliability target",
+                "safety_impact": 4,
+                "exploitability": 3,
+                "detectability": 2,
+                "remediation_complexity": 5,
+                "rationale": (
+                    "High safety impact (no numeric target for AI reliability at ASIL D). "
+                    "Moderate exploitability (systematic failures can occur). "
+                    "Easy to detect (known limitation). "
+                    "Very hard to remediate (requires new research on AI reliability metrics)."
+                ),
+            },
+            "Gap-2": {
+                "gap_id": "Gap-2",
+                "description": "No complete OTA re-assurance workflow",
+                "safety_impact": 4,
+                "exploitability": 4,
+                "detectability": 2,
+                "remediation_complexity": 4,
+                "rationale": (
+                    "High safety impact (OTA updates can introduce regressions). "
+                    "High exploitability (OTA updates are frequent for AI). "
+                    "Easy to detect (assessors know about OTA). "
+                    "Hard to remediate (requires cross-standard workflow)."
+                ),
+            },
+            "Gap-3": {
+                "gap_id": "Gap-3",
+                "description": "Adversarial-SOTIF boundary unowned",
+                "safety_impact": 5,
+                "exploitability": 4,
+                "detectability": 5,
+                "remediation_complexity": 4,
+                "rationale": (
+                    "Critical safety impact (adversarial attacks that exploit functional "
+                    "insufficiency are unowned — neither standard takes responsibility). "
+                    "High exploitability (adversarial LiDAR attacks are demonstrated). "
+                    "Very hard to detect (requires integration to see the scope gap). "
+                    "Hard to remediate (requires ISO 21448/21434 scope alignment)."
+                ),
+            },
+            "Gap-4": {
+                "gap_id": "Gap-4",
+                "description": "No cross-domain release decision criteria",
+                "safety_impact": 5,
+                "exploitability": 5,
+                "detectability": 4,
+                "remediation_complexity": 5,
+                "rationale": (
+                    "Critical safety impact (release without combined evaluation). "
+                    "Very high exploitability (every release decision is affected). "
+                    "Hard to detect (each standard has its own release criteria). "
+                    "Very hard to remediate (requires new combined sufficiency definition "
+                    "at G5 — the evidence type asymmetry problem)."
+                ),
+            },
+            "Gap-5": {
+                "gap_id": "Gap-5",
+                "description": "No ASIL-to-AI-class mapping",
+                "safety_impact": 3,
+                "exploitability": 2,
+                "detectability": 3,
+                "remediation_complexity": 3,
+                "rationale": (
+                    "Moderate safety impact (AI assurance depth unclear). "
+                    "Low exploitability (conservative defaults can be used). "
+                    "Moderate detectability (known gap in TR 5469). "
+                    "Moderate remediation (mapping table could be defined)."
+                ),
+            },
+            "Gap-6": {
+                "gap_id": "Gap-6",
+                "description": "Data acceptance threshold undefined",
+                "safety_impact": 3,
+                "exploitability": 3,
+                "detectability": 2,
+                "remediation_complexity": 4,
+                "rationale": (
+                    "Moderate safety impact (data quality affects model performance). "
+                    "Moderate exploitability (unclear when data is sufficient). "
+                    "Easy to detect (known limitation). "
+                    "Hard to remediate (domain-specific, no universal threshold)."
+                ),
+            },
+        }
+
+        result = []
+        for gap in self.gaps:
+            s = scores.get(gap.gap_id, {})
+            dims = [s.get("safety_impact", 0), s.get("exploitability", 0),
+                    s.get("detectability", 0), s.get("remediation_complexity", 0)]
+            overall = sum(dims) / len(dims) if dims else 0
+            result.append({
+                **s,
+                "integration_induced": gap.integration_induced,
+                "overall_severity": round(overall, 1),
+                "priority": "CRITICAL" if overall >= 4.0 else "HIGH" if overall >= 3.0 else "MEDIUM",
+            })
+
+        return result
+
     def summary_statistics(self) -> dict:
         return {
             "total": len(self.gaps),
