@@ -103,6 +103,122 @@ def run_sensitivity_analysis(
     )
 
 
+@dataclass
+class ThresholdSensitivityResult:
+    """Results from varying the SOTIF triggering thresholds."""
+
+    rain_thresholds: list[float]
+    visibility_thresholds: list[float]
+    recall_gaps: list[list[float]]  # [rain_idx][vis_idx]
+    triggering_counts: list[list[int]]
+    seed: int
+    scenes_per_weather: int
+
+
+def run_threshold_sensitivity(
+    rain_thresholds: list[float] | None = None,
+    visibility_thresholds: list[float] | None = None,
+    seed: int = 42,
+    scenes_per_weather: int = 50,
+) -> ThresholdSensitivityResult:
+    """Vary the SOTIF triggering thresholds and measure the recall gap.
+
+    The default thresholds (rain > 20 mm/h OR visibility < 200m) are from
+    ISO 21448 Cl.7. This analysis shows how sensitive the findings are to
+    different threshold choices.
+
+    Args:
+        rain_thresholds: Rain thresholds to test. Default: [10, 15, 20, 25, 30, 40, 50].
+        visibility_thresholds: Visibility thresholds to test. Default: [100, 150, 200, 250, 300].
+        seed: Random seed for evaluation.
+        scenes_per_weather: Scenes per weather condition.
+
+    Returns:
+        ThresholdSensitivityResult with recall gaps for each threshold combination.
+    """
+    if rain_thresholds is None:
+        rain_thresholds = [10, 15, 20, 25, 30, 40, 50]
+    if visibility_thresholds is None:
+        visibility_thresholds = [100, 150, 200, 250, 300]
+
+    # Run evaluation once (the data doesn't change; only the classification changes)
+    result = generate_synthetic_evaluation(
+        num_scenes_per_weather=scenes_per_weather,
+        seed=seed,
+    )
+
+    recall_gaps = []
+    triggering_counts = []
+
+    for rain_thresh in rain_thresholds:
+        gap_row = []
+        count_row = []
+        for vis_thresh in visibility_thresholds:
+            # Reclassify triggering conditions with new thresholds
+            trig_recalls = []
+            non_trig_recalls = []
+            n_trig = 0
+            for wr in result.weather_results:
+                is_trig = (
+                    wr.weather.rain_intensity > rain_thresh
+                    or wr.weather.fog_density < vis_thresh
+                )
+                if is_trig:
+                    trig_recalls.append(wr.mean_recall)
+                    n_trig += 1
+                else:
+                    non_trig_recalls.append(wr.mean_recall)
+
+            if trig_recalls and non_trig_recalls:
+                gap = float(np.mean(non_trig_recalls) - np.mean(trig_recalls))
+            else:
+                gap = 0.0
+            gap_row.append(gap)
+            count_row.append(n_trig)
+
+        recall_gaps.append(gap_row)
+        triggering_counts.append(count_row)
+
+    return ThresholdSensitivityResult(
+        rain_thresholds=rain_thresholds,
+        visibility_thresholds=visibility_thresholds,
+        recall_gaps=recall_gaps,
+        triggering_counts=triggering_counts,
+        seed=seed,
+        scenes_per_weather=scenes_per_weather,
+    )
+
+
+def print_threshold_sensitivity_report(result: ThresholdSensitivityResult):
+    """Print the threshold sensitivity analysis report."""
+    print("=" * 80)
+    print("THRESHOLD SENSITIVITY: Recall Gap vs. SOTIF Triggering Threshold")
+    print("=" * 80)
+    print(f"  Seed: {result.seed}, Scenes/weather: {result.scenes_per_weather}")
+    print(f"  ISO 21448 Cl.7 default: rain > 20 mm/h OR visibility < 200m")
+    print()
+
+    # Header
+    header = f"{'Rain>':>8}"
+    for vis in result.visibility_thresholds:
+        header += f"  vis<{vis:>3}m"
+    print(header)
+    print("-" * len(header))
+
+    for i, rain in enumerate(result.rain_thresholds):
+        row = f"{rain:>5}mm/h"
+        for j in range(len(result.visibility_thresholds)):
+            gap = result.recall_gaps[i][j]
+            marker = " *" if (rain == 20 and result.visibility_thresholds[j] == 200) else "  "
+            row += f"  {gap:>6.3f}{marker}"
+        print(row)
+
+    print()
+    print("  * = ISO 21448 Cl.7 default threshold")
+    print("  Values show recall gap (non-triggering - triggering).")
+    print("  Positive values indicate performance degradation under triggering conditions.")
+
+
 def print_sensitivity_report(result: SensitivityResult):
     """Print the sensitivity analysis report."""
     s = result.summary()

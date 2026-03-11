@@ -189,3 +189,84 @@ class EvidenceConvergenceAnalysis:
             "into a single sufficiency claim at G5, or what 'sufficient' means "
             "when all four are present."
         )
+
+    def get_solution_sketch(self) -> dict:
+        """Return a sketch of potential approaches to combine the four evidence types.
+
+        This does not solve the problem fully — it provides direction for future
+        research and demonstrates that the authors have considered resolution paths.
+        """
+        return {
+            "problem": (
+                "Four incommensurable evidence types converge at G5. Each uses a "
+                "different scale (binary, count, probability, rate). No standard "
+                "defines a combination rule or joint sufficiency criterion."
+            ),
+            "approaches": [
+                {
+                    "name": "Threshold-per-type with conjunctive rule",
+                    "description": (
+                        "Define a minimum threshold for each evidence type independently "
+                        "(e.g., MC/DC >= 100%, scenario coverage >= 95%, AUROC >= 0.95, "
+                        "attack success rate <= 5%). Claim sufficiency iff ALL thresholds met."
+                    ),
+                    "pros": [
+                        "Simple to implement and audit",
+                        "Each threshold can be justified from its source standard",
+                        "Conservative (all must pass)",
+                    ],
+                    "cons": [
+                        "Does not capture interactions between evidence types",
+                        "No principled basis for threshold values",
+                        "Cannot trade off strength in one area against weakness in another",
+                    ],
+                    "feasibility": "HIGH — can be implemented immediately",
+                },
+                {
+                    "name": "Weighted Dempster-Shafer belief combination",
+                    "description": (
+                        "Map each evidence type to a belief mass function over "
+                        "{sufficient, insufficient, uncertain}. Combine using "
+                        "Dempster's rule of combination. Claim sufficiency when "
+                        "Bel(sufficient) exceeds a threshold."
+                    ),
+                    "pros": [
+                        "Handles uncertainty and conflicting evidence formally",
+                        "Well-established in safety assessment literature",
+                        "Can model partial confidence in each evidence type",
+                    ],
+                    "cons": [
+                        "Requires mapping each scale to belief masses (subjective)",
+                        "Dempster's rule can give counterintuitive results with high conflict",
+                        "Computationally more complex to audit",
+                    ],
+                    "feasibility": "MEDIUM — requires expert elicitation for mass assignments",
+                },
+                {
+                    "name": "Multi-criteria decision analysis (MCDA)",
+                    "description": (
+                        "Treat each evidence type as a criterion. Use MCDA methods "
+                        "(e.g., TOPSIS, AHP) to rank the overall assurance level. "
+                        "Weight criteria by safety relevance."
+                    ),
+                    "pros": [
+                        "Flexible weighting scheme",
+                        "Transparent decision process",
+                        "Can incorporate stakeholder preferences",
+                    ],
+                    "cons": [
+                        "Weights are subjective",
+                        "Not standard practice in functional safety",
+                        "May not satisfy regulatory auditors",
+                    ],
+                    "feasibility": "MEDIUM — well-understood but novel in this context",
+                },
+            ],
+            "recommendation": (
+                "We recommend starting with the threshold-per-type approach for "
+                "practical deployments, as it is the most auditable and aligns with "
+                "existing standard practices. For research, the Dempster-Shafer "
+                "approach offers the most principled combination of heterogeneous "
+                "evidence under uncertainty. Both warrant further investigation."
+            ),
+        }

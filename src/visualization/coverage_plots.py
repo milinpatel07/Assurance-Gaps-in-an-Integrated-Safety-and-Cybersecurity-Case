@@ -15,7 +15,9 @@ import numpy as np
 
 try:
     import matplotlib
-    matplotlib.use("Agg")
+    # Only set Agg backend if no backend is already configured (e.g. in Jupyter/Colab)
+    if matplotlib.get_backend() == "":
+        matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
     MPL_AVAILABLE = True
@@ -68,7 +70,7 @@ def plot_coverage_heatmap(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved coverage heatmap to {output_path}")
-    plt.close()
+        plt.close()
 
 
 def plot_goal_density(
@@ -123,7 +125,7 @@ def plot_goal_density(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved goal density plot to {output_path}")
-    plt.close()
+        plt.close()
 
 
 def plot_evidence_convergence(
@@ -224,7 +226,7 @@ def plot_evidence_convergence(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved convergence diagram to {output_path}")
-    plt.close()
+        plt.close()
 
 
 def plot_weather_evaluation(
@@ -270,7 +272,7 @@ def plot_weather_evaluation(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved weather evaluation plot to {output_path}")
-    plt.close()
+        plt.close()
 
 
 def plot_weather_heatmap(
@@ -359,7 +361,7 @@ def plot_weather_heatmap(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved weather heatmap to {output_path}")
-    plt.close()
+        plt.close()
 
 
 def plot_inconsistency_distribution(
@@ -413,7 +415,7 @@ def plot_inconsistency_distribution(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved inconsistency distribution to {output_path}")
-    plt.close()
+        plt.close()
 
 
 def plot_gap_lifecycle_distribution(
@@ -462,4 +464,4 @@ def plot_gap_lifecycle_distribution(
     if output_path:
         plt.savefig(output_path, dpi=150, bbox_inches="tight")
         print(f"Saved gap distribution to {output_path}")
-    plt.close()
+        plt.close()
