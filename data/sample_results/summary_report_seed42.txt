@@ -1,0 +1,93 @@
+================================================================================
+ANALYSIS RESULTS SUMMARY
+Assurance Gaps in an Integrated Safety and Cybersecurity Case
+for an AI-Based Perception Component in Highly Automated Driving
+================================================================================
+Generated: 2026-03-11 10:08:09
+Random seed: 42
+
+------------------------------------------------------------
+STANDARDS FRAMEWORK
+------------------------------------------------------------
+Standards analysed:    5
+Total clauses:         52
+Total claims:          40
+
+------------------------------------------------------------
+INTEGRATED GSN
+------------------------------------------------------------
+  total_elements: 34
+  goals: 9
+  strategies: 1
+  contexts: 2
+  assumptions: 1
+  solutions: 21
+  junction_points: 6
+  undeveloped_goals: 1
+  retained_goals: 6
+  new_goals: 2
+  max_standards_per_goal: 4
+
+------------------------------------------------------------
+REQUIREMENT INCONSISTENCIES
+------------------------------------------------------------
+  Total: 7
+  Structural:      3
+  Terminological:  2
+  Methodological:  2
+
+  I-1: Incompatible risk classification frameworks
+  I-2: Evidence type asymmetry at V&V
+  I-3: AI error terminology differs across standards
+  I-4: 'Validation' defined differently across standards
+  I-5: Cybersecurity-SOTIF boundary undefined for adversarial inputs
+  I-6: Monitoring scope overlap — three regimes on one component
+  I-7: Data sufficiency threshold undefined
+
+------------------------------------------------------------
+ASSURANCE GAPS
+------------------------------------------------------------
+  Total: 6
+  Missing claim:               2
+  Missing evidence:            3
+  Unresolved inconsistency:    1
+  Integration-induced:         2
+
+  Gap-1: No AI-specific quantitative reliability target
+  Gap-2: No complete OTA re-assurance workflow for AI
+  Gap-3: Adversarial-SOTIF boundary unowned — adversarial inputs that exploit functional insufficiencies fall between G7 and G8 [INTEGRATION-INDUCED]
+  Gap-4: No cross-domain release decision criteria — four separate evidence sets with no combined evaluation [INTEGRATION-INDUCED]
+  Gap-5: No ASIL-to-AI-class mapping — cannot derive AI assurance depth from ASIL D assignment
+  Gap-6: Data acceptance threshold undefined — no standard prescribes when training data are sufficient
+
+------------------------------------------------------------
+EVIDENCE CONVERGENCE AT G5 (CENTRAL FINDING)
+------------------------------------------------------------
+Four evidence types converge at the V&V goal:
+  [1] Structural coverage (MC/DC) (ISO 26262)
+      Scale: Binary (pass/fail per condition)
+  [2] Scenario-based testing with triggering condition coverage (ISO 21448)
+      Scale: Count (scenarios tested / triggering conditions covered)
+  [3] AI-specific uncertainty quantification (ISO/PAS 8800)
+      Scale: Statistical distribution (e.g., AUROC for OOD detection)
+  [4] Adversarial penetration testing (ISO/SAE 21434)
+      Scale: Rate (attack success rate under threat model)
+
+Finding: No standard defines how to combine these four
+evidence types into a single sufficiency claim at G5.
+
+------------------------------------------------------------
+CARLA EVALUATION RESULTS
+------------------------------------------------------------
+  Weather conditions:        25
+  Triggering conditions:     21
+  Overall mean recall:       0.5445
+  Triggering mean recall:    0.5082
+  Non-triggering recall:     0.7353
+  Overall mean divergence:   0.5125
+  Triggering divergence:     0.5552
+  Total false negatives:     4606
+
+================================================================================
+END OF REPORT
+================================================================================

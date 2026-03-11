@@ -26,7 +26,7 @@ pip install -e ".[dev]"
 pytest tests/ -v --tb=short
 ```
 
-All 84 tests should pass. The tests verify the correctness of:
+All 95 tests should pass. The tests verify the correctness of:
 - Standards instantiation (clauses, claims, lifecycle mappings)
 - GSN construction (9 goals, junction points, undeveloped goals)
 - Inconsistency and gap classification

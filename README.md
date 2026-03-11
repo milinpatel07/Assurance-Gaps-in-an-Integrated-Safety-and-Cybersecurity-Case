@@ -45,6 +45,8 @@ src/
 │   ├── inconsistencies.py     # 7 requirement inconsistencies (Table 5)
 │   ├── gaps.py                # 6 assurance gaps (Table 6)
 │   ├── evidence_convergence.py # Evidence convergence at G5 (Figure 4)
+│   ├── traceability.py        # Traceability matrix (goals → claims/gaps)
+│   ├── sensitivity.py         # Multi-seed sensitivity analysis
 │   └── run_analysis.py        # Main analysis runner (all 5 steps)
 │
 ├── results/            # Publication output generation
@@ -134,6 +136,16 @@ This generates:
 
 See [REPRODUCING.md](REPRODUCING.md) for detailed reproduction instructions.
 
+### Interactive Notebook (Google Colab)
+
+Open the notebook for an interactive walkthrough with inline visualizations:
+
+```bash
+jupyter notebook notebooks/assurance_gaps_analysis.ipynb
+```
+
+The notebook can also be run directly in Google Colab — it clones the repository and installs dependencies automatically.
+
 ### Run Individual Components
 
 ```bash
@@ -187,13 +199,14 @@ convergence.print_analysis()
 pytest tests/ -v --tb=short
 ```
 
-84 tests covering:
+95 tests covering:
 - Standards instantiation and claim extraction
 - GSN construction and structural properties
 - Inconsistency and gap classification
 - Perception module (voxelization, IoU, divergence, AUROC)
 - Weather condition generation and evaluation pipeline
 - Results generation (LaTeX tables, JSON/CSV export, summary report)
+- Traceability matrix and sensitivity analysis
 
 ## Applicable Standards
 
