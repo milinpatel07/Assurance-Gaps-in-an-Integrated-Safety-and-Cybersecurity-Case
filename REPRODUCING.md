@@ -26,12 +26,13 @@ pip install -e ".[dev]"
 pytest tests/ -v --tb=short
 ```
 
-All 69 tests should pass. The tests verify the correctness of:
+All 84 tests should pass. The tests verify the correctness of:
 - Standards instantiation (clauses, claims, lifecycle mappings)
 - GSN construction (9 goals, junction points, undeveloped goals)
 - Inconsistency and gap classification
 - Perception module (voxelization, 3D IoU, geometric divergence, AUROC)
 - Weather condition generation and evaluation pipeline
+- Results generation (LaTeX tables, JSON/CSV export, summary report)
 
 ## Step 3: Generate All Results
 

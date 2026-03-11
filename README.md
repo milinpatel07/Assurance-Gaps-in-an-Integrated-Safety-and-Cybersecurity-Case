@@ -47,6 +47,11 @@ src/
 │   ├── evidence_convergence.py # Evidence convergence at G5 (Figure 4)
 │   └── run_analysis.py        # Main analysis runner (all 5 steps)
 │
+├── results/            # Publication output generation
+│   ├── generate_all.py       # Master runner (JSON, CSV, LaTeX, figures)
+│   ├── latex_tables.py       # LaTeX tables (Tables 1-8, booktabs)
+│   └── export.py             # JSON/CSV/plain-text export
+│
 └── visualization/      # Diagram and plot generation
     ├── gsn_renderer.py       # GSN diagram via Graphviz (Figure 3)
     └── coverage_plots.py     # Coverage heatmaps, density plots, convergence
@@ -182,12 +187,13 @@ convergence.print_analysis()
 pytest tests/ -v --tb=short
 ```
 
-Test coverage includes:
+84 tests covering:
 - Standards instantiation and claim extraction
 - GSN construction and structural properties
 - Inconsistency and gap classification
 - Perception module (voxelization, IoU, divergence, AUROC)
 - Weather condition generation and evaluation pipeline
+- Results generation (LaTeX tables, JSON/CSV export, summary report)
 
 ## Applicable Standards
 
