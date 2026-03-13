@@ -1,0 +1,208 @@
+# Integrated Safety and Cybersecurity GSN Pattern
+# Figure 3 in the paper: extends ISO/PAS 8800 Annex B from 6 to 9 goals
+#
+# Rendered with gsn2x (https://github.com/jonasthewolf/gsn2x)
+# Usage: gsn2x gsn/integrated_pattern.gsn.yaml
+#
+# Node origins:
+#   G1-G6 — retained from ISO/PAS 8800 Annex B (augmented)
+#   G7     — new, from ISO 21448
+#   G8     — new, from ISO/SAE 21434
+#   G9     — undeveloped (assurance gap)
+
+G1:
+  text: |
+    The AI-based perception component
+    satisfies the integrated safety and
+    cybersecurity requirements allocated to it
+  inContextOf: [C1, C2]
+  supportedBy: [S1]
+
+C1:
+  text: |
+    ASIL D assigned from HARA
+    (ISO 26262-3 Cl.6)
+    Controllability C3 at SAE Level 4+
+
+C2:
+  text: |
+    TARA results with risk values
+    (ISO/SAE 21434 Cl.15)
+    LiDAR spoofing, adversarial perturbation
+
+S1:
+  text: |
+    Argue over four assurance domains:
+    (a) AI-specific insufficiencies controlled (8800)
+    (b) Functional insufficiencies acceptable (21448)
+    (c) Cybersecurity risks managed (21434)
+    (d) HW faults controlled (26262, via A1.4)
+  supportedBy: [G2, G3, G4, G5, G6, G7, G8, G9]
+  inContextOf: [A1_4]
+
+A1_4:
+  text: |
+    HW random faults and systematic faults
+    in non-AI elements are controlled
+    by ISO 26262 processes
+
+G2:
+  text: |
+    Specification sufficient for all
+    applicable assurance domains
+    [8800 + 21448 + 21434]
+  supportedBy: [Sn1, Sn2, Sn3]
+
+Sn1:
+  text: |
+    AI specification review
+    (ISO/PAS 8800 Cl.5)
+
+Sn2:
+  text: |
+    Triggering condition catalogue
+    (ISO 21448 Cl.7, Table A.8)
+
+Sn3:
+  text: |
+    Cybersecurity requirements
+    (ISO/SAE 21434 [RQ-06-01])
+
+G3:
+  text: |
+    Training and test data sufficient
+    [8800 only]
+  supportedBy: [Sn4, Sn5, Sn6]
+
+Sn4:
+  text: |
+    Data quality report
+    (ISO/PAS 8800 Cl.8.4)
+
+Sn5:
+  text: |
+    Distribution coverage analysis
+
+Sn6:
+  text: |
+    Annotation quality metrics
+
+G4:
+  text: |
+    AI design satisfies safety and
+    cybersecurity requirements
+    [8800 + 21448 + 21434]
+  supportedBy: [Sn7, Sn8, Sn9]
+
+Sn7:
+  text: |
+    AI design review
+    (ISO/PAS 8800 Cl.7)
+
+Sn8:
+  text: |
+    SOTIF design measures
+    (ISO 21448 Table A.9)
+
+Sn9:
+  text: |
+    Cybersecurity control design
+    (ISO/SAE 21434 Cl.10)
+
+G5:
+  text: |
+    V&V evidence sufficient across
+    all assurance domains
+    [All four standards]
+  supportedBy: [Sn10, Sn11, Sn12, Sn13]
+
+Sn10:
+  text: |
+    MC/DC structural coverage
+    of non-AI wrapper code
+    (ISO 26262-6 Cl.9)
+
+Sn11:
+  text: |
+    Scenario-based testing with
+    triggering condition coverage
+    (ISO 21448 Cl.9-11)
+
+Sn12:
+  text: |
+    Deep ensemble uncertainty
+    quantification
+    (ISO/PAS 8800 Cl.8-9)
+
+Sn13:
+  text: |
+    Adversarial penetration testing
+    (ISO/SAE 21434 Cl.10)
+
+G6:
+  text: |
+    Operational monitoring covers
+    AI, SOTIF, and cybersecurity
+    [8800 + 21448 + 21434]
+  supportedBy: [Sn14, Sn15, Sn16]
+
+Sn14:
+  text: |
+    OOD detection and drift monitoring
+    (ISO/PAS 8800 Cl.14)
+
+Sn15:
+  text: |
+    SOTIF field monitoring
+    (ISO 21448 Tables A.13-A.14)
+
+Sn16:
+  text: |
+    Cybersecurity monitoring
+    (ISO/SAE 21434 Cl.8)
+
+G7:
+  text: |
+    Residual risk from functional
+    insufficiencies meets acceptance
+    criteria (ISO 21448 Cl.6.5)
+  supportedBy: [Sn17, Sn18]
+
+Sn17:
+  text: |
+    Four-area model evaluation
+    (ISO 21448 Cl.5)
+
+Sn18:
+  text: |
+    Acceptance criteria assessment
+    (ISO 21448 Cl.6.5, Table A.10)
+
+G8:
+  text: |
+    Cybersecurity risks treated to
+    acceptable level
+    (ISO/SAE 21434 Cl.3.1.11)
+  supportedBy: [Sn19, Sn20, Sn21]
+
+Sn19:
+  text: |
+    TARA report
+    (ISO/SAE 21434 Cl.15)
+
+Sn20:
+  text: |
+    Risk treatment plan
+    (ISO/SAE 21434 Cl.15)
+
+Sn21:
+  text: |
+    Safety-cybersecurity bridge
+    (ISO/SAE 21434 [RQ-15-06])
+
+G9:
+  text: |
+    AI model modifications controlled
+    with re-assurance criteria
+    [UNDEVELOPED - Gap-2]
+  undeveloped: true
