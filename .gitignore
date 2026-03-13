@@ -43,3 +43,11 @@ Thumbs.db
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+
+# gsn2x binary (download from https://github.com/jonasthewolf/gsn2x/releases)
+gsn/gsn2x
+gsn/gsn2x.exe
+
+# gsn2x generated outputs
+gsn/*.svg
+evidence.md
