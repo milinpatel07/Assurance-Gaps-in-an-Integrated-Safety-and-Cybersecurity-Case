@@ -168,6 +168,16 @@ class FullEvaluationResult:
                 np.mean([wr.mean_divergence for wr in trig_results]).item()
                 if trig_results else 0.0
             ),
+            "non_triggering_mean_divergence": (
+                np.mean([wr.mean_divergence for wr in non_trig]).item()
+                if non_trig else 0.0
+            ),
+            "triggering_false_negatives": sum(
+                wr.total_false_negatives for wr in trig_results
+            ),
+            "non_triggering_false_negatives": sum(
+                wr.total_false_negatives for wr in non_trig
+            ),
             "total_false_negatives": sum(
                 wr.total_false_negatives for wr in all_results
             ),

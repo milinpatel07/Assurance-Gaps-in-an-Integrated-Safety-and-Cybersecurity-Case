@@ -389,15 +389,17 @@ def generate_table8_weather_evaluation(eval_summary: dict) -> str:
     overall_div = eval_summary.get("overall_mean_divergence", 0.0)
     trig_div = eval_summary.get("triggering_mean_divergence", 0.0)
     non_trig_div = eval_summary.get("non_triggering_mean_divergence", 0.0)
+    trig_fn = eval_summary.get("triggering_false_negatives", 0)
+    non_trig_fn = eval_summary.get("non_triggering_false_negatives", 0)
     total_fn = eval_summary.get("total_false_negatives", 0)
 
     lines.append(
         f"  Non-triggering & {non_trig_recall:.3f} & "
-        f"{non_trig_div:.3f} & --- \\\\"
+        f"{non_trig_div:.3f} & {non_trig_fn} \\\\"
     )
     lines.append(
         f"  Triggering & {trig_recall:.3f} & "
-        f"{trig_div:.3f} & --- \\\\"
+        f"{trig_div:.3f} & {trig_fn} \\\\"
     )
     lines.append(r"\midrule")
     lines.append(

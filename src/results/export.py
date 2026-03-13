@@ -379,6 +379,7 @@ def export_summary_report(
     lines.append(f"  Non-triggering recall:     {eval_summary['non_triggering_mean_recall']:.4f}")
     lines.append(f"  Overall mean divergence:   {eval_summary['overall_mean_divergence']:.4f}")
     lines.append(f"  Triggering divergence:     {eval_summary['triggering_mean_divergence']:.4f}")
+    lines.append(f"  Non-triggering divergence: {eval_summary['non_triggering_mean_divergence']:.4f}")
     lines.append(f"  Total false negatives:     {eval_summary['total_false_negatives']}")
     lines.append("")
 
