@@ -241,7 +241,7 @@ def plot_weather_evaluation(
     categories = ["Non-triggering", "Triggering"]
     recall = [summary["non_triggering_mean_recall"], summary["triggering_mean_recall"]]
     divergence = [
-        summary.get("non_triggering_mean_divergence", 0.15),
+        summary["non_triggering_mean_divergence"],
         summary["triggering_mean_divergence"],
     ]
 
