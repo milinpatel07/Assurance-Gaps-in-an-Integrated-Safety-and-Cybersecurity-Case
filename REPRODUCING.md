@@ -45,7 +45,7 @@ make results SEED=42 SCENES=50
 |-----------|----------|
 | `output/analysis_results.json` | Complete structured results |
 | `output/summary_report.txt` | Human-readable summary |
-| `output/csv/` | Coverage matrix, goal density, inconsistencies, gaps, weather evaluation |
+| `output/csv/` | Coverage matrix, goal density, inconsistencies, gaps, counterfactual visibility, sensitivity analysis, weather evaluation |
 | `output/latex/` | 8 LaTeX tables (booktabs format) for direct `\input{}` inclusion |
 | `output/figures/` | Heatmaps, bar charts, convergence diagram, GSN diagram |
 

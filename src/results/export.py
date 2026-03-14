@@ -23,6 +23,8 @@ from src.analysis.inconsistencies import InconsistencyCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.evaluation.carla_evaluator import FullEvaluationResult
+from src.analysis.completeness import check_gsn_completeness
+from src.analysis.counterfactual import CounterfactualAnalysis
 
 
 def _json_default(obj):
@@ -148,6 +150,16 @@ def export_json(
                 ],
             },
         },
+        "completeness": {
+            "is_complete": check_gsn_completeness().is_complete,
+            "total_claims": check_gsn_completeness().total_claims,
+            "mapped_claims": check_gsn_completeness().mapped_claims,
+            "explanation": check_gsn_completeness().explanation,
+        },
+        "counterfactual": {
+            "gap_visibility_matrix": CounterfactualAnalysis().get_gap_visibility_matrix(),
+            "num_perspectives": len(CounterfactualAnalysis().perspectives),
+        },
         "evaluation": eval_result.compute_summary(),
         "evaluation_per_weather": [
             {
@@ -255,6 +267,19 @@ def export_csv_tables(
                 "Yes" if gap.integration_induced else "No",
                 "; ".join(gap.partial_coverage),
             ])
+    files.append(path)
+
+    # Counterfactual gap visibility matrix
+    counterfactual = CounterfactualAnalysis()
+    gap_matrix = counterfactual.get_gap_visibility_matrix()
+    path = os.path.join(output_dir, "counterfactual_gap_visibility.csv")
+    with open(path, "w", newline="") as f:
+        writer = csv.writer(f)
+        all_gaps = ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5", "Gap-6"]
+        writer.writerow(["Standard"] + all_gaps)
+        for std_id, vis in gap_matrix.items():
+            row = [std_id] + ["Yes" if vis.get(g, False) else "No" for g in all_gaps]
+            writer.writerow(row)
     files.append(path)
 
     # Weather evaluation per condition
@@ -366,6 +391,34 @@ def export_summary_report(
     lines.append("")
     lines.append("Finding: No standard defines how to combine these four")
     lines.append("evidence types into a single sufficiency claim at G5.")
+    lines.append("")
+
+    # Completeness
+    completeness = check_gsn_completeness()
+    lines.append("-" * 60)
+    lines.append("GSN COMPLETENESS CHECK")
+    lines.append("-" * 60)
+    lines.append(f"  Complete: {completeness.is_complete}")
+    lines.append(f"  Claims mapped: {completeness.mapped_claims}/{completeness.total_claims}")
+    lines.append(f"  Phases covered: {', '.join(completeness.phases_covered)}")
+    if completeness.phases_uncovered:
+        lines.append(f"  Phases uncovered: {', '.join(completeness.phases_uncovered)}")
+    lines.append(f"  {completeness.explanation}")
+    lines.append("")
+
+    # Counterfactual
+    counterfactual = CounterfactualAnalysis()
+    gap_matrix = counterfactual.get_gap_visibility_matrix()
+    lines.append("-" * 60)
+    lines.append("COUNTERFACTUAL ANALYSIS")
+    lines.append("-" * 60)
+    lines.append("Gap visibility from each standard's perspective:")
+    for std_id, gaps_visible in gap_matrix.items():
+        visible = [g for g, v in gaps_visible.items() if v]
+        lines.append(f"  {std_id:15s}: {', '.join(visible) if visible else '(none)'}")
+    lines.append("")
+    lines.append("Key finding: Gap-3 and Gap-4 are invisible from any single standard.")
+    lines.append("They emerge only when standards are integrated into one GSN.")
     lines.append("")
 
     # Evaluation

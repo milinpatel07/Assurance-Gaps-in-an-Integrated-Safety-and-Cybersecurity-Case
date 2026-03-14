@@ -32,6 +32,9 @@ output/
 /results/
 *.log
 
+# Pytest
+.pytest_cache/
+
 # OS
 .DS_Store
 Thumbs.db

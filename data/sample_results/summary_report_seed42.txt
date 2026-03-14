@@ -3,7 +3,7 @@ ANALYSIS RESULTS SUMMARY
 Assurance Gaps in an Integrated Safety and Cybersecurity Case
 for an AI-Based Perception Component in Highly Automated Driving
 ================================================================================
-Generated: 2026-03-11 10:08:09
+Generated: 2026-03-14 11:20:03
 Random seed: 42
 
 ------------------------------------------------------------
@@ -77,6 +77,27 @@ Finding: No standard defines how to combine these four
 evidence types into a single sufficiency claim at G5.
 
 ------------------------------------------------------------
+GSN COMPLETENESS CHECK
+------------------------------------------------------------
+  Complete: True
+  Claims mapped: 40/40
+  Phases covered: Concept / Requirements, Design / Training, Integration / Deployment, Modification / Re-assurance, Operation / Monitoring, Verification & Validation
+  The 9-goal GSN is structurally complete. All 40 claims from 5 standards map to goal nodes. All 6 lifecycle phases are covered. G9 is intentionally undeveloped (Gap-2: no re-assurance workflow). The extension from 6 to 9 goals is justified: G7 (SOTIF), G8 (cybersecurity), and G9 (modification) are required to host claims that have no home in the base ISO/PAS 8800 Annex B pattern.
+
+------------------------------------------------------------
+COUNTERFACTUAL ANALYSIS
+------------------------------------------------------------
+Gap visibility from each standard's perspective:
+  ISO 26262      : Gap-1, Gap-2
+  ISO 21448      : Gap-1
+  ISO/SAE 21434  : (none)
+  ISO/PAS 8800   : Gap-2, Gap-6
+  Integrated     : Gap-1, Gap-2, Gap-3, Gap-4, Gap-5, Gap-6
+
+Key finding: Gap-3 and Gap-4 are invisible from any single standard.
+They emerge only when standards are integrated into one GSN.
+
+------------------------------------------------------------
 CARLA EVALUATION RESULTS
 ------------------------------------------------------------
   Weather conditions:        25
@@ -86,6 +107,7 @@ CARLA EVALUATION RESULTS
   Non-triggering recall:     0.7353
   Overall mean divergence:   0.5125
   Triggering divergence:     0.5552
+  Non-triggering divergence: 0.2885
   Total false negatives:     4606
 
 ================================================================================

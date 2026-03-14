@@ -124,7 +124,7 @@ class TestExport:
     def test_csv_export(self, registry, eval_result):
         with tempfile.TemporaryDirectory() as tmpdir:
             files = export_csv_tables(registry, eval_result, tmpdir)
-            assert len(files) == 5
+            assert len(files) == 6
             for f in files:
                 assert os.path.exists(f)
 
