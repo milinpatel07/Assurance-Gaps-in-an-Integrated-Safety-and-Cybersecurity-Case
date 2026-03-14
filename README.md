@@ -94,7 +94,7 @@ make gsn
 
 The `make results` command produces structured outputs in `output/`:
 - `analysis_results.json` — complete structured results
-- `csv/` — coverage matrix, inconsistencies, gaps, weather evaluation
+- `csv/` — coverage matrix, inconsistencies, gaps, counterfactual visibility, sensitivity analysis, weather evaluation
 - `latex/` — 8 LaTeX tables in booktabs format for direct `\input{}` inclusion
 - `figures/` — heatmaps, bar charts, and the GSN diagram (Graphviz)
 

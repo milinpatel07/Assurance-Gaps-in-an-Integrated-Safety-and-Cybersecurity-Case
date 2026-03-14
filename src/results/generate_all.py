@@ -32,6 +32,9 @@ from src.evaluation.carla_evaluator import generate_synthetic_evaluation
 from src.evaluation.weather_conditions import generate_weather_grid, compute_triggering_coverage
 from src.results.latex_tables import generate_all_tables
 from src.results.export import export_json, export_csv_tables, export_summary_report
+from src.analysis.completeness import check_gsn_completeness
+from src.analysis.counterfactual import CounterfactualAnalysis
+from src.analysis.sensitivity import run_sensitivity_analysis
 
 
 def run_step1(registry: StandardsRegistry) -> dict:
@@ -277,6 +280,23 @@ def main():
     print(f"  {convergence['num_evidence_types']} evidence types, "
           f"{convergence['num_analysis_paths']} analysis paths")
 
+    # ── Completeness check ─────────────────────────────────────────
+    print("[Analysis] GSN completeness check...")
+    completeness = check_gsn_completeness()
+    print(f"  Complete: {completeness.is_complete}, "
+          f"{completeness.mapped_claims}/{completeness.total_claims} claims mapped")
+
+    # ── Counterfactual analysis ────────────────────────────────────
+    print("[Analysis] Counterfactual analysis (per-standard perspective)...")
+    counterfactual = CounterfactualAnalysis()
+    gap_matrix = counterfactual.get_gap_visibility_matrix()
+    integration_only = sum(
+        1 for g in ["Gap-3", "Gap-4"]
+        if all(not gap_matrix[s].get(g, False) for s in gap_matrix if s != "Integrated")
+    )
+    print(f"  {len(counterfactual.perspectives)} standard perspectives, "
+          f"{integration_only} gaps visible only through integration")
+
     # ── CARLA evaluation ──────────────────────────────────────────────
     print(f"[Evaluation] Running synthetic CARLA evaluation "
           f"({args.scenes} scenes/weather)...")
@@ -287,6 +307,13 @@ def main():
     eval_summary = eval_result.compute_summary()
     print(f"  {eval_summary['total_weather_conditions']} conditions, "
           f"recall: {eval_summary['overall_mean_recall']:.4f}")
+
+    # ── Sensitivity analysis ──────────────────────────────────────────
+    print("[Analysis] Running sensitivity analysis (5 seeds)...")
+    sensitivity = run_sensitivity_analysis(scenes_per_weather=args.scenes)
+    sens_summary = sensitivity.summary()
+    print(f"  Recall gap: {sens_summary['recall_gap_mean']:.4f} "
+          f"+/- {sens_summary['recall_gap_std']:.4f} across {sens_summary['num_seeds']} seeds")
 
     # ── Export results ────────────────────────────────────────────────
     print()
@@ -307,6 +334,36 @@ def main():
                                   os.path.join(output_dir, "latex"))
     for name in tables:
         print(f"  LaTeX:   output/latex/{name}.tex")
+
+    # Sensitivity results
+    sens_path = os.path.join(output_dir, "csv", "sensitivity_analysis.csv")
+    os.makedirs(os.path.join(output_dir, "csv"), exist_ok=True)
+    import csv
+    with open(sens_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Seed", "Overall Recall", "Triggering Recall",
+                          "Non-Triggering Recall", "Triggering Divergence", "Recall Gap"])
+        for i, seed in enumerate(sensitivity.seeds):
+            writer.writerow([
+                seed,
+                f"{sensitivity.overall_recall[i]:.4f}",
+                f"{sensitivity.triggering_recall[i]:.4f}",
+                f"{sensitivity.non_triggering_recall[i]:.4f}",
+                f"{sensitivity.triggering_divergence[i]:.4f}",
+                f"{sensitivity.recall_gap[i]:.4f}",
+            ])
+        writer.writerow([])
+        writer.writerow(["Mean", f"{sens_summary['overall_recall_mean']:.4f}",
+                          f"{sens_summary['triggering_recall_mean']:.4f}",
+                          f"{sens_summary['non_triggering_recall_mean']:.4f}",
+                          f"{sens_summary['triggering_divergence_mean']:.4f}",
+                          f"{sens_summary['recall_gap_mean']:.4f}"])
+        writer.writerow(["Std", f"{sens_summary['overall_recall_std']:.4f}",
+                          f"{sens_summary['triggering_recall_std']:.4f}",
+                          f"{sens_summary['non_triggering_recall_std']:.4f}",
+                          f"{sens_summary['triggering_divergence_std']:.4f}",
+                          f"{sens_summary['recall_gap_std']:.4f}"])
+    print(f"  CSV:     {sens_path}")
 
     # Summary report
     report_path = export_summary_report(registry, eval_result, output_dir)
