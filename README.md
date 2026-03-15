@@ -34,7 +34,7 @@ The GSN argument structure is defined in machine-readable YAML files (`gsn/`) an
 │   ├── results/                # Output generation (JSON, CSV, LaTeX tables)
 │   └── visualization/          # Matplotlib figures
 │
-├── tests/                      # 95 tests
+├── tests/                      # 193 tests
 ├── notebooks/                  # Interactive Jupyter/Colab notebook
 ├── configs/                    # YAML configuration
 ├── data/sample_results/        # Reference outputs (seed=42)
@@ -104,7 +104,7 @@ The `make results` command produces structured outputs in `output/`:
 pytest tests/ -v
 ```
 
-95 tests cover standards instantiation, GSN construction, inconsistency and gap classification, the perception module, the evaluation pipeline, and result generation.
+193 tests cover standards instantiation, GSN construction, inconsistency and gap classification, the perception module, the evaluation pipeline, result generation, paper claim validation, completeness checking, counterfactual analysis, generalisability classification, base pattern sensitivity, practitioner guidance, and threshold sensitivity.
 
 ## Reproducibility
 
