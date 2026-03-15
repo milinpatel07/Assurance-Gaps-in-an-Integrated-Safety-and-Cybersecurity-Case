@@ -4,9 +4,9 @@ Supplementary material for:
 
 > **Assurance Gaps in an Integrated Safety and Cybersecurity Case for an AI-Based Perception Component in Highly Automated Driving**
 >
-> Milin Patel and Rolf Jung — Kempten University of Applied Sciences
+> Milin Patel — Kempten University of Applied Sciences
 >
-> SafeComp 2026 WAISE Workshop — LNCS (Springer)
+
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/notebooks/assurance_gaps_analysis.ipynb)
 
