@@ -1,0 +1,85 @@
+# Evidence Convergence at G5 (Figure 4)
+# Shows how a single failure event enters the integrated argument
+# through three analysis paths, each producing a different evidence type
+#
+# Rendered with gsn2x (https://github.com/jonasthewolf/gsn2x)
+# Usage: gsn2x gsn/evidence_convergence.gsn.yaml
+
+G5:
+  text: |
+    V&V evidence sufficient across
+    all assurance domains
+    — No standard defines how to combine
+    the four evidence types below
+  supportedBy: [S_26262, S_21448, S_21434, S_8800]
+
+S_26262:
+  text: |
+    Functional safety verification
+    via ISO 26262-6 Cl.9
+  supportedBy: [Sn_mcdc]
+  inContextOf: [C_hara]
+
+C_hara:
+  text: |
+    HARA assigns ASIL D
+    (ISO 26262-3 Cl.6)
+
+Sn_mcdc:
+  text: |
+    MC/DC structural coverage
+    of non-AI wrapper code
+    Scale: binary (pass/fail)
+
+S_21448:
+  text: |
+    SOTIF verification via
+    ISO 21448 Cl.9-11
+  supportedBy: [Sn_scenario]
+  inContextOf: [C_trigger]
+
+C_trigger:
+  text: |
+    Triggering condition:
+    heavy rain reduces LiDAR
+    point density
+
+Sn_scenario:
+  text: |
+    Scenario coverage + ensemble
+    uncertainty under 25 weather
+    combinations in CARLA
+    Scale: count + statistical
+
+S_21434:
+  text: |
+    Cybersecurity verification via
+    ISO/SAE 21434 Cl.10
+  supportedBy: [Sn_pentest]
+  inContextOf: [C_threat]
+
+C_threat:
+  text: |
+    Threat scenario:
+    LiDAR spoofing causes
+    false negative detection
+
+Sn_pentest:
+  text: |
+    Penetration testing results
+    against LiDAR spoofing and
+    point cloud perturbation
+    Scale: attack success rate
+
+S_8800:
+  text: |
+    AI-specific verification via
+    ISO/PAS 8800 Cl.8-9
+  supportedBy: [Sn_ensemble]
+
+Sn_ensemble:
+  text: |
+    Deep ensemble geometric
+    divergence metric (AUROC
+    for OOD detection)
+    Scale: statistical distribution

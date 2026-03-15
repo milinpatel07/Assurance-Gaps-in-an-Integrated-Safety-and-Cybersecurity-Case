@@ -1,0 +1,59 @@
+# SECOND detector + Deep Ensemble configuration for CARLA evaluation
+# Architecture: Yan et al., "SECOND: Sparsely Embedded Convolutional Detection," Sensors, 2018.
+
+detector:
+  architecture: "SECOND"
+  reference: "Yan et al., 2018"
+  task: "3D Object Detection from LiDAR point clouds"
+  classes:
+    - Car
+    - Pedestrian
+    - Cyclist
+
+  voxelization:
+    voxel_size: [0.16, 0.16, 4.0]  # meters (x, y, z)
+    point_cloud_range: [0, -39.68, -3, 69.12, 39.68, 1]  # [x_min, y_min, z_min, x_max, y_max, z_max]
+    max_points_per_voxel: 35
+    max_voxels: 20000
+
+  backbone:
+    type: "SpMiddle"
+    sparse_conv_layers: 4
+    feature_map_channels: [16, 32, 64, 64]
+
+  rpn:
+    type: "SECONDRPN"
+    anchor_sizes:
+      Car: [3.9, 1.6, 1.56]       # L, W, H in meters
+      Pedestrian: [0.8, 0.6, 1.73]
+      Cyclist: [1.76, 0.6, 1.73]
+    num_directions: 2
+
+  post_processing:
+    nms_threshold: 0.1
+    score_threshold: 0.3
+
+ensemble:
+  num_members: 5
+  training:
+    epochs_per_member: 80
+    batch_size: 4
+    learning_rate: 0.001
+    optimizer: "adam_onecycle"
+    initialization: "independent random"
+    note: >
+      Each ensemble member is trained from a different random initialization
+      on the same dataset. This provides diversity in the weight space for
+      meaningful uncertainty quantification via geometric divergence.
+
+  uncertainty_metric:
+    name: "Geometric Divergence"
+    description: >
+      For each detected object, the 5 ensemble members predict 5 bounding boxes.
+      Geometric divergence measures the spread of these 3D boxes using
+      1 - mean(pairwise IoU). High divergence indicates the ensemble disagrees
+      on the object's location/size, signalling potential out-of-distribution input.
+    threshold: 0.5
+    interpretation: >
+      Divergence > 0.5 indicates the ensemble members place bounding boxes
+      with less than 50% average overlap, suggesting the detection is unreliable.

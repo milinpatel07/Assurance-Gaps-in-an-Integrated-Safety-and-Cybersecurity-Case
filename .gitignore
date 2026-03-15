@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data and models
+*.pth
+*.pt
+*.onnx
+*.bin
+data/kitti/
+data/nuscenes/
+data/carla_output/
+
+# Output (generated results, not source code)
+output/
+/results/
+*.log
+
+# Pytest
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LaTeX auxiliary
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# gsn2x binary (download from https://github.com/jonasthewolf/gsn2x/releases)
+gsn/gsn2x
+gsn/gsn2x.exe
+
+# gsn2x generated outputs
+gsn/*.svg
+evidence.md

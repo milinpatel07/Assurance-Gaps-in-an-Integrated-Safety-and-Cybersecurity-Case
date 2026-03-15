@@ -1,0 +1,115 @@
+================================================================================
+ANALYSIS RESULTS SUMMARY
+Assurance Gaps in an Integrated Safety and Cybersecurity Case
+for an AI-Based Perception Component in Highly Automated Driving
+================================================================================
+Generated: 2026-03-14 11:20:03
+Random seed: 42
+
+------------------------------------------------------------
+STANDARDS FRAMEWORK
+------------------------------------------------------------
+Standards analysed:    5
+Total clauses:         52
+Total claims:          40
+
+------------------------------------------------------------
+INTEGRATED GSN
+------------------------------------------------------------
+  total_elements: 34
+  goals: 9
+  strategies: 1
+  contexts: 2
+  assumptions: 1
+  solutions: 21
+  junction_points: 6
+  undeveloped_goals: 1
+  retained_goals: 6
+  new_goals: 2
+  max_standards_per_goal: 4
+
+------------------------------------------------------------
+REQUIREMENT INCONSISTENCIES
+------------------------------------------------------------
+  Total: 7
+  Structural:      3
+  Terminological:  2
+  Methodological:  2
+
+  I-1: Incompatible risk classification frameworks
+  I-2: Evidence type asymmetry at V&V
+  I-3: AI error terminology differs across standards
+  I-4: 'Validation' defined differently across standards
+  I-5: Cybersecurity-SOTIF boundary undefined for adversarial inputs
+  I-6: Monitoring scope overlap — three regimes on one component
+  I-7: Data sufficiency threshold undefined
+
+------------------------------------------------------------
+ASSURANCE GAPS
+------------------------------------------------------------
+  Total: 6
+  Missing claim:               2
+  Missing evidence:            3
+  Unresolved inconsistency:    1
+  Integration-induced:         2
+
+  Gap-1: No AI-specific quantitative reliability target
+  Gap-2: No complete OTA re-assurance workflow for AI
+  Gap-3: Adversarial-SOTIF boundary unowned — adversarial inputs that exploit functional insufficiencies fall between G7 and G8 [INTEGRATION-INDUCED]
+  Gap-4: No cross-domain release decision criteria — four separate evidence sets with no combined evaluation [INTEGRATION-INDUCED]
+  Gap-5: No ASIL-to-AI-class mapping — cannot derive AI assurance depth from ASIL D assignment
+  Gap-6: Data acceptance threshold undefined — no standard prescribes when training data are sufficient
+
+------------------------------------------------------------
+EVIDENCE CONVERGENCE AT G5 (CENTRAL FINDING)
+------------------------------------------------------------
+Four evidence types converge at the V&V goal:
+  [1] Structural coverage (MC/DC) (ISO 26262)
+      Scale: Binary (pass/fail per condition)
+  [2] Scenario-based testing with triggering condition coverage (ISO 21448)
+      Scale: Count (scenarios tested / triggering conditions covered)
+  [3] AI-specific uncertainty quantification (ISO/PAS 8800)
+      Scale: Statistical distribution (e.g., AUROC for OOD detection)
+  [4] Adversarial penetration testing (ISO/SAE 21434)
+      Scale: Rate (attack success rate under threat model)
+
+Finding: No standard defines how to combine these four
+evidence types into a single sufficiency claim at G5.
+
+------------------------------------------------------------
+GSN COMPLETENESS CHECK
+------------------------------------------------------------
+  Complete: True
+  Claims mapped: 40/40
+  Phases covered: Concept / Requirements, Design / Training, Integration / Deployment, Modification / Re-assurance, Operation / Monitoring, Verification & Validation
+  The 9-goal GSN is structurally complete. All 40 claims from 5 standards map to goal nodes. All 6 lifecycle phases are covered. G9 is intentionally undeveloped (Gap-2: no re-assurance workflow). The extension from 6 to 9 goals is justified: G7 (SOTIF), G8 (cybersecurity), and G9 (modification) are required to host claims that have no home in the base ISO/PAS 8800 Annex B pattern.
+
+------------------------------------------------------------
+COUNTERFACTUAL ANALYSIS
+------------------------------------------------------------
+Gap visibility from each standard's perspective:
+  ISO 26262      : Gap-1, Gap-2
+  ISO 21448      : Gap-1
+  ISO/SAE 21434  : (none)
+  ISO/PAS 8800   : Gap-2, Gap-6
+  Integrated     : Gap-1, Gap-2, Gap-3, Gap-4, Gap-5, Gap-6
+
+Key finding: Gap-3 and Gap-4 are invisible from any single standard.
+They emerge only when standards are integrated into one GSN.
+
+------------------------------------------------------------
+CARLA EVALUATION RESULTS
+------------------------------------------------------------
+  Weather conditions:        25
+  Triggering conditions:     21
+  Overall mean recall:       0.5445
+  Triggering mean recall:    0.5082
+  Non-triggering recall:     0.7353
+  Overall mean divergence:   0.5125
+  Triggering divergence:     0.5552
+  Non-triggering divergence: 0.2885
+  Total false negatives:     4606
+
+================================================================================
+END OF REPORT
+================================================================================

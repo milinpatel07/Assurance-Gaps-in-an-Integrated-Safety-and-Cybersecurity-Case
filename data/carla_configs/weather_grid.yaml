@@ -1,0 +1,54 @@
+# CARLA weather evaluation configuration
+# Parametric weather grid for SOTIF triggering condition analysis
+# Per ISO 21448 Cl.7: triggering conditions degrade the intended function
+
+weather_grid:
+  description: >
+    5x5 parametric grid of rain intensity and fog visibility.
+    Each condition is evaluated with 50 independent scenes.
+    SOTIF triggering threshold: rain > 20 mm/h OR visibility < 200 m
+    (per ISO 21448 Cl.7 definition of performance-limiting conditions).
+
+  rain_intensity_levels_mm_h:
+    - 0      # No rain (clear)
+    - 10     # Light rain
+    - 25     # Moderate rain (SOTIF triggering threshold)
+    - 50     # Heavy rain
+    - 100    # Extreme rain
+
+  fog_visibility_levels_m:
+    - 500    # Clear visibility
+    - 200    # Light fog (SOTIF triggering threshold)
+    - 100    # Moderate fog
+    - 50     # Dense fog
+    - 10     # Very dense fog
+
+  total_conditions: 25
+  triggering_conditions: 21
+  non_triggering_conditions: 4
+
+  triggering_thresholds:
+    rain_mm_h: 20
+    visibility_m: 200
+
+  # Fixed parameters across all conditions
+  fixed_parameters:
+    sun_altitude_deg: 45.0
+    map: "Town03"
+    scenes_per_condition: 50
+    random_seed: 42
+
+  # Evaluation metrics
+  metrics:
+    primary:
+      - name: "Mean Recall"
+        description: "Fraction of ground-truth objects detected"
+      - name: "Mean Precision"
+        description: "Fraction of detections that are correct"
+      - name: "Geometric Divergence"
+        description: "Ensemble disagreement in 3D bounding box predictions"
+    secondary:
+      - name: "False Negatives"
+        description: "Total missed detections per condition"
+      - name: "AUROC"
+        description: "Area under ROC for OOD detection via divergence"
