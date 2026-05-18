@@ -156,7 +156,7 @@ def generate_figures(registry, gsn, eval_result, output_dir):
 
     dot_source = render_gsn_to_dot(gsn)
     dot_path = os.path.join(fig_dir, "integrated_gsn.dot")
-    with open(dot_path, "w") as f:
+    with open(dot_path, "w", encoding="utf-8") as f:
         f.write(dot_source)
     try:
         save_gsn_diagram(gsn, os.path.join(fig_dir, "integrated_gsn"), fmt="png")
@@ -339,7 +339,7 @@ def main():
     sens_path = os.path.join(output_dir, "csv", "sensitivity_analysis.csv")
     os.makedirs(os.path.join(output_dir, "csv"), exist_ok=True)
     import csv
-    with open(sens_path, "w", newline="") as f:
+    with open(sens_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Seed", "Overall Recall", "Triggering Recall",
                           "Non-Triggering Recall", "Triggering Divergence", "Recall Gap"])
