@@ -1,10 +1,10 @@
-# Assurance Gaps in an Integrated Safety and Cybersecurity Case
+# Integrating Cybersecurity into the AI Safety Assurance Argument: A GSN Pattern for AI-Based Perception Components in Highly Automated Driving
 
 Supplementary material for:
 
-> **Assurance Gaps in an Integrated Safety and Cybersecurity Case for an AI-Based Perception Component in Highly Automated Driving**
+> **Integrating Cybersecurity into the AI Safety Assurance Argument: A GSN Pattern for AI-Based Perception Components in Highly Automated Driving**
 >
-> Milin Patel — Kempten University of Applied Sciences
+> Milin Patel and Rolf Jung — Kempten University of Applied Sciences
 >
 
 
@@ -140,9 +140,10 @@ python -m src.results.generate_all --seed 42 --scenes 50 --output output
 ```bibtex
 @inproceedings{PatelJung2026,
   author    = {Patel, Milin and Jung, Rolf},
-  title     = {Assurance Gaps in an Integrated Safety and Cybersecurity Case
-               for an {AI}-Based Perception Component in Highly Automated Driving},
-  booktitle = {SafeComp 2026 Workshops (WAISE)},
+  title     = {Integrating Cybersecurity into the {AI} Safety Assurance Argument:
+               A {GSN} Pattern for {AI}-Based Perception Components in
+               Highly Automated Driving},
+  booktitle = {WAISE 2026 Workshop at SafeComp 2026},
   series    = {LNCS},
   publisher = {Springer},
   year      = {2026}
