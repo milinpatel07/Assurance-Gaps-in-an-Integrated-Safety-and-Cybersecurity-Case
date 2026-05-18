@@ -37,12 +37,33 @@ The GSN argument structure is defined in machine-readable YAML files (`gsn/`) an
 ├── tests/                      # 193 tests
 ├── notebooks/                  # Interactive Jupyter/Colab notebook
 ├── configs/                    # YAML configuration
-├── data/synthetic_illustrations/  # Reference outputs (seed=42)
+├── data/
+│   ├── empirical_results/      # Measured KITTI/nuScenes results (PointPillars ensemble)
+│   └── synthetic_illustrations/  # Deterministic seeded illustration outputs (seed=42)
 ├── docs/                       # LaTeX sections and reference figures
 ├── Makefile                    # Build targets
 ├── REPRODUCING.md              # Reproduction guide
 └── pyproject.toml
 ```
+
+## Three-layer repository structure
+
+The repository separates three kinds of artefact, which should not be conflated:
+
+1. **Methodology** — `src/`. The five-step constructive integration code: claim
+   extraction, lifecycle mapping, GSN construction, inconsistency analysis, and gap
+   classification, with the perception, evaluation, and results modules. This
+   implements the method described in the paper.
+
+2. **Synthetic illustrations** — `data/synthetic_illustrations/`. Reference outputs
+   of the analysis and the synthetic evaluation pipeline. The weather-evaluation
+   numbers are deterministic seeded output (seed = 42), not measurements. See
+   `data/synthetic_illustrations/README.md`.
+
+3. **Empirical evidence** — `data/empirical_results/`. Measured AUROC and MDR/MFAR
+   results from a trained PointPillars deep ensemble on KITTI and nuScenes,
+   supporting the G5 and G6 claims of the integrated pattern. See
+   `data/empirical_results/README.md` for full provenance.
 
 ## GSN Diagrams
 
