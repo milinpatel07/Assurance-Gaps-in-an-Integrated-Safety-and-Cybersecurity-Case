@@ -66,8 +66,7 @@ class TraceabilityMatrix:
             "Gap-2": ["G9"],   # No complete OTA re-assurance workflow
             "Gap-3": ["G7", "G8"],  # Adversarial-SOTIF boundary
             "Gap-4": ["G5"],   # No cross-domain release decision criteria
-            "Gap-5": ["G1", "G2"],  # No ASIL-to-AI-class mapping
-            "Gap-6": ["G3"],   # Data acceptance threshold undefined
+            "Gap-5": ["G3"],   # Data acceptance threshold undefined
         }
         for g in self.gap_classification.gaps:
             nodes = gap_goal_mapping.get(g.gap_id, [])

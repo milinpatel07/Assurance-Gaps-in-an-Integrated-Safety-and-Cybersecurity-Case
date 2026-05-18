@@ -280,7 +280,7 @@ def main():
     print("=" * 80)
     print("\nKey findings:")
     print("  - 7 requirement inconsistencies (3 structural, 2 terminological, 2 methodological)")
-    print("  - 6 assurance gaps (2 integration-induced)")
+    print("  - 5 assurance gaps (2 integration-induced)")
     print("  - Central finding: evidence type asymmetry at G5 (I-2)")
     print("  - G5 is the only node where ALL four standards contribute claims")
     print("\nOutput files in: output/")

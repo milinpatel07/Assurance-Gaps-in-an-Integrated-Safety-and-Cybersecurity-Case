@@ -275,7 +275,7 @@ def export_csv_tables(
     path = os.path.join(output_dir, "counterfactual_gap_visibility.csv")
     with open(path, "w", newline="") as f:
         writer = csv.writer(f)
-        all_gaps = ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5", "Gap-6"]
+        all_gaps = ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5"]
         writer.writerow(["Standard"] + all_gaps)
         for std_id, vis in gap_matrix.items():
             row = [std_id] + ["Yes" if vis.get(g, False) else "No" for g in all_gaps]

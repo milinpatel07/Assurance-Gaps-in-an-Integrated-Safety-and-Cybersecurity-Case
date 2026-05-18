@@ -67,7 +67,7 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "Prescribes data quality requirements but no operationalised "
-                "threshold for data sufficiency (Gap-6, I-7)."
+                "threshold for data sufficiency (Gap-5, I-7)."
             ),
         ),
         Clause(
