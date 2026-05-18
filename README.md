@@ -37,7 +37,7 @@ The GSN argument structure is defined in machine-readable YAML files (`gsn/`) an
 ├── tests/                      # 193 tests
 ├── notebooks/                  # Interactive Jupyter/Colab notebook
 ├── configs/                    # YAML configuration
-├── data/sample_results/        # Reference outputs (seed=42)
+├── data/synthetic_illustrations/  # Reference outputs (seed=42)
 ├── docs/                       # LaTeX sections and reference figures
 ├── Makefile                    # Build targets
 ├── REPRODUCING.md              # Reproduction guide
