@@ -20,7 +20,7 @@ from src.gsn.integrated_pattern import build_integrated_gsn
 from src.analysis.inconsistencies import InconsistencyCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.evaluation.weather_conditions import generate_weather_grid, compute_triggering_coverage
 
 
@@ -136,7 +136,7 @@ def run_carla_evaluation():
     print(f"  Triggering condition coverage: {trig_coverage}")
 
     # Run synthetic evaluation
-    result = generate_synthetic_evaluation(num_scenes_per_weather=10)
+    result = generate_synthetic_illustration(num_scenes_per_weather=10)
     summary = result.compute_summary()
 
     print(f"\n  Evaluation Summary:")

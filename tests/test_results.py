@@ -7,7 +7,7 @@ import tempfile
 import pytest
 
 from src.standards.registry import StandardsRegistry
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.results.latex_tables import (
     generate_table1_standards_overview,
     generate_table2_coverage_matrix,
@@ -29,7 +29,7 @@ def registry():
 
 @pytest.fixture
 def eval_result():
-    return generate_synthetic_evaluation(num_scenes_per_weather=5, seed=42)
+    return generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)
 
 
 class TestLatexTables:

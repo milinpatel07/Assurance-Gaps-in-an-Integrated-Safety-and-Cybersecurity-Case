@@ -10,7 +10,7 @@ from src.analysis.sensitivity import (
     run_sensitivity_analysis,
     run_threshold_sensitivity,
 )
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 
 
 class TestSensitivityRobustness:
@@ -87,8 +87,8 @@ class TestEvaluationDeterminism:
 
     def test_same_seed_same_results(self):
         """Two runs with same seed should produce identical results."""
-        r1 = generate_synthetic_evaluation(num_scenes_per_weather=5, seed=42)
-        r2 = generate_synthetic_evaluation(num_scenes_per_weather=5, seed=42)
+        r1 = generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)
+        r2 = generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)
         s1 = r1.compute_summary()
         s2 = r2.compute_summary()
         assert s1["overall_mean_recall"] == s2["overall_mean_recall"]
@@ -96,8 +96,8 @@ class TestEvaluationDeterminism:
 
     def test_different_seeds_different_results(self):
         """Two runs with different seeds should differ."""
-        r1 = generate_synthetic_evaluation(num_scenes_per_weather=5, seed=42)
-        r2 = generate_synthetic_evaluation(num_scenes_per_weather=5, seed=99)
+        r1 = generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)
+        r2 = generate_synthetic_illustration(num_scenes_per_weather=5, seed=99)
         s1 = r1.compute_summary()
         s2 = r2.compute_summary()
         assert s1["overall_mean_recall"] != s2["overall_mean_recall"]

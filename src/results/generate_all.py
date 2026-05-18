@@ -28,7 +28,7 @@ from src.gsn.integrated_pattern import build_integrated_gsn
 from src.analysis.inconsistencies import InconsistencyCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.evaluation.weather_conditions import generate_weather_grid, compute_triggering_coverage
 from src.results.latex_tables import generate_all_tables
 from src.results.export import export_json, export_csv_tables, export_summary_report
@@ -300,7 +300,7 @@ def main():
     # ── CARLA evaluation ──────────────────────────────────────────────
     print(f"[Evaluation] Running synthetic CARLA evaluation "
           f"({args.scenes} scenes/weather)...")
-    eval_result = generate_synthetic_evaluation(
+    eval_result = generate_synthetic_illustration(
         num_scenes_per_weather=args.scenes,
         seed=args.seed,
     )
