@@ -57,8 +57,8 @@ class TestGapClassification:
     def gaps(self):
         return GapClassification()
 
-    def test_six_gaps(self, gaps):
-        assert len(gaps.gaps) == 6
+    def test_five_gaps(self, gaps):
+        assert len(gaps.gaps) == 5
 
     def test_two_integration_induced(self, gaps):
         integration = gaps.get_integration_induced()
@@ -69,7 +69,7 @@ class TestGapClassification:
     def test_gap_types(self, gaps):
         stats = gaps.summary_statistics()
         assert stats["missing_claim"] == 2
-        assert stats["missing_evidence"] == 3
+        assert stats["missing_evidence"] == 2
         assert stats["unresolved_inconsistency"] == 1
 
     def test_gap2_modification_phase(self, gaps):

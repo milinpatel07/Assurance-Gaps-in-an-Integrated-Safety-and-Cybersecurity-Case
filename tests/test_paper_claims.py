@@ -236,9 +236,9 @@ class TestGapClaims:
     def gaps(self):
         return GapClassification()
 
-    def test_exactly_six_gaps(self, gaps):
-        """Section 5.2: 'Step 5 identifies six assurance gaps'."""
-        assert len(gaps.gaps) == 6
+    def test_exactly_five_gaps(self, gaps):
+        """Section 5.2: 'Step 5 identifies five assurance gaps'."""
+        assert len(gaps.gaps) == 5
 
     def test_exactly_two_integration_induced(self, gaps):
         """Section 5.2: 'Two of the six (Gap-3 and Gap-4) are
@@ -273,23 +273,17 @@ class TestGapClaims:
         assert gap4.lifecycle_phase == LifecyclePhase.INTEGRATION
         assert gap4.integration_induced
 
-    def test_gap5_no_asil_to_ai_mapping(self, gaps):
-        """Section 5.2: Gap-5 in concept phase."""
+    def test_gap5_data_threshold_undefined(self, gaps):
+        """Section 5.2: Gap-5 in design phase."""
         gap5 = gaps.get_by_id("Gap-5")
         assert gap5.gap_type == GapType.MISSING_EVIDENCE
-        assert gap5.lifecycle_phase == LifecyclePhase.CONCEPT
-
-    def test_gap6_data_threshold_undefined(self, gaps):
-        """Section 5.2: Gap-6 in design phase."""
-        gap6 = gaps.get_by_id("Gap-6")
-        assert gap6.gap_type == GapType.MISSING_EVIDENCE
-        assert gap6.lifecycle_phase == LifecyclePhase.DESIGN
+        assert gap5.lifecycle_phase == LifecyclePhase.DESIGN
 
     def test_gap_type_counts_match_table6(self, gaps):
-        """Table 6: MC=2, ME=3, UI=1."""
+        """Table 6: MC=2, ME=2, UI=1."""
         stats = gaps.summary_statistics()
         assert stats["missing_claim"] == 2
-        assert stats["missing_evidence"] == 3
+        assert stats["missing_evidence"] == 2
         assert stats["unresolved_inconsistency"] == 1
 
     def test_all_lifecycle_phases_have_at_least_one_gap(self, gaps):
@@ -404,7 +398,7 @@ class TestCounterfactualValidation:
                 )
 
     def test_integrated_view_sees_all_gaps(self, counterfactual):
-        """The integrated perspective should see all six gaps."""
+        """The integrated perspective should see all five gaps."""
         matrix = counterfactual.get_gap_visibility_matrix()
         integrated = matrix["Integrated"]
         assert all(integrated.values())
@@ -431,7 +425,7 @@ class TestGapSeverityScoring:
     def test_all_gaps_have_severity_scores(self, gaps):
         """Every gap should have a computed severity score."""
         scores = gaps.severity_scores()
-        assert len(scores) == 6
+        assert len(scores) == 5
 
     def test_integration_induced_have_higher_severity(self, gaps):
         """Gap-3 and Gap-4 (integration-induced) should have critical
@@ -496,10 +490,10 @@ class TestTableConsistency:
         assert ids == [f"I-{n}" for n in range(1, 8)]
 
     def test_table6_gap_ids_sequential(self):
-        """Gap-1 through Gap-6 should be present."""
+        """Gap-1 through Gap-5 should be present."""
         gaps = GapClassification()
         ids = [g.gap_id for g in gaps.gaps]
-        assert ids == [f"Gap-{n}" for n in range(1, 7)]
+        assert ids == [f"Gap-{n}" for n in range(1, 6)]
 
     def test_coverage_matrix_all_standards(self):
         """Table 2: all five standards should appear."""

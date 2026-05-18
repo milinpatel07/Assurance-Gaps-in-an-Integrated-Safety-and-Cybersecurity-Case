@@ -67,7 +67,7 @@ class TestLatexTables:
 
     def test_table6_has_all_gaps(self):
         latex = generate_table6_gaps()
-        for g in ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5", "Gap-6"]:
+        for g in ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5"]:
             assert g in latex
 
     def test_table6_marks_integration_induced(self):
@@ -118,7 +118,7 @@ class TestExport:
             with open(path) as f:
                 data = json.load(f)
             assert data["inconsistencies"]["summary"]["total"] == 7
-            assert data["gaps"]["summary"]["total"] == 6
+            assert data["gaps"]["summary"]["total"] == 5
             assert data["gsn_statistics"]["goals"] == 9
 
     def test_csv_export(self, registry, eval_result):
@@ -136,4 +136,4 @@ class TestExport:
                 content = f.read()
             assert "ANALYSIS RESULTS SUMMARY" in content
             assert "7" in content  # inconsistencies
-            assert "6" in content  # gaps
+            assert "5" in content  # gaps
