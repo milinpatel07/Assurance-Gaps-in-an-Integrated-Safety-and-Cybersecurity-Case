@@ -7,6 +7,8 @@ Supplementary material for:
 > Milin Patel and Rolf Jung — Kempten University of Applied Sciences
 >
 
+The paper itself is published separately and is not included in this repository.
+
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/notebooks/assurance_gaps_analysis.ipynb)
 
