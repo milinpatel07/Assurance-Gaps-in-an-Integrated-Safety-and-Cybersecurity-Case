@@ -230,7 +230,7 @@ def export_csv_tables(
 
     # Inconsistencies
     catalogue = DecisionPointCatalogue()
-    path = os.path.join(output_dir, "inconsistencies.csv")
+    path = os.path.join(output_dir, "decision_points.csv")
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
