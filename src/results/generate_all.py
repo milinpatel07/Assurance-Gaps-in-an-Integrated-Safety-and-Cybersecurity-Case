@@ -25,7 +25,7 @@ import numpy as np
 
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.evaluation.carla_evaluator import generate_synthetic_illustration
@@ -102,7 +102,7 @@ def run_step3() -> dict:
 
 def run_step4() -> dict:
     """Step 4: Junction-point analysis (inconsistencies)."""
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     return {
         "summary": catalogue.summary_statistics(),
         "items": [

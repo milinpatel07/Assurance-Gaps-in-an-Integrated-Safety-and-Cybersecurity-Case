@@ -18,7 +18,7 @@ from src.analysis.practitioner_guidance import (
 from src.analysis.completeness import check_gsn_completeness
 from src.analysis.counterfactual import CounterfactualAnalysis
 from src.analysis.gaps import GapClassification
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 
 
 class TestGeneralisability:

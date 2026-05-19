@@ -19,7 +19,7 @@ from src.standards.base import LifecyclePhase, InconsistencyType, GapType
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.gsn.model import Goal, GoalStatus
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.evaluation.carla_evaluator import FullEvaluationResult
@@ -47,7 +47,7 @@ def export_json(
 ) -> str:
     """Export complete analysis results as structured JSON."""
     gsn = build_integrated_gsn()
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     gaps = GapClassification()
     convergence = EvidenceConvergenceAnalysis()
 
@@ -229,7 +229,7 @@ def export_csv_tables(
     files.append(path)
 
     # Inconsistencies
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     path = os.path.join(output_dir, "inconsistencies.csv")
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -315,7 +315,7 @@ def export_summary_report(
 ) -> str:
     """Export a plain-text summary report."""
     gsn = build_integrated_gsn()
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     gaps = GapClassification()
     convergence = EvidenceConvergenceAnalysis()
     eval_summary = eval_result.compute_summary()

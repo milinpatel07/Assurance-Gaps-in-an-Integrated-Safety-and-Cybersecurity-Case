@@ -1,6 +1,6 @@
 """Analysis engine for inconsistencies, gaps, and traceability (Steps 4-5)."""
 
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.analysis.traceability import TraceabilityMatrix
@@ -12,7 +12,7 @@ from src.analysis.base_pattern_sensitivity import compare_base_patterns
 from src.analysis.practitioner_guidance import build_practitioner_guidance
 
 __all__ = [
-    "InconsistencyCatalogue",
+    "DecisionPointCatalogue",
     "GapClassification",
     "EvidenceConvergenceAnalysis",
     "TraceabilityMatrix",

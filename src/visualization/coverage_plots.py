@@ -372,10 +372,10 @@ def plot_inconsistency_distribution(
         print("matplotlib not available; skipping inconsistency plot")
         return
 
-    from src.analysis.inconsistencies import InconsistencyCatalogue
+    from src.analysis.decision_points import DecisionPointCatalogue
     from src.standards.base import InconsistencyType
 
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
 
     # Count per GSN node
     node_counts: dict[str, dict[str, int]] = {}

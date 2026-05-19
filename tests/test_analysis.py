@@ -3,17 +3,17 @@
 import pytest
 
 from src.standards.base import InconsistencyType, GapType, LifecyclePhase
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 
 
-class TestInconsistencyCatalogue:
+class TestDecisionPointCatalogue:
     """Test the requirement inconsistencies (Step 4)."""
 
     @pytest.fixture
     def catalogue(self):
-        return InconsistencyCatalogue()
+        return DecisionPointCatalogue()
 
     def test_seven_inconsistencies(self, catalogue):
         assert len(catalogue.inconsistencies) == 7

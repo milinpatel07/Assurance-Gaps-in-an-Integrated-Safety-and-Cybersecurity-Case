@@ -17,7 +17,7 @@ import json
 
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.evaluation.carla_evaluator import generate_synthetic_illustration
@@ -88,7 +88,7 @@ def run_step4_inconsistency_analysis():
     print("STEP 4: JUNCTION-POINT ANALYSIS (Inconsistencies)")
     print("=" * 80)
 
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     catalogue.print_catalogue()
 
     stats = catalogue.summary_statistics()

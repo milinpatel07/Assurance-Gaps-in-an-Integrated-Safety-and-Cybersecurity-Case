@@ -17,7 +17,7 @@ from typing import Optional
 
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 
 
@@ -45,7 +45,7 @@ class TraceabilityMatrix:
     def __init__(self):
         self.registry = StandardsRegistry()
         self.gsn = build_integrated_gsn()
-        self.catalogue = InconsistencyCatalogue()
+        self.catalogue = DecisionPointCatalogue()
         self.gap_classification = GapClassification()
         self.entries = self._build_entries()
 

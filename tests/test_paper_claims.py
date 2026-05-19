@@ -11,7 +11,7 @@ from src.gsn.integrated_pattern import build_integrated_gsn
 from src.gsn.model import Goal, Strategy, Context, Assumption, GoalStatus
 from src.standards.registry import StandardsRegistry
 from src.standards.base import InconsistencyType, GapType, LifecyclePhase
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.analysis.completeness import check_gsn_completeness
@@ -166,7 +166,7 @@ class TestInconsistencyClaims:
 
     @pytest.fixture
     def catalogue(self):
-        return InconsistencyCatalogue()
+        return DecisionPointCatalogue()
 
     def test_exactly_seven_inconsistencies(self, catalogue):
         """Section 5.1: 'Step 4 identifies seven requirement
@@ -485,7 +485,7 @@ class TestTableConsistency:
 
     def test_table5_inconsistency_ids_sequential(self):
         """I-1 through I-7 should be present."""
-        cat = InconsistencyCatalogue()
+        cat = DecisionPointCatalogue()
         ids = [i.inconsistency_id for i in cat.inconsistencies]
         assert ids == [f"I-{n}" for n in range(1, 8)]
 
