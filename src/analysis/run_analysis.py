@@ -17,10 +17,10 @@ import json
 
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.evaluation.weather_conditions import generate_weather_grid, compute_triggering_coverage
 
 
@@ -88,7 +88,7 @@ def run_step4_inconsistency_analysis():
     print("STEP 4: JUNCTION-POINT ANALYSIS (Inconsistencies)")
     print("=" * 80)
 
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     catalogue.print_catalogue()
 
     stats = catalogue.summary_statistics()
@@ -136,7 +136,7 @@ def run_carla_evaluation():
     print(f"  Triggering condition coverage: {trig_coverage}")
 
     # Run synthetic evaluation
-    result = generate_synthetic_evaluation(num_scenes_per_weather=10)
+    result = generate_synthetic_illustration(num_scenes_per_weather=10)
     summary = result.compute_summary()
 
     print(f"\n  Evaluation Summary:")
@@ -280,7 +280,7 @@ def main():
     print("=" * 80)
     print("\nKey findings:")
     print("  - 7 requirement inconsistencies (3 structural, 2 terminological, 2 methodological)")
-    print("  - 6 assurance gaps (2 integration-induced)")
+    print("  - 5 assurance gaps (2 integration-induced)")
     print("  - Central finding: evidence type asymmetry at G5 (I-2)")
     print("  - G5 is the only node where ALL four standards contribute claims")
     print("\nOutput files in: output/")

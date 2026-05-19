@@ -19,7 +19,7 @@ from src.standards.base import LifecyclePhase, InconsistencyType, GapType
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.gsn.model import Goal, GoalStatus
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.evaluation.carla_evaluator import FullEvaluationResult
@@ -47,7 +47,7 @@ def export_json(
 ) -> str:
     """Export complete analysis results as structured JSON."""
     gsn = build_integrated_gsn()
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     gaps = GapClassification()
     convergence = EvidenceConvergenceAnalysis()
 
@@ -179,7 +179,7 @@ def export_json(
 
     os.makedirs(output_dir, exist_ok=True)
     path = os.path.join(output_dir, "analysis_results.json")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, default=_json_default)
 
     return path
@@ -198,7 +198,7 @@ def export_csv_tables(
     matrix = registry.compute_coverage_matrix()
     phases = [p.display_name for p in LifecyclePhase]
     path = os.path.join(output_dir, "coverage_matrix.csv")
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Standard"] + phases)
         for std_id, phase_counts in matrix.items():
@@ -210,7 +210,7 @@ def export_csv_tables(
     density = registry.compute_goal_density()
     std_ids = list(registry.standards.keys())
     path = os.path.join(output_dir, "goal_density.csv")
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Goal"] + std_ids + ["Active"])
         for gid in ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9"]:
@@ -229,9 +229,9 @@ def export_csv_tables(
     files.append(path)
 
     # Inconsistencies
-    catalogue = InconsistencyCatalogue()
-    path = os.path.join(output_dir, "inconsistencies.csv")
-    with open(path, "w", newline="") as f:
+    catalogue = DecisionPointCatalogue()
+    path = os.path.join(output_dir, "decision_points.csv")
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
             "ID", "Type", "Description", "Standards",
@@ -252,7 +252,7 @@ def export_csv_tables(
     # Gaps
     gaps = GapClassification()
     path = os.path.join(output_dir, "gaps.csv")
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
             "ID", "Type", "Description", "Lifecycle Phase",
@@ -273,9 +273,9 @@ def export_csv_tables(
     counterfactual = CounterfactualAnalysis()
     gap_matrix = counterfactual.get_gap_visibility_matrix()
     path = os.path.join(output_dir, "counterfactual_gap_visibility.csv")
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        all_gaps = ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5", "Gap-6"]
+        all_gaps = ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5"]
         writer.writerow(["Standard"] + all_gaps)
         for std_id, vis in gap_matrix.items():
             row = [std_id] + ["Yes" if vis.get(g, False) else "No" for g in all_gaps]
@@ -284,7 +284,7 @@ def export_csv_tables(
 
     # Weather evaluation per condition
     path = os.path.join(output_dir, "weather_evaluation.csv")
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
             "Weather", "Rain (mm/h)", "Visibility (m)",
@@ -315,7 +315,7 @@ def export_summary_report(
 ) -> str:
     """Export a plain-text summary report."""
     gsn = build_integrated_gsn()
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     gaps = GapClassification()
     convergence = EvidenceConvergenceAnalysis()
     eval_summary = eval_result.compute_summary()
@@ -442,7 +442,7 @@ def export_summary_report(
 
     os.makedirs(output_dir, exist_ok=True)
     path = os.path.join(output_dir, "summary_report.txt")
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
     return path

@@ -36,7 +36,7 @@ def _latex_escape(text: str) -> str:
     return text
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.gsn.model import Goal, GoalStatus
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 
@@ -253,7 +253,7 @@ def generate_table4_goal_density() -> str:
 
 def generate_table5_inconsistencies() -> str:
     """Table 5: Requirement inconsistency catalogue."""
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
 
     type_map = {
         InconsistencyType.STRUCTURAL: "S",

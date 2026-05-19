@@ -1,7 +1,7 @@
 """GSN diagram renderer using Graphviz.
 
 Generates visual representations of the integrated GSN argument pattern
-(Figure 3 in the paper) using the Graphviz DOT language.
+(Figure 2 in the paper) using the Graphviz DOT language.
 """
 
 from __future__ import annotations

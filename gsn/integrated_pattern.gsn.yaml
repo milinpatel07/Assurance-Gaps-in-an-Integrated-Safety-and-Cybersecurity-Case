@@ -1,5 +1,5 @@
 # Integrated Safety and Cybersecurity GSN Pattern
-# Figure 3 in the paper: extends ISO/PAS 8800 Annex B from 6 to 9 goals
+# Figure 2 in the paper: extends ISO/PAS 8800 Annex B from 6 to 9 goals
 #
 # Rendered with gsn2x (https://github.com/jonasthewolf/gsn2x)
 # Usage: gsn2x gsn/integrated_pattern.gsn.yaml

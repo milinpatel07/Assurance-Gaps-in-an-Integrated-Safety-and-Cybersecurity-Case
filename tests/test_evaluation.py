@@ -11,7 +11,7 @@ from src.evaluation.weather_conditions import (
     VISIBILITY_LEVELS,
 )
 from src.evaluation.carla_evaluator import (
-    generate_synthetic_evaluation,
+    generate_synthetic_illustration,
     SceneEvaluation,
 )
 
@@ -58,11 +58,11 @@ class TestSyntheticEvaluation:
     """Test the synthetic CARLA evaluation."""
 
     def test_generates_results(self):
-        result = generate_synthetic_evaluation(num_scenes_per_weather=5, seed=42)
+        result = generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)
         assert len(result.weather_results) == 25  # 5x5 grid
 
     def test_summary_statistics(self):
-        result = generate_synthetic_evaluation(num_scenes_per_weather=5, seed=42)
+        result = generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)
         summary = result.compute_summary()
         assert summary["total_weather_conditions"] == 25
         assert 0 < summary["overall_mean_recall"] < 1
@@ -70,7 +70,7 @@ class TestSyntheticEvaluation:
 
     def test_triggering_worse_than_non_triggering(self):
         """Severe weather should degrade performance (by design)."""
-        result = generate_synthetic_evaluation(num_scenes_per_weather=20, seed=42)
+        result = generate_synthetic_illustration(num_scenes_per_weather=20, seed=42)
         summary = result.compute_summary()
         # Triggering conditions should have lower recall
         assert summary["triggering_mean_recall"] < summary["non_triggering_mean_recall"]
@@ -80,7 +80,7 @@ class TestSyntheticEvaluation:
         )
 
     def test_scene_metrics(self):
-        result = generate_synthetic_evaluation(num_scenes_per_weather=3, seed=42)
+        result = generate_synthetic_illustration(num_scenes_per_weather=3, seed=42)
         for wr in result.weather_results:
             for scene in wr.scene_results:
                 assert 0 <= scene.precision <= 1

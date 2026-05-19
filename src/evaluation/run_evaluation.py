@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 import os
 
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.evaluation.weather_conditions import (
     generate_weather_grid,
     compute_triggering_coverage,
@@ -60,7 +60,7 @@ def main():
 
     if args.mode == "synthetic":
         print("\nRunning synthetic evaluation (no CARLA required)...")
-        result = generate_synthetic_evaluation(
+        result = generate_synthetic_illustration(
             num_scenes_per_weather=args.scenes_per_weather,
             seed=args.seed,
         )
@@ -68,7 +68,7 @@ def main():
         print("\nCARLA mode requires a running CARLA server.")
         print("To start CARLA: ./CarlaUE4.sh -quality-level=Epic -world-port=2000")
         print("Falling back to synthetic evaluation.")
-        result = generate_synthetic_evaluation(
+        result = generate_synthetic_illustration(
             num_scenes_per_weather=args.scenes_per_weather,
             seed=args.seed,
         )

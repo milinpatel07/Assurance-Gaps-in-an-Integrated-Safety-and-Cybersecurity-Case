@@ -1,6 +1,6 @@
 # Reproducing the Results
 
-**"Assurance Gaps in an Integrated Safety and Cybersecurity Case for an AI-Based Perception Component in Highly Automated Driving"**
+**"Integrating Cybersecurity into the AI Safety Assurance Argument: A GSN Pattern for AI-Based Perception Components in Highly Automated Driving"**
 — Milin Patel, Rolf Jung — SafeComp 2026 WAISE Workshop
 
 ## Prerequisites
@@ -25,7 +25,7 @@ pip install -e ".[dev]"
 pytest tests/ -v --tb=short
 ```
 
-All 95 tests should pass.
+All 192 tests should pass.
 
 ## Step 3: Generate All Results
 
@@ -62,8 +62,8 @@ make gsn
 ```
 
 This produces:
-- `gsn/integrated_pattern.gsn.svg` — the 9-goal integrated pattern (Figure 3)
-- `gsn/evidence_convergence.gsn.svg` — evidence convergence at G5 (Figure 4)
+- `gsn/integrated_pattern.gsn.svg` — the 9-goal integrated pattern (Figure 2)
+- `gsn/evidence_convergence.gsn.svg` — evidence convergence at G5 (Figure 3)
 
 ## Determinism
 
@@ -96,8 +96,8 @@ For GSN figures, include the SVG or convert to PDF:
 ```bibtex
 @inproceedings{PatelJung2026,
   author    = {Patel, Milin and Jung, Rolf},
-  title     = {Assurance Gaps in an Integrated Safety and Cybersecurity Case
-               for an {AI}-Based Perception Component in Highly Automated Driving},
+  title     = {Integrating Cybersecurity into the {AI} Safety Assurance Argument:
+               A {GSN} Pattern for {AI}-Based Perception Components in Highly Automated Driving},
   booktitle = {SafeComp 2026 Workshops (WAISE)},
   series    = {LNCS},
   publisher = {Springer},

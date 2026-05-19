@@ -156,7 +156,7 @@ class CounterfactualAnalysis:
                 ],
                 visible_gaps=[
                     "Gap-2 (incomplete OTA re-assurance)",
-                    "Gap-6 (data acceptance threshold undefined)",
+                    "Gap-5 (data acceptance threshold undefined)",
                 ],
                 invisible_gaps=[
                     "Gap-3 (adversarial-SOTIF boundary — defers both to other standards)",
@@ -180,7 +180,7 @@ class CounterfactualAnalysis:
 
     def get_gap_visibility_matrix(self) -> dict[str, dict[str, bool]]:
         """Return which gaps are visible from each standard's perspective."""
-        all_gaps = ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5", "Gap-6"]
+        all_gaps = ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5"]
         matrix = {}
         for p in self.perspectives:
             visible_ids = set()

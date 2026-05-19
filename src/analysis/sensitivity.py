@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 
 
 @dataclass
@@ -78,7 +78,7 @@ def run_sensitivity_analysis(
     recall_gap = []
 
     for seed in seeds:
-        result = generate_synthetic_evaluation(
+        result = generate_synthetic_illustration(
             num_scenes_per_weather=scenes_per_weather,
             seed=seed,
         )
@@ -142,7 +142,7 @@ def run_threshold_sensitivity(
         visibility_thresholds = [100, 150, 200, 250, 300]
 
     # Run evaluation once (the data doesn't change; only the classification changes)
-    result = generate_synthetic_evaluation(
+    result = generate_synthetic_illustration(
         num_scenes_per_weather=scenes_per_weather,
         seed=seed,
     )

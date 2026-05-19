@@ -6,7 +6,7 @@ This module builds the integrated GSN by:
 3. Augmenting existing goals with claims from ISO 21448 and ISO/SAE 21434
 4. Adding new goals G7 (SOTIF residual risk), G8 (cybersecurity risk), G9 (modification)
 
-The output is the integrated GSN shown in Figure 3 and Table 3 of the paper.
+The output is the integrated GSN shown in Figure 2 and Table 3 of the paper.
 """
 
 from src.gsn.model import (

@@ -7,7 +7,7 @@ import tempfile
 import pytest
 
 from src.standards.registry import StandardsRegistry
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.results.latex_tables import (
     generate_table1_standards_overview,
     generate_table2_coverage_matrix,
@@ -29,7 +29,7 @@ def registry():
 
 @pytest.fixture
 def eval_result():
-    return generate_synthetic_evaluation(num_scenes_per_weather=5, seed=42)
+    return generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)
 
 
 class TestLatexTables:
@@ -67,7 +67,7 @@ class TestLatexTables:
 
     def test_table6_has_all_gaps(self):
         latex = generate_table6_gaps()
-        for g in ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5", "Gap-6"]:
+        for g in ["Gap-1", "Gap-2", "Gap-3", "Gap-4", "Gap-5"]:
             assert g in latex
 
     def test_table6_marks_integration_induced(self):
@@ -118,7 +118,7 @@ class TestExport:
             with open(path) as f:
                 data = json.load(f)
             assert data["inconsistencies"]["summary"]["total"] == 7
-            assert data["gaps"]["summary"]["total"] == 6
+            assert data["gaps"]["summary"]["total"] == 5
             assert data["gsn_statistics"]["goals"] == 9
 
     def test_csv_export(self, registry, eval_result):
@@ -136,4 +136,4 @@ class TestExport:
                 content = f.read()
             assert "ANALYSIS RESULTS SUMMARY" in content
             assert "7" in content  # inconsistencies
-            assert "6" in content  # gaps
+            assert "5" in content  # gaps

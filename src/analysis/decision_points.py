@@ -1,10 +1,11 @@
-"""Requirement inconsistency analysis (Step 4 of the methodology).
+"""Decision point analysis (Step 4 of the methodology).
 
 Implements junction-point analysis: examines each node in the integrated GSN
-where claims from two or more standards meet, identifying where standards
-impose different or incompatible requirements on the same AI component.
+where claims from two or more standards meet, identifying decision points
+where the standards defer to application context instead of prescribing a
+single requirement on the AI component.
 
-Three inconsistency types (Section 3.2, Step 4):
+Three decision point types (Section 3.2, Step 4):
 - Terminological: different terms for the same concept
 - Methodological: different methods for the same assurance objective
 - Structural: different risk classification or evidence frameworks
@@ -15,10 +16,10 @@ from __future__ import annotations
 from src.standards.base import Inconsistency, InconsistencyType
 
 
-class InconsistencyCatalogue:
-    """The seven requirement inconsistencies identified in the analysis.
+class DecisionPointCatalogue:
+    """The seven decision points identified in the analysis.
 
-    Each inconsistency corresponds to a row in Table 5 of the paper.
+    Each decision point corresponds to a row in Table 5 of the paper.
     """
 
     def __init__(self):
@@ -175,7 +176,7 @@ class InconsistencyCatalogue:
         return [i for i in self.inconsistencies if goal_id in i.gsn_nodes]
 
     def print_catalogue(self):
-        """Print the inconsistency catalogue (Table 5)."""
+        """Print the decision point catalogue (Table 5)."""
         print("=" * 80)
         print("REQUIREMENT INCONSISTENCIES (Step 4 Output — Table 5)")
         print("=" * 80)

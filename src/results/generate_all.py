@@ -25,10 +25,10 @@ import numpy as np
 
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
-from src.evaluation.carla_evaluator import generate_synthetic_evaluation
+from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.evaluation.weather_conditions import generate_weather_grid, compute_triggering_coverage
 from src.results.latex_tables import generate_all_tables
 from src.results.export import export_json, export_csv_tables, export_summary_report
@@ -102,7 +102,7 @@ def run_step3() -> dict:
 
 def run_step4() -> dict:
     """Step 4: Junction-point analysis (inconsistencies)."""
-    catalogue = InconsistencyCatalogue()
+    catalogue = DecisionPointCatalogue()
     return {
         "summary": catalogue.summary_statistics(),
         "items": [
@@ -156,7 +156,7 @@ def generate_figures(registry, gsn, eval_result, output_dir):
 
     dot_source = render_gsn_to_dot(gsn)
     dot_path = os.path.join(fig_dir, "integrated_gsn.dot")
-    with open(dot_path, "w") as f:
+    with open(dot_path, "w", encoding="utf-8") as f:
         f.write(dot_source)
     try:
         save_gsn_diagram(gsn, os.path.join(fig_dir, "integrated_gsn"), fmt="png")
@@ -300,7 +300,7 @@ def main():
     # ── CARLA evaluation ──────────────────────────────────────────────
     print(f"[Evaluation] Running synthetic CARLA evaluation "
           f"({args.scenes} scenes/weather)...")
-    eval_result = generate_synthetic_evaluation(
+    eval_result = generate_synthetic_illustration(
         num_scenes_per_weather=args.scenes,
         seed=args.seed,
     )
@@ -339,7 +339,7 @@ def main():
     sens_path = os.path.join(output_dir, "csv", "sensitivity_analysis.csv")
     os.makedirs(os.path.join(output_dir, "csv"), exist_ok=True)
     import csv
-    with open(sens_path, "w", newline="") as f:
+    with open(sens_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Seed", "Overall Recall", "Triggering Recall",
                           "Non-Triggering Recall", "Triggering Divergence", "Recall Gap"])

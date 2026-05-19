@@ -18,7 +18,7 @@ from src.analysis.practitioner_guidance import (
 from src.analysis.completeness import check_gsn_completeness
 from src.analysis.counterfactual import CounterfactualAnalysis
 from src.analysis.gaps import GapClassification
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 
 
 class TestGeneralisability:
@@ -29,14 +29,14 @@ class TestGeneralisability:
         return classify_finding_generalisability()
 
     def test_all_findings_classified(self, findings):
-        """All 13 findings (7 inconsistencies + 6 gaps) should be classified."""
-        assert len(findings) == 13
+        """All 12 findings (7 inconsistencies + 5 gaps) should be classified."""
+        assert len(findings) == 12
 
     def test_all_findings_are_universal(self, findings):
         """All findings should be classified as universal (arising from
         standards structure, not component choice)."""
         summary = get_generalisability_summary()
-        assert summary["universal"] == 13
+        assert summary["universal"] == 12
 
     def test_each_finding_has_would_apply_to(self, findings):
         """Each finding should list other components it would apply to."""
@@ -59,9 +59,9 @@ class TestGeneralisability:
             assert f"I-{i}" in ids
 
     def test_findings_cover_all_gaps(self, findings):
-        """Should cover Gap-1 through Gap-6."""
+        """Should cover Gap-1 through Gap-5."""
         ids = {f.finding_id for f in findings}
-        for i in range(1, 7):
+        for i in range(1, 6):
             assert f"Gap-{i}" in ids
 
 
@@ -109,11 +109,11 @@ class TestPractitionerGuidance:
     def guidance(self):
         return build_practitioner_guidance()
 
-    def test_guidance_for_all_six_gaps(self, guidance):
-        """Should have guidance for all six gaps."""
-        assert len(guidance) == 6
+    def test_guidance_for_all_five_gaps(self, guidance):
+        """Should have guidance for all five gaps."""
+        assert len(guidance) == 5
         ids = {g.gap_id for g in guidance}
-        assert ids == {f"Gap-{i}" for i in range(1, 7)}
+        assert ids == {f"Gap-{i}" for i in range(1, 6)}
 
     def test_each_gap_has_immediate_actions(self, guidance):
         """Each gap should have at least one immediate action."""
@@ -154,7 +154,7 @@ class TestPractitionerGuidance:
     def test_summary_statistics(self):
         """Summary should have reasonable counts."""
         summary = get_gap_resolution_summary()
-        assert summary["total_gaps"] == 6
+        assert summary["total_gaps"] == 5
         assert summary["total_immediate_actions"] >= 12
         assert summary["total_required_decisions"] >= 6
         assert summary["total_evidence_items"] >= 6

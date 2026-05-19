@@ -47,7 +47,7 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "Classifies AI by technology class but no mapping to ASIL "
-                "exists (Gap-5)."
+                "exists."
             ),
         ),
         Clause(

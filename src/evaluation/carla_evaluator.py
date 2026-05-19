@@ -1,15 +1,19 @@
 """CARLA evaluation pipeline for the deep ensemble under weather conditions.
 
-This module provides the evaluation framework for running the SECOND deep
-ensemble in CARLA under parametrically controlled weather conditions.
+This module defines the evaluation protocol and result structures for the
+deep ensemble under parametrically controlled weather conditions, together
+with a synthetic illustration routine.
 
-CARLA (Dosovitskiy et al., 2017) is used because its weather and sensor
-degradation parameters can be varied independently, allowing controlled
-coverage of the triggering conditions that ISO 21448 Clauses 9-11 require.
+CARLA (Dosovitskiy et al., 2017) provides weather and sensor degradation
+parameters that can be varied independently, allowing controlled coverage of
+the triggering conditions that ISO 21448 Clauses 9-11 require.
 
-Note: This module defines the evaluation protocol and result structures.
-Actual CARLA server connection requires a running CARLA instance and the
-carla Python package.
+The `generate_synthetic_illustration` function in this module produces
+illustration output, not measurements: it does not connect to CARLA and does
+not run a detector. It generates deterministic seeded values that demonstrate
+the pipeline format. Real empirical evaluation results are in
+`data/empirical_results/`. A live CARLA connection requires a running CARLA
+instance and the carla Python package.
 """
 
 from __future__ import annotations
@@ -184,18 +188,19 @@ class FullEvaluationResult:
         }
 
 
-def generate_synthetic_evaluation(
+def generate_synthetic_illustration(
     num_scenes_per_weather: int = 10,
     seed: int = 42,
 ) -> FullEvaluationResult:
-    """Generate synthetic evaluation results for demonstration.
+    """Generate a synthetic illustration of the evaluation output.
 
-    This produces realistic-looking results that demonstrate the
-    evaluation pipeline structure and the relationship between
-    weather severity, detection performance, and ensemble uncertainty.
+    This produces deterministic seeded values that demonstrate the evaluation
+    pipeline structure and the relationship between weather severity,
+    detection performance, and ensemble uncertainty. The output is an
+    illustration of the pipeline format, not a measurement: no detector is
+    run and CARLA is not contacted.
 
-    In a real implementation, this would be replaced by actual CARLA
-    evaluation with the trained deep ensemble.
+    Real empirical evaluation results are in `data/empirical_results/`.
     """
     rng = np.random.RandomState(seed)
     conditions = generate_weather_grid()

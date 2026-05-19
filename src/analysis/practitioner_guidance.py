@@ -165,29 +165,6 @@ def build_practitioner_guidance() -> list[GapResolutionGuidance]:
         ),
         GapResolutionGuidance(
             gap_id="Gap-5",
-            description="No ASIL-to-AI-class mapping",
-            immediate_actions=[
-                "Create a project-specific mapping table from ASIL levels to "
-                "AI technology classes (TR 5469 Table 1)",
-                "Use conservative defaults: ASIL D -> highest AI assurance class",
-                "Document the mapping rationale with reference to TR 5469 Cl.6.2",
-            ],
-            required_decisions=[
-                "Which AI technology class applies to the specific component?",
-                "Does ASIL decomposition (ISO 26262-9) affect the AI class?",
-            ],
-            evidence_to_produce=[
-                "ASIL-to-AI-class mapping table with rationale",
-                "AI technology classification report for the component",
-            ],
-            open_research_questions=[
-                "Should ISO/PAS 8800 define a normative ASIL-to-AI-class mapping?",
-                "Can ASIL decomposition be applied meaningfully to AI components?",
-            ],
-            estimated_effort="low",
-        ),
-        GapResolutionGuidance(
-            gap_id="Gap-6",
             description="Data acceptance threshold undefined",
             immediate_actions=[
                 "Define project-specific data acceptance criteria based on "

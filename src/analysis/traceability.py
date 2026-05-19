@@ -17,7 +17,7 @@ from typing import Optional
 
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.analysis.inconsistencies import InconsistencyCatalogue
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
 
 
@@ -45,7 +45,7 @@ class TraceabilityMatrix:
     def __init__(self):
         self.registry = StandardsRegistry()
         self.gsn = build_integrated_gsn()
-        self.catalogue = InconsistencyCatalogue()
+        self.catalogue = DecisionPointCatalogue()
         self.gap_classification = GapClassification()
         self.entries = self._build_entries()
 
@@ -66,8 +66,7 @@ class TraceabilityMatrix:
             "Gap-2": ["G9"],   # No complete OTA re-assurance workflow
             "Gap-3": ["G7", "G8"],  # Adversarial-SOTIF boundary
             "Gap-4": ["G5"],   # No cross-domain release decision criteria
-            "Gap-5": ["G1", "G2"],  # No ASIL-to-AI-class mapping
-            "Gap-6": ["G3"],   # Data acceptance threshold undefined
+            "Gap-5": ["G3"],   # Data acceptance threshold undefined
         }
         for g in self.gap_classification.gaps:
             nodes = gap_goal_mapping.get(g.gap_id, [])

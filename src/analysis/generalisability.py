@@ -175,15 +175,6 @@ def classify_finding_generalisability() -> list[FindingGeneralisability]:
         ),
         FindingGeneralisability(
             finding_id="Gap-5",
-            description="No ASIL-to-AI-class mapping",
-            scope="universal",
-            rationale=(
-                "The mapping problem exists for all AI components assigned an ASIL."
-            ),
-            would_apply_to=["All AI components with ASIL assignment"],
-        ),
-        FindingGeneralisability(
-            finding_id="Gap-6",
             description="Data acceptance threshold undefined",
             scope="universal",
             rationale=(

@@ -15,7 +15,7 @@ from src.standards.base import AssuranceGap, GapType, LifecyclePhase
 
 
 class GapClassification:
-    """The six assurance gaps identified in the analysis.
+    """The five assurance gaps identified in the analysis.
 
     Each gap corresponds to a row in Table 6 of the paper.
     Two gaps (Gap-3, Gap-4) are integration-induced.
@@ -82,20 +82,6 @@ class GapClassification:
             ),
             AssuranceGap(
                 gap_id="Gap-5",
-                description=(
-                    "No ASIL-to-AI-class mapping — cannot derive AI assurance "
-                    "depth from ASIL D assignment"
-                ),
-                gap_type=GapType.MISSING_EVIDENCE,
-                lifecycle_phase=LifecyclePhase.CONCEPT,
-                partial_coverage=[
-                    "ISO 26262-3 Cl.6 (ASIL assignment)",
-                    "ISO/IEC TR 5469 Cl.6.2, Table 1 (AI technology classes)",
-                ],
-                integration_induced=False,
-            ),
-            AssuranceGap(
-                gap_id="Gap-6",
                 description=(
                     "Data acceptance threshold undefined — no standard prescribes "
                     "when training data are sufficient"
@@ -219,20 +205,6 @@ class GapClassification:
             },
             "Gap-5": {
                 "gap_id": "Gap-5",
-                "description": "No ASIL-to-AI-class mapping",
-                "safety_impact": 3,
-                "exploitability": 2,
-                "detectability": 3,
-                "remediation_complexity": 3,
-                "rationale": (
-                    "Moderate safety impact (AI assurance depth unclear). "
-                    "Low exploitability (conservative defaults can be used). "
-                    "Moderate detectability (known gap in TR 5469). "
-                    "Moderate remediation (mapping table could be defined)."
-                ),
-            },
-            "Gap-6": {
-                "gap_id": "Gap-6",
                 "description": "Data acceptance threshold undefined",
                 "safety_impact": 3,
                 "exploitability": 3,
