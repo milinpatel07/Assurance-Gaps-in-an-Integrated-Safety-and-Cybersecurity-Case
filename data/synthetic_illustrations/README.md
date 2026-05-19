@@ -32,7 +32,7 @@ deep ensemble on KITTI and nuScenes, together with a provenance README.
 
 - `gaps.csv` - assurance gap classification; deterministic output of the analysis
   code.
-- `inconsistencies.csv` - requirement inconsistency catalogue; deterministic output
+- `decision_points.csv` - requirement inconsistency catalogue; deterministic output
   of the analysis code.
 - `summary_report_seed42.txt` - consolidated report. The standards, GSN, and gap
   sections are deterministic; the CARLA evaluation section is synthetic

@@ -16,7 +16,7 @@ The paper itself is published separately and is not included in this repository.
 
 ## Overview
 
-This repository contains the implementation of a five-step constructive integration methodology that combines assurance claims from ISO 26262, ISO 21448, ISO/SAE 21434, and ISO/PAS 8800 into a single GSN argument pattern for an AI-based LiDAR perception component. The integrated pattern extends ISO/PAS 8800 Annex B from 6 to 9 goals, identifies 7 decision points where the standards defer to application context, and classifies 6 assurance gaps — 2 of which are only visible through constructive integration.
+This repository contains the implementation of a five-step constructive integration methodology that combines assurance claims from ISO 26262, ISO 21448, ISO/SAE 21434, and ISO/PAS 8800 into a single GSN argument pattern for an AI-based LiDAR perception component. The integrated pattern extends ISO/PAS 8800 Annex B from 6 to 9 goals, identifies 7 decision points where the standards defer to application context, and classifies 5 assurance gaps — 2 of which are only visible through constructive integration.
 
 The GSN argument structure is defined in machine-readable YAML files (`gsn/`) and rendered to SVG using [gsn2x](https://github.com/jonasthewolf/gsn2x), an open-source tool that produces standard-compliant GSN diagrams.
 
@@ -36,7 +36,7 @@ The GSN argument structure is defined in machine-readable YAML files (`gsn/`) an
 │   ├── results/                # Output generation (JSON, CSV, LaTeX tables)
 │   └── visualization/          # Matplotlib figures
 │
-├── tests/                      # 193 tests
+├── tests/                      # 192 tests
 ├── notebooks/                  # Interactive Jupyter/Colab notebook
 ├── configs/                    # YAML configuration
 ├── data/
@@ -127,7 +127,7 @@ The `make results` command produces structured outputs in `output/`:
 pytest tests/ -v
 ```
 
-193 tests cover standards instantiation, GSN construction, inconsistency and gap classification, the perception module, the evaluation pipeline, result generation, paper claim validation, completeness checking, counterfactual analysis, generalisability classification, base pattern sensitivity, practitioner guidance, and threshold sensitivity.
+192 tests cover standards instantiation, GSN construction, inconsistency and gap classification, the perception module, the evaluation pipeline, result generation, paper claim validation, completeness checking, counterfactual analysis, generalisability classification, base pattern sensitivity, practitioner guidance, and threshold sensitivity.
 
 ## Reproducibility
 
