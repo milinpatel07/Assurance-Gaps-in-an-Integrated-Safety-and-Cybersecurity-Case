@@ -22,8 +22,8 @@ The GSN argument structure is defined in machine-readable YAML files (`gsn/`) an
 
 ```
 ├── gsn/                        # GSN argument patterns (YAML for gsn2x)
-│   ├── integrated_pattern.gsn.yaml   # Figure 3: 9-goal integrated pattern
-│   └── evidence_convergence.gsn.yaml # Figure 4: evidence convergence at G5
+│   ├── integrated_pattern.gsn.yaml   # Figure 2: 9-goal integrated pattern
+│   └── evidence_convergence.gsn.yaml # Figure 3: evidence convergence at G5
 │
 ├── src/
 │   ├── standards/              # Claim extraction and lifecycle mapping (Steps 1-2)

@@ -3,7 +3,7 @@
 Generates the plots and tables that support the paper's analysis:
 - Coverage matrix heatmap (Table 2)
 - Goal density table (Table 4)
-- Evidence convergence diagram (Figure 4)
+- Evidence convergence diagram (Figure 3)
 - Weather evaluation results
 """
 
@@ -131,7 +131,7 @@ def plot_goal_density(
 def plot_evidence_convergence(
     output_path: Optional[str] = None,
 ) -> None:
-    """Plot the evidence convergence diagram at G5 (Figure 4).
+    """Plot the evidence convergence diagram at G5 (Figure 3).
 
     Shows how a single failure event (missed pedestrian detection)
     enters the integrated argument through three analysis paths.
@@ -219,7 +219,7 @@ def plot_evidence_convergence(
             ha="center", va="center", fontsize=9, fontstyle="italic",
             color="#C62828")
 
-    ax.set_title("Evidence Convergence at G5 for a Single Failure Event (Figure 4)",
+    ax.set_title("Evidence Convergence at G5 for a Single Failure Event (Figure 3)",
                  fontsize=12, fontweight="bold", pad=20)
 
     plt.tight_layout()

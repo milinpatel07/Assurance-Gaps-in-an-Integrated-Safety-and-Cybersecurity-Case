@@ -316,11 +316,11 @@ class TestEvidenceConvergenceClaims:
         assert len(methods) == 4
 
     def test_failure_event_three_analysis_paths(self, analysis):
-        """Figure 4: single failure event enters through three paths."""
+        """Figure 3: single failure event enters through three paths."""
         assert len(analysis.failure_event.analysis_paths) == 3
 
     def test_all_paths_converge_at_g5(self, analysis):
-        """Figure 4: all paths lead to G5."""
+        """Figure 3: all paths lead to G5."""
         for path in analysis.failure_event.analysis_paths:
             assert path.gsn_node == "G5"
 

@@ -4,7 +4,7 @@ This module analyses the evidence type asymmetry identified as I-2:
 four fundamentally different evidence types converge at the V&V goal,
 and no standard defines how to combine them.
 
-Figure 4 in the paper illustrates this convergence for a single failure
+Figure 3 in the paper illustrates this convergence for a single failure
 event (missed pedestrian detection).
 """
 
@@ -113,7 +113,7 @@ class EvidenceConvergenceAnalysis:
         ]
 
     def _build_failure_event(self) -> FailureEvent:
-        """Build the example failure event from Figure 4."""
+        """Build the example failure event from Figure 3."""
         return FailureEvent(
             description=(
                 "LiDAR detector misses a pedestrian — a single physical event "
@@ -174,7 +174,7 @@ class EvidenceConvergenceAnalysis:
             print(f"      Scale:        {et.scale}")
             print(f"      Case study:   {et.case_study_instance[:80]}...")
 
-        print(f"\n--- Single Failure Event Analysis (Figure 4) ---")
+        print(f"\n--- Single Failure Event Analysis (Figure 3) ---")
         print(f"\n  Event: {self.failure_event.description}")
         for path in self.failure_event.analysis_paths:
             print(f"\n  Path via {path.standard}:")
