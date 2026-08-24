@@ -1,6 +1,8 @@
-# CLAUDE.md
+# Working Practices
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Rules for anyone working in this repository, including the authors. They cover
+what the repository is for, what may be written into it, and the checks that must
+pass before a change is considered done.
 
 ## What this repository is
 
@@ -12,7 +14,9 @@ machine-checkable and reproducible, and `paper/` holds the LaTeX sources themsel
 There are **two papers** (see `paper/`), both by Patel & Jung, Kempten University:
 
 - `paper/waise2026/` (LLNCS format) — the GSN integration pattern paper. The `src/` code
-  backs *this* paper: the 9-goal integrated pattern, 7 inconsistencies, 5 gaps.
+  backs *this* paper: the 9-goal integrated pattern, 7 decision points (DP-1 to
+  DP-7 in the paper, I-1 to I-7 in the code), 5 findings (F-1 to F-5 in the paper,
+  Gap-1 to Gap-5 in the code).
 - `paper/safecomp2026-position/` (IEEEtran) — a position paper on the operational
   concern-assignment gap (assigning a runtime anomaly to SOTIF / AI-safety / cybersecurity).
   It is argued at the clause level and is not backed by the `src/` analysis code.
@@ -23,7 +27,7 @@ A poster is also in scope on this branch (`restructure/two-papers-plus-poster`).
 
 ```bash
 pip install -e ".[dev]"          # install (make install)
-pytest tests/ -v --tb=short      # run all 192 tests (make test)
+pytest tests/ -v --tb=short      # run all 203 tests (make test)
 pytest tests/test_paper_claims.py -v                       # one file
 pytest tests/test_paper_claims.py::TestGapClaims -v        # one class
 pytest "tests/test_paper_claims.py::TestGapClaims::test_exactly_five_gaps" -v  # one test
@@ -89,10 +93,11 @@ by design. Run the test file after any such edit.
 - `data/synthetic_illustrations/` — deterministic seeded (seed=42) reference outputs of the
   analysis/evaluation pipeline. Illustrative, **not measurements**.
 - `data/empirical_results/` — real measured AUROC and MDR/MFAR from a trained **PointPillars**
-  deep ensemble on KITTI/nuScenes, supporting the G5/G6 claims. Note the paper text names
-  SECOND as the case-study architecture; the empirical evaluation substitutes PointPillars
-  (both OpenPCDet voxel single-stage detectors) — this substitution is stated in that README,
-  not the paper.
+  deep ensemble on KITTI/nuScenes. **Neither paper cites these files** and no paper claim
+  rests on them; they came from a separate runtime-monitoring project. The WAISE paper's
+  own G5 evidence type (c) is the simulated VEHITS 2026 result instead. The paper text names
+  SECOND as the case-study architecture; this data uses PointPillars (both OpenPCDet voxel
+  single-stage detectors) — the substitution is stated in that README, not the paper.
 - `gsn/*.gsn.yaml` — GSN argument in gsn2x YAML, the source of truth for the *rendered*
   figures (kept consistent with `build_integrated_gsn()` but separate from it).
 
@@ -153,10 +158,10 @@ Applies to every README, comment, docstring, and commit message.
   portrait at 380px in bright outdoor light. High contrast, no thin grey on white.
 - No decorative element that carries no information.
 
-## Tools
-- Prefer Serena symbol tools over reading whole files in src/ and tests/.
-- Use subagents for independent review passes and for parallel branches that do
-  not depend on each other. State what each subagent was asked.
+## Working method
+- Read symbols rather than whole files when working in src/ and tests/.
+- Run review passes independently of each other, and independently of the work
+  being reviewed. Record what each pass was asked to check.
 - Verify by running the tests and Makefile targets, never by reasoning about
   what the code would do.
 

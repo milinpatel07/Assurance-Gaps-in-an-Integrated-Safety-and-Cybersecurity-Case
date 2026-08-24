@@ -252,7 +252,7 @@ def generate_table4_goal_density() -> str:
 
 
 def generate_table5_inconsistencies() -> str:
-    """Table 5: Requirement inconsistency catalogue."""
+    """Table 5: decision-point catalogue (paper: DP-1 to DP-7)."""
     catalogue = DecisionPointCatalogue()
 
     type_map = {
@@ -264,10 +264,12 @@ def generate_table5_inconsistencies() -> str:
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Requirement inconsistencies identified at junction points"
-        r" in the integrated GSN. Types: S = structural,"
-        r" T = terminological, M = methodological.}",
-        r"\label{tab:inconsistencies}",
+        r"\caption{Decision points at junction points of the integrated GSN,"
+        r" generated from the analysis code. Types: S = structural,"
+        r" T = terminological, M = methodological. Identifiers I-1 to I-7"
+        r" are the code's names for the decision points the paper calls"
+        r" DP-1 to DP-7.}",
+        r"\label{tab:gen-decision-points}",
         r"\small",
         r"\begin{tabular}{@{}clclp{6.5cm}@{}}",
         r"\toprule",
@@ -292,7 +294,7 @@ def generate_table5_inconsistencies() -> str:
 
 
 def generate_table6_gaps() -> str:
-    """Table 6: Assurance gap classification."""
+    """Table 6: findings classification (paper: F-1 to F-5)."""
     gaps_cls = GapClassification()
 
     type_map = {
@@ -304,11 +306,15 @@ def generate_table6_gaps() -> str:
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Assurance gaps classified by type and lifecycle phase."
-        r" Types: MC = missing claim, ME = missing evidence,"
-        r" UI = unresolved inconsistency."
-        r" Gaps marked with $\dagger$ are integration-induced.}",
-        r"\label{tab:gaps}",
+        r"\caption{Findings classified by type and lifecycle phase,"
+        r" generated from the analysis code. Types: MC = missing claim,"
+        r" ME = missing evidence, UI = unresolved inconsistency."
+        r" Findings marked with $\dagger$ are integration-induced."
+        r" Identifiers Gap-1 to Gap-5 are the code's names for the findings"
+        r" the paper calls F-1 to F-5. The paper's own table groups these"
+        r" as integration-induced findings and open methodological problems"
+        r" rather than by the three types above.}",
+        r"\label{tab:gen-findings}",
         r"\small",
         r"\begin{tabular}{@{}clllp{5.5cm}@{}}",
         r"\toprule",

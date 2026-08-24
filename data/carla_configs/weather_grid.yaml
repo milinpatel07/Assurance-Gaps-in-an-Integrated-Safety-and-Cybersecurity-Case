@@ -1,13 +1,19 @@
 # CARLA weather evaluation configuration
-# Parametric weather grid for SOTIF triggering condition analysis
-# Per ISO 21448 Cl.7: triggering conditions degrade the intended function
+# Parametric weather grid for SOTIF triggering condition analysis.
+#
+# ISO 21448:2022 Cl.7 covers the identification of hazardous scenarios and
+# triggering conditions. It does not give numeric weather thresholds. The two
+# numbers below are choices made for this case study, not values taken from any
+# standard. They are documented here and used in
+# src/evaluation/weather_conditions.py; tests/test_config_documentation.py
+# checks that the two still agree.
 
 weather_grid:
   description: >
     5x5 parametric grid of rain intensity and fog visibility.
     Each condition is evaluated with 50 independent scenes.
-    SOTIF triggering threshold: rain > 20 mm/h OR visibility < 200 m
-    (per ISO 21448 Cl.7 definition of performance-limiting conditions).
+    Triggering threshold chosen for this case study:
+    rain > 20 mm/h OR visibility < 200 m.
 
   rain_intensity_levels_mm_h:
     - 0      # No rain (clear)

@@ -54,3 +54,10 @@ gsn/gsn2x.exe
 # gsn2x generated outputs
 gsn/*.svg
 evidence.md
+
+# Local tool session state (never committed)
+.claude/
+.headroom/
+
+# Local agent configuration (not part of the research record)
+CLAUDE.md
