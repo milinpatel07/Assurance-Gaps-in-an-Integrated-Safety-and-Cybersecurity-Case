@@ -10,7 +10,7 @@ claim: an ISO 26262 claim mapped to G2 made G2 appear to draw on all four
 standards under ``compute_goal_density()``, which would have contradicted the
 paper's claim that G5 is the only such node, while the goal's own
 ``source_standards`` still said three. The claim turned out to be a system-level
-obligation outside the AI component's scope. See ``REPO_AUDIT.md``.
+obligation outside the AI component's scope (commit ``f9a7902``).
 
 These tests exist so that drift fails the build rather than surviving to a
 reader. Where the two views differ for a reason, the reason is recorded here as

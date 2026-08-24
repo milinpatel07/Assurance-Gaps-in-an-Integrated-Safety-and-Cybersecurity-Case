@@ -17,7 +17,7 @@ from src.standards.base import AssuranceGap, GapType, LifecyclePhase
 # Where each finding sits in the argument. Single source: counterfactual.py and
 # traceability.py both read this rather than keeping their own copies, because a
 # fact written down twice with nothing holding the copies together is how G2 came
-# to contradict a published claim (REPO_AUDIT.md section 5b.2).
+# to contradict a published claim (see tests/test_representation_consistency.py).
 GAP_GOAL_MAP: dict[str, list[str]] = {
     "Gap-1": ["G1"],
     "Gap-2": ["G9"],

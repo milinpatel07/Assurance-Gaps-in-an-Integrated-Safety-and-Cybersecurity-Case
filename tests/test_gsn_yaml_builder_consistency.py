@@ -8,7 +8,7 @@ The nine-goal argument is written down twice:
      every claim in the test suite is checked against.
 
 Nothing kept the two in step. This is the same defect class as the drift that
-reached a published claim at G2 (see ``REPO_AUDIT.md`` and
+reached a published claim at G2 (see
 ``tests/test_representation_consistency.py``), in the one place still unchecked:
 the rendered diagram is visible to readers and, until this module, invisible to
 the suite.
