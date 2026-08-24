@@ -1,9 +1,18 @@
 # Empirical Results
 
-This directory holds empirical evaluation results for the deep-ensemble uncertainty
-signal used as verification and monitoring evidence in the integrated GSN argument
-pattern. These are real measurements from trained models, in contrast to the
-deterministic seeded outputs in `data/synthetic_illustrations/`.
+Provenance: measured. These are real measurements from trained models, in
+contrast to the deterministic seeded outputs in `data/synthetic_illustrations/`.
+
+Neither paper cites these files, and no claim in either paper rests on them. They
+were produced by a separate runtime-monitoring project (referred to below as paper
+P5, in preparation). They are kept here because they are the kind of evidence the
+argument's G5 and G6 goals call for, and because a reader who wants to know
+whether the ensemble uncertainty signal actually works on real data should be able
+to see the answer, including where it is weak.
+
+For the evidence the WAISE paper does cite at G5, see its evidence type (c): a
+simulated ensemble result reported in the VEHITS 2026 companion study, not the
+measurements here.
 
 ## 1. Provenance
 
@@ -55,8 +64,11 @@ relevant case of a missed object, is the hardest and sits just above random.
 
 ## 3. Mapping to the integrated GSN pattern
 
-`kitti_v2_evidence/` and `nuscenes_evidence/` support G5 (V&V sufficiency evidence,
-ISO/PAS 8800 Cl. 8-9). The headline AUROC values, each with a 95% confidence
+This section describes how these measurements would attach to the argument if a
+project used them. It is a mapping made here, not a claim either paper makes.
+
+`kitti_v2_evidence/` and `nuscenes_evidence/` correspond to G5 (V&V sufficiency
+evidence, ISO/PAS 8800 Cl. 8-9). The headline AUROC values, each with a 95% confidence
 interval, are the AI-specific verification metric: they quantify how well the
 ensemble uncertainty score discriminates error frames. They are reported per frame-
 label type because the metric is informative for `severe` frames and weak for `FN`
