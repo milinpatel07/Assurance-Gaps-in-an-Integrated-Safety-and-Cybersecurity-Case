@@ -117,6 +117,9 @@ def export_json(
                     "description": g.description,
                     "type": g.gap_type.value,
                     "lifecycle_phase": g.lifecycle_phase.value,
+                    # Every phase the paper lists, not only the primary one.
+                    "lifecycle_phases": [p.value for p in g.lifecycle_phases],
+                    "lifecycle_phase_label": g.lifecycle_phase_label,
                     "partial_coverage": g.partial_coverage,
                     "integration_induced": g.integration_induced,
                 }
@@ -154,6 +157,11 @@ def export_json(
             "is_complete": check_gsn_completeness().is_complete,
             "total_claims": check_gsn_completeness().total_claims,
             "mapped_claims": check_gsn_completeness().mapped_claims,
+            # Shipped so that mapped_claims and total_claims reconcile in the
+            # exported JSON. Without it a reader sees 39 of 40 with nothing
+            # accounting for the difference.
+            "out_of_scope_claims": check_gsn_completeness().out_of_scope_claims,
+            "unmapped_claims": check_gsn_completeness().unmapped_claims,
             "explanation": check_gsn_completeness().explanation,
         },
         "counterfactual": {
@@ -263,7 +271,7 @@ def export_csv_tables(
                 gap.gap_id,
                 gap.gap_type.value,
                 gap.description,
-                gap.lifecycle_phase.display_name,
+                gap.lifecycle_phase_label,
                 "Yes" if gap.integration_induced else "No",
                 "; ".join(gap.partial_coverage),
             ])

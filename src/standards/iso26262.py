@@ -53,15 +53,21 @@ def _build_clauses() -> list[Clause]:
         ),
         Clause(
             standard_id="ISO26262",
-            reference="Part 4, Cl.6",
-            title="Technical safety concept",
+            reference="Part 4, Cl.6.4.3",
+            title=(
+                "Technical safety concept (work product: Cl.6.5.2 technical "
+                "safety concept)"
+            ),
             lifecycle_phases=[LifecyclePhase.DESIGN],
             normative=True,
             ai_applicable=None,
             ai_applicability_note=(
                 "Limited applicability for trained AI models. The technical safety "
                 "concept assumes requirements can be decomposed to software units, "
-                "which is not directly applicable to neural network weights."
+                "which is not directly applicable to neural network weights. "
+                "Clause 6.4.6.1 allocates technical safety requirements to system, "
+                "hardware or software as the implementing technology, and that is "
+                "the decomposition assumption this note concerns."
             ),
         ),
         Clause(
@@ -182,17 +188,50 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
             lifecycle_phase=LifecyclePhase.CONCEPT,
             evidence_types=["Controllability justification"],
         ),
+        # Out of scope for the AI-component argument: gsn_goal is None.
+        #
+        # The obligation is real and ISO 26262 imposes it, so the claim is kept
+        # rather than deleted. It attaches to no goal in this pattern because the
+        # technical safety concept is a system-level artefact, produced above the
+        # AI component the pattern scopes to (ISO 26262-2 Cl.6.4.8, the
+        # encompassing system safety case; see ISO/PAS 8800 Cl.8.3.1 Notes 1
+        # and 2).
+        #
+        # Clause evidence: Cl.6.2 defines the technical safety concept as the
+        # technical safety requirements together with the system architectural
+        # design. Cl.6.4.6.1 allocates those requirements to system, hardware or
+        # software as the implementing technology. That allocation activity sits
+        # in the encompassing system safety case, not in the AI component's own
+        # argument. The clause's ai_applicability_note records why the
+        # decomposition assumption does not hold for network weights.
+        #
+        # It was previously mapped to G2. Neither G2 nor G4 declares ISO 26262 as
+        # a source, both matching the paper's Table 2, so the claim was out of
+        # scope rather than mis-placed. While it sat at G2 it made G2 appear to
+        # draw on all four standards under compute_goal_density(), which would
+        # have contradicted the paper's claim that G5 is the only such node.
+        # Recorded in REPO_AUDIT.md.
         Claim(
             claim_id="CLM-26262-TSC-01",
             text=(
                 "A technical safety concept shall be derived from the "
                 "functional safety concept."
             ),
-            source_clause=clause_map["Part 4, Cl.6"],
+            source_clause=clause_map["Part 4, Cl.6.4.3"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
-            gsn_goal="G2",
+            gsn_goal=None,
             lifecycle_phase=LifecyclePhase.DESIGN,
             evidence_types=["Technical safety concept document"],
+            out_of_scope_reason=(
+                "System-level obligation. Cl.6.2 defines the technical safety "
+                "concept as the technical safety requirements together with the "
+                "system architectural design, and Cl.6.4.6.1 allocates those "
+                "requirements to system, hardware or software as the implementing "
+                "technology. That activity belongs to the encompassing system "
+                "safety case (ISO 26262-2 Cl.6.4.8), above the AI component this "
+                "pattern is scoped to. Neither G2 nor G4 declares ISO 26262 as a "
+                "source, matching Table 2 of the WAISE paper."
+            ),
         ),
         Claim(
             claim_id="CLM-26262-INTG-01",

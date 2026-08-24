@@ -9,6 +9,7 @@
 #   make gsn          — Render GSN diagrams from YAML (requires gsn2x)
 #   make figures      — Generate figures only
 #   make latex        — Generate LaTeX tables only
+#   make traceability — Regenerate the traceability index
 #   make clean        — Remove generated output
 #   make all          — Install, test, and generate results
 #
@@ -23,7 +24,7 @@ SCENES   ?= 50
 OUTDIR   ?= output
 GSN2X    ?= gsn/gsn2x
 
-.PHONY: all install test results figures latex gsn gsn-install clean help
+.PHONY: all install test results figures latex gsn gsn-install traceability clean help
 
 all: install test results
 
@@ -33,9 +34,10 @@ help:
 	@echo "  test         — Run test suite (pytest)"
 	@echo "  results      — Generate all results (JSON, CSV, LaTeX, figures)"
 	@echo "  gsn          — Render GSN diagrams from YAML via gsn2x"
-	@echo "  gsn-install  — Download gsn2x binary for Linux"
+	@echo "  gsn-install  — Download the gsn2x binary for this platform"
 	@echo "  figures      — Generate visualization figures only"
 	@echo "  latex        — Generate LaTeX tables only"
+	@echo "  traceability — Regenerate TRACEABILITY.md"
 	@echo "  clean        — Remove generated output directory"
 	@echo "  all          — install + test + results"
 	@echo ""
@@ -49,6 +51,10 @@ install:
 
 test:
 	$(PYTHON) -m pytest tests/ -v --tb=short
+
+# Regenerate the traceability index. Use --check in CI to fail on a stale copy.
+traceability:
+	$(PYTHON) -m src.results.traceability_index
 
 results: $(OUTDIR)/analysis_results.json
 
@@ -79,11 +85,32 @@ $(OUTDIR)/latex/table1_standards.tex:
 # argument structure. gsn2x renders them to SVG following the
 # GSN Community Standard v3.
 
+# The release publishes one binary per platform: gsn2x-Linux, gsn2x-macOS and
+# gsn2x-Windows.exe. Earlier versions of this target fetched gsn2x-Linux on every
+# platform, which produced a file that could not run on Windows or macOS.
+GSN2X_VERSION ?= v4.2.3
+
+UNAME_S := $(shell uname -s)
+ifeq ($(OS),Windows_NT)
+    GSN2X_ASSET := gsn2x-Windows.exe
+    GSN2X_BIN   := $(GSN2X).exe
+else ifeq ($(UNAME_S),Darwin)
+    GSN2X_ASSET := gsn2x-macOS
+    GSN2X_BIN   := $(GSN2X)
+else
+    GSN2X_ASSET := gsn2x-Linux
+    GSN2X_BIN   := $(GSN2X)
+endif
+
 gsn-install:
-	@echo "Downloading gsn2x v4.2.3..."
-	curl -sL "https://github.com/jonasthewolf/gsn2x/releases/download/v4.2.3/gsn2x-Linux" \
-		-o $(GSN2X) && chmod +x $(GSN2X)
-	@echo "Installed: $$($(GSN2X) --version)"
+	@echo "Downloading gsn2x $(GSN2X_VERSION) asset $(GSN2X_ASSET)..."
+	curl -fsSL "https://github.com/jonasthewolf/gsn2x/releases/download/$(GSN2X_VERSION)/$(GSN2X_ASSET)" \
+		-o "$(GSN2X_BIN)"
+	@chmod +x "$(GSN2X_BIN)" 2>/dev/null || true
+	@echo "Installed: $$("$(GSN2X_BIN)" --version)"
+
+# If gsn2x is already on the PATH, skip the download and use it:
+#   make gsn GSN2X=gsn2x
 
 gsn: gsn/integrated_pattern.gsn.svg gsn/evidence_convergence.gsn.svg
 

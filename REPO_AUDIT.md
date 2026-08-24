@@ -279,6 +279,99 @@ No numeric claim in the position paper depends on `src/`. This is expected.
 
 ---
 
+## 5b. Two findings from the derivation work (added after this audit was written)
+
+Both are kept as evidence about how far these claims can be derived. Neither is a
+failed attempt to be deleted.
+
+### 5b.1 A derivation probe that disagreed with the published claim
+
+An attempt to derive, rather than assert, which findings are invisible from a
+single standard produced **{Gap-2, Gap-3}** against the published **{Gap-3,
+Gap-4}**. The divergence traced to the probe's rule, not to the paper.
+
+The rule was: an assessor applying standard S sees only goals that S sources, so
+a gap is visible to S only if S sources every goal the gap occupies. It failed in
+two distinct ways.
+
+- **Gap-4 came out visible from all four.** G5 is sourced by all four standards,
+  so under that rule every standard "sees" G5. But F-4 is about no standard
+  requiring that per-domain assessments be *combined*. A single-standard assessor
+  at G5 holds one evidence strand and cannot pose a combining question at all.
+  The rule tested presence at a node where the claim concerns plurality at a node.
+- **Gap-2 came out invisible from all.** G9 carries no `source_standards`, because
+  it is the undeveloped goal. That empty list means "no standard fully covers
+  this", not "no assessor could notice it". ISO 26262 and ISO/PAS 8800 each hold a
+  claim at G9, and ISO/PAS 8800 Cl.14.8.3 by itself shows re-approval is partial.
+
+What survived is narrower and now implemented in `counterfactual.py`: Gap-3 is
+derived outright, Gap-4 is derived from a plurality premise stated as a premise,
+and Gap-1, Gap-2 and Gap-5 are documented as asserted. The reason the other three
+cannot be derived is that no machine-readable field records whether a single
+standard's own text exhibits a deficiency alone, and adding one would relocate the
+assertion rather than remove it.
+
+### 5b.2 Two views of the argument had drifted, and the drift reached a published claim
+
+The repository writes down "which standards contribute to which goal" twice: as
+`source_standards` on each goal in `build_integrated_gsn()`, and as `gsn_goal` on
+each `Claim`. Nothing held them together, and they disagreed at three goals.
+
+The consequence was not cosmetic. `CLM-26262-TSC-01` ("A technical safety concept
+shall be derived from the functional safety concept") carried `gsn_goal="G2"`,
+which made **G2 report all four standards under `compute_goal_density()`**. The
+paper's central structural claim is that G5 is the only such node. The claim
+survived only because `test_g5_only_node_all_four_standards` reads
+`source_standards`, where G2 stood at three. One clause assignment decided a
+published claim, which is exactly the objection recorded in
+`passes/04_adversarial_critic.md`.
+
+**Resolution: the claim was out of scope, not mis-placed.** The clause evidence,
+read by the authors from ISO 26262-4:
+
+- Cl.6.2 defines the technical safety concept as the technical safety
+  requirements together with the system architectural design.
+- Cl.6.4.3.1 bases it on the item definition, the functional safety concept and
+  the prior system architectural design.
+- Cl.6.4.6.1 allocates technical safety requirements to system, hardware or
+  software as the implementing technology.
+- Cl.6.5 lists work products spanning specification (6.5.1), the technical safety
+  concept (6.5.2) and architectural design (6.5.3), so Clause 6 is not a
+  specification-only clause.
+- Cl.6.3.1 makes the functional safety concept a prerequisite input produced
+  under ISO 26262-3.
+
+That activity belongs to the encompassing system safety case (ISO 26262-2
+Cl.6.4.8), above the AI component this pattern is scoped to. Neither G2 nor G4
+declares ISO 26262 as a source, both matching the paper's Table 2, and the
+clause's own `ai_applicability_note` records that decomposition to software units
+does not hold for network weights.
+
+An intermediate move of the claim from G2 to G4 was tried and reverted: it
+relocated the all-four count to G4 rather than removing it.
+
+**What changed.** The claim is kept in `iso26262.py` with `gsn_goal=None` and a
+new `out_of_scope_reason` field carrying the clause evidence, so the obligation
+stays visible while staying out of the argument. Its clause reference was
+narrowed from "Part 4, Cl.6" to "Part 4, Cl.6.4.3", recording Cl.6.5.2 as the
+work product. The claim text was not touched. `check_gsn_completeness()` now
+separates deliberate exclusions from unmapped claims, so the paper's "all
+extracted claims map to GSN nodes" invariant keeps its real meaning rather than
+being weakened to pass.
+
+**Result.** G5 is now the only all-four node under *both* views. The two views
+agree at seven of nine goals; G8 and G9 differ for reasons now recorded as
+explicit exceptions (G8 lists ISO 26262 for the RQ-15-06 bridge, carried by an
+ISO/SAE 21434 claim; G9 is undeveloped yet holds the partial-coverage claims for
+F-2).
+
+**Prevention.** `tests/test_representation_consistency.py` (13 tests) holds the
+two views to each other, requires every exception to state a reason, requires an
+exception to be deleted once it no longer applies, checks claim phase against
+goal for the five single-phase goals, and asserts G5's uniqueness under both
+views. Re-introducing the original assignment in memory makes both checks fail,
+so they are not vacuous.
+
 ## 6. Lockstep integrity (src ↔ test ↔ paper)
 
 **The numbers are in lockstep; the labels are not.**
@@ -347,9 +440,18 @@ No case was found where the three disagree on a *value*. All drift is nominal
    (`numpy>=1.24`, `torch>=2.0`, `matplotlib>=3.7`, `pandas>=2.0`, …). "Byte-identical
    output for the same seed" (REPRODUCING.md, docs/working-practices.md) is not guaranteed across
    dependency upgrades; float formatting and RNG streams can move. No lockfile.
-3. **Platform assumption in `make gsn-install`.** It downloads the **Linux** gsn2x
-   binary to `gsn/gsn2x`. On the stated Windows host it will not run; README and
-   docs/working-practices.md note manual install but the Makefile target itself is Linux-only.
+3. **Platform assumption in `make gsn-install`. Gate 3 violation, now closed.**
+   The target downloaded the **Linux** gsn2x binary unconditionally, on every
+   platform, producing a file that cannot run on the stated Windows host. The
+   README and `docs/working-practices.md` told the reader to install manually, but
+   the target itself stayed Linux-only, so "one command from a clone" was false off
+   Linux. It now detects the platform and selects `gsn2x-Windows.exe`,
+   `gsn2x-macOS`, or `gsn2x-Linux`. Those three asset names were read from the
+   v4.2.3 release listing rather than guessed. Two caveats recorded rather than
+   glossed: `make` is not installed on the development host, so the edited target
+   has not been executed, and what would settle that is running it on each platform
+   or in CI; and the gsn2x actually installed here is 4.3.1 while the target pins
+   4.2.3, so the pinned version is not the one these diagrams were rendered with.
 4. **`torch>=2.0` required to install the dev/test set.** The perception tests import
    torch though no paper number depends on that code (§2.4). A reviewer reproducing
    only the paper claims still pays the torch install cost.

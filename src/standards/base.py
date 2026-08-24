@@ -113,8 +113,17 @@ class Claim:
         source_clause: The clause from which this claim is derived.
         claim_type: Classification of the claim.
         gsn_goal: The GSN goal node this claim maps to (e.g., 'G5').
+            None means the claim attaches to no node in this pattern. That is a
+            defect unless out_of_scope_reason says why.
         lifecycle_phase: Primary lifecycle phase of this claim.
         evidence_types: Types of evidence required to support this claim.
+        out_of_scope_reason: Why a claim with no gsn_goal is deliberately outside
+            the AI-component argument rather than missing from it. The pattern is
+            scoped to the AI component inside the encompassing system safety case
+            (ISO 26262-2 Cl.6.4.8), so some obligations a standard imposes belong
+            above that boundary. Recording the reason keeps the obligation visible
+            while keeping it out of the argument, and lets the completeness check
+            tell a deliberate exclusion apart from an unmapped claim.
     """
 
     claim_id: str
@@ -124,6 +133,12 @@ class Claim:
     gsn_goal: Optional[str] = None
     lifecycle_phase: Optional[LifecyclePhase] = None
     evidence_types: list[str] = field(default_factory=list)
+    out_of_scope_reason: str = ""
+
+    @property
+    def is_out_of_scope(self) -> bool:
+        """True when the claim is deliberately outside the argument's scope."""
+        return self.gsn_goal is None and bool(self.out_of_scope_reason)
 
     @property
     def standard_id(self) -> str:
@@ -161,7 +176,13 @@ class AssuranceGap:
         gap_id: Identifier (e.g., 'Gap-1').
         description: Description of the gap.
         gap_type: Classification (missing claim, missing evidence, unresolved inconsistency).
-        lifecycle_phase: The lifecycle phase where the gap occurs.
+        lifecycle_phase: The primary lifecycle phase where the gap occurs.
+        additional_lifecycle_phases: Further phases the camera-ready table lists
+            for this finding. The paper's findings table (tab:gaps) gives two
+            phases for F-1 ("Concept,
+            Verification") and for F-3 ("Verification, Operation"). The primary
+            field is kept so existing callers keep working; use
+            ``lifecycle_phases`` to get the full set the paper states.
         partial_coverage: Standards that provide partial coverage.
         integration_induced: Whether this gap only appears in the integrated argument.
     """
@@ -172,6 +193,19 @@ class AssuranceGap:
     lifecycle_phase: LifecyclePhase
     partial_coverage: list[str]
     integration_induced: bool = False
+    additional_lifecycle_phases: list[LifecyclePhase] = field(default_factory=list)
+
+    @property
+    def lifecycle_phases(self) -> list[LifecyclePhase]:
+        """Every phase the paper lists for this finding, primary first."""
+        return [self.lifecycle_phase, *self.additional_lifecycle_phases]
+
+    @property
+    def lifecycle_phase_label(self) -> str:
+        """Phases as the paper's findings table writes them, e.g. 'Concept, Verification'."""
+        order = list(LifecyclePhase)
+        phases = sorted(set(self.lifecycle_phases), key=order.index)
+        return ", ".join(p.display_name.split(" /")[0].split(" &")[0] for p in phases)
 
 
 @dataclass

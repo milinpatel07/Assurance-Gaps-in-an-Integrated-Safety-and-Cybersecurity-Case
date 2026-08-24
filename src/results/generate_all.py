@@ -128,7 +128,7 @@ def run_step5() -> dict:
                 "id": g.gap_id,
                 "type": g.gap_type.value,
                 "description": g.description,
-                "phase": g.lifecycle_phase.display_name,
+                "phase": g.lifecycle_phase_label,
                 "integration_induced": g.integration_induced,
             }
             for g in gaps.gaps

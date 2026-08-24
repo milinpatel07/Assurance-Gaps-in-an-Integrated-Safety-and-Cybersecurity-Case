@@ -19,7 +19,8 @@ from src.standards.base import Inconsistency, InconsistencyType
 class DecisionPointCatalogue:
     """The seven decision points identified in the analysis.
 
-    Each decision point corresponds to a row in Table 5 of the paper.
+    Each decision point corresponds to a row in the paper's decision-point
+    table (tab:inconsistencies).
     """
 
     def __init__(self):
@@ -47,6 +48,22 @@ class DecisionPointCatalogue:
                     "to reconcile these into a single sufficiency judgement at G1."
                 ),
             ),
+            # Type follows the paper's prose, which calls DP-2 structural in three
+            # places: the list of structural decision points "(DP-1, DP-2, DP-5)",
+            # the subsection heading "DP-2: Evidence type asymmetry at V&V
+            # (structural decision point)", and the discussion, "the evidence
+            # asymmetry at G5 (DP-2) is a structural property of the applicable
+            # standards".
+            #
+            # The paper's decision-point table (tab:inconsistencies) tags DP-2
+            # "S, M" instead. That is a known inconsistency inside the
+            # camera-ready, not a defect in this repository, and the authors
+            # resolved it in favour of the prose.
+            #
+            # The prose is not merely more numerous, it is load-bearing: the same
+            # sentence partitions the seven decision points as two terminological,
+            # two methodological and three structural. Counting DP-2 twice breaks
+            # that sentence, not only summary_statistics().
             Inconsistency(
                 inconsistency_id="I-2",
                 description="Evidence type asymmetry at V&V",

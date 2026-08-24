@@ -23,6 +23,7 @@ class CompletenessCheckResult:
     total_claims: int
     mapped_claims: int
     unmapped_claims: list[str]
+    out_of_scope_claims: list[str]
     phases_covered: list[str]
     phases_uncovered: list[str]
     goals_with_claims: dict[str, int]
@@ -35,7 +36,8 @@ def check_gsn_completeness() -> CompletenessCheckResult:
     """Check that the 9-goal GSN extension is structurally complete.
 
     Verifies:
-    1. Every claim from every standard maps to at least one GSN goal
+    1. Every claim from every standard maps to a GSN element, unless it is
+       recorded as out of scope for the AI-component argument
     2. Every lifecycle phase is addressed by at least one goal
     3. No goal is without supporting claims (except G9 which is undeveloped)
     """
@@ -49,11 +51,17 @@ def check_gsn_completeness() -> CompletenessCheckResult:
     goals_with_claims: dict[str, int] = {g: 0 for g in goal_ids}
     unmapped = []
 
+    out_of_scope = []
+
     for claim in all_claims:
         if claim.gsn_goal in all_element_ids:
             if claim.gsn_goal in goal_ids:
                 goals_with_claims[claim.gsn_goal] += 1
             # Claims mapping to strategies (e.g., S1) are valid
+        elif claim.is_out_of_scope:
+            # Deliberately outside the AI-component argument, with a recorded
+            # reason. Not a mapping defect. See Claim.out_of_scope_reason.
+            out_of_scope.append(f"{claim.claim_id}: {claim.out_of_scope_reason}")
         else:
             unmapped.append(f"{claim.claim_id} -> {claim.gsn_goal}")
 
@@ -76,8 +84,11 @@ def check_gsn_completeness() -> CompletenessCheckResult:
 
     if is_complete:
         explanation = (
-            f"The 9-goal GSN is structurally complete. All {len(all_claims)} claims "
-            f"from {len(registry.all_standards)} standards map to goal nodes. "
+            f"The 9-goal GSN is structurally complete. "
+            f"{len(all_claims) - len(unmapped) - len(out_of_scope)} of "
+            f"{len(all_claims)} claims from {len(registry.all_standards)} standards "
+            f"map to GSN nodes; {len(out_of_scope)} recorded as outside the "
+            f"AI-component scope; none unmapped. "
             f"All {len(all_phases)} lifecycle phases are covered. "
             f"G9 is intentionally undeveloped (Gap-2: no re-assurance workflow). "
             f"The extension from 6 to 9 goals is justified: G7 (SOTIF), G8 (cybersecurity), "
@@ -94,8 +105,9 @@ def check_gsn_completeness() -> CompletenessCheckResult:
 
     return CompletenessCheckResult(
         total_claims=len(all_claims),
-        mapped_claims=len(all_claims) - len(unmapped),
+        mapped_claims=len(all_claims) - len(unmapped) - len(out_of_scope),
         unmapped_claims=unmapped,
+        out_of_scope_claims=out_of_scope,
         phases_covered=sorted(covered_phases),
         phases_uncovered=uncovered,
         goals_with_claims=goals_with_claims,

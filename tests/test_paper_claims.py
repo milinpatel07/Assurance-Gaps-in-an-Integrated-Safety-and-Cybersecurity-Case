@@ -415,6 +415,157 @@ class TestCounterfactualValidation:
             )
 
 
+class TestCameraReadyClassifications:
+    """Classifications the camera-ready carries that the code had not absorbed.
+
+    Table 4 gives two lifecycle phases for F-1 and F-3, and adds ISO 24089 to
+    F-2's coverage row. Table 3 tags DP-2 "S, M" while the prose calls it
+    structural in three places; the authors resolved that in favour of the prose,
+    so I-2 stays structural and the reasoning sits in decision_points.py.
+    """
+
+    @pytest.fixture
+    def gaps(self):
+        return GapClassification()
+
+    def test_f1_spans_concept_and_verification(self, gaps):
+        """Table 4, F-1: 'Concept, Verification'."""
+        assert gaps.get_by_id("Gap-1").lifecycle_phase_label == "Concept, Verification"
+
+    def test_f3_spans_verification_and_operation(self, gaps):
+        """Table 4, F-3: 'Verification, Operation'."""
+        assert gaps.get_by_id("Gap-3").lifecycle_phase_label == "Verification, Operation"
+
+    def test_f2_coverage_includes_iso_24089(self, gaps):
+        """Table 4, F-2, camera-ready addition."""
+        coverage = " ".join(gaps.get_by_id("Gap-2").partial_coverage)
+        assert "24089" in coverage
+
+    def test_f2_stays_single_phase(self, gaps):
+        """Table 4 gives F-2 'Modification' alone."""
+        assert gaps.get_by_id("Gap-2").lifecycle_phase_label == "Modification"
+
+    def test_primary_phase_is_unchanged_for_every_finding(self, gaps):
+        """The added phases must not disturb the existing single-value contract."""
+        primary = {g.gap_id: g.lifecycle_phase for g in gaps.gaps}
+        assert primary["Gap-1"] == LifecyclePhase.VERIFICATION
+        assert primary["Gap-2"] == LifecyclePhase.MODIFICATION
+        assert primary["Gap-3"] == LifecyclePhase.VERIFICATION
+        assert primary["Gap-4"] == LifecyclePhase.INTEGRATION
+        assert primary["Gap-5"] == LifecyclePhase.DESIGN
+
+    def test_i2_follows_the_prose_not_the_table(self):
+        """DP-2 is structural per the prose; Table 3's 'S, M' is a known
+        inconsistency inside the camera-ready, not a repository defect."""
+        catalogue = DecisionPointCatalogue()
+        assert catalogue.get_by_id("I-2").inconsistency_type == InconsistencyType.STRUCTURAL
+        stats = catalogue.summary_statistics()
+        assert stats["structural"] == 3
+        assert stats["terminological"] == 2
+        assert stats["methodological"] == 2
+
+
+class TestCounterfactualDerivation:
+    """Check the derived half of the counterfactual claim.
+
+    The tests in TestCounterfactualValidation read back the hand-authored
+    visibility lists, so they check self-consistency and not much else. These
+    tests exercise the derivations, which compute from the goal structure in
+    build_integrated_gsn() rather than from anything written in counterfactual.py.
+    A change to which standards source G7, G8 or G5 will fail these.
+    """
+
+    def test_gap3_derivation_uses_the_g7_g8_boundary(self):
+        """Section 5.2, F-3: the boundary lies between G7 and G8."""
+        result = CounterfactualAnalysis.derive_gap3_invisibility()
+        assert result["boundary_goals"] == ["G7", "G8"]
+
+    def test_gap3_no_standard_sources_both_boundary_goals(self):
+        """The derived reason Gap-3 is invisible: nobody holds both ends."""
+        result = CounterfactualAnalysis.derive_gap3_invisibility()
+        assert result["standards_sourcing_both"] == []
+        assert result["invisible_from_every_single_standard"] is True
+
+    def test_gap3_boundary_goals_come_from_different_standards(self):
+        """G7 is SOTIF (21448); G8 is cybersecurity (21434, with 26262)."""
+        sources = CounterfactualAnalysis.derive_gap3_invisibility()["sources_per_goal"]
+        assert "ISO21448" in sources["G7"]
+        assert "ISO21434" in sources["G8"]
+        assert set(sources["G7"]).isdisjoint(set(sources["G8"]))
+
+    def test_gap4_g5_draws_on_all_four_normative_standards(self):
+        """Section 4.2: G5 is the node where all four contribute."""
+        result = CounterfactualAnalysis.derive_gap4_invisibility()
+        assert result["union_contributor_count"] == 4
+
+    def test_gap4_single_standard_view_has_one_contributor(self):
+        """Restricted to one standard, no cross-domain question is posed."""
+        result = CounterfactualAnalysis.derive_gap4_invisibility()
+        assert result["contributors_in_any_single_standard_view"] == 1
+        assert result["invisible_under_premise"] is True
+
+    def test_gap4_premise_does_not_by_itself_select_g5(self):
+        """The premise holds at most nodes, so it cannot be sold as selective.
+
+        Guards against overstating the derivation: if this ever returns only G5,
+        the claim in the docstring has changed and must be re-read.
+        """
+        satisfying = [
+            g
+            for g in ("G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8")
+            if CounterfactualAnalysis.derive_gap4_invisibility(g)["invisible_under_premise"]
+        ]
+        assert "G5" in satisfying
+        assert len(satisfying) > 1, (
+            "The premise is being presented as selective. It is not."
+        )
+        for single_standard_goal in ("G3", "G7"):
+            assert single_standard_goal not in satisfying
+
+    def test_gap4_states_the_limit_of_what_it_shows(self):
+        result = CounterfactualAnalysis.derive_gap4_invisibility()
+        assert "does not single out" in result["what_this_does_not_show"]
+
+    def test_gap3_boundary_goals_come_from_the_shared_map(self):
+        """counterfactual.py must not keep its own copy of the gap-to-goal map."""
+        from src.analysis.gaps import GAP_GOAL_MAP
+
+        result = CounterfactualAnalysis.derive_gap3_invisibility()
+        assert result["boundary_goals"] == GAP_GOAL_MAP["Gap-3"]
+
+    def test_gap4_derivation_states_its_premise(self):
+        """The premise is asserted, so it must be visible to a reader."""
+        result = CounterfactualAnalysis.derive_gap4_invisibility()
+        assert "asserted, not proved" in result["premise"]
+        assert result["caveat"]
+
+    def test_gap4_contrast_case_single_standard_goal(self):
+        """G3 draws on one standard, so no combining question arises there.
+
+        Without this contrast the Gap-4 derivation would be vacuous.
+        """
+        result = CounterfactualAnalysis.derive_gap4_invisibility(goal="G3")
+        assert result["union_contributor_count"] == 1
+        assert result["invisible_under_premise"] is False
+
+    def test_report_marks_the_three_asserted_gaps(self):
+        """Gap-1, Gap-2 and Gap-5 must not be presented as computed."""
+        asserted = CounterfactualAnalysis.derivation_report()["asserted_not_computed"]
+        assert {"Gap-1", "Gap-2", "Gap-5"} <= set(asserted)
+        assert "relocate the assertion" in asserted["reason"]
+
+    def test_derivation_agrees_with_the_published_integration_induced_set(self):
+        """The two derived gaps are exactly the two the paper calls II."""
+        report = CounterfactualAnalysis.derivation_report()
+        derived_invisible = {
+            gap_id
+            for gap_id, r in report["derived"].items()
+            if r.get("invisible_from_every_single_standard") or r.get("invisible_under_premise")
+        }
+        published = {g.gap_id for g in GapClassification().gaps if g.integration_induced}
+        assert derived_invisible == published == {"Gap-3", "Gap-4"}
+
+
 class TestGapSeverityScoring:
     """Validate the gap severity scoring system."""
 

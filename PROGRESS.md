@@ -132,3 +132,71 @@ generated rules file; rewriting history is reserved to the authors and was not d
 **Cost.** Roughly two hours of machine work: one baseline install and test run, six
 verification runs of the suite, two full pipeline runs for the determinism check, one
 history search, and four review passes run in parallel.
+
+---
+
+## Between iterations: the counterfactual derivation and the G2 resolution
+
+Commit `f9a7902`. Not planned as an iteration; it began as IDEAS.md candidate 4
+(derive the counterfactual instead of asserting it) and turned up a second,
+larger finding on the way.
+
+**Reviewers: standards practitioner and support reviewer only.** The four-reviewer
+pass was skipped because nothing here is reader-facing: no README, figure,
+notebook or landing page changed. The phone visitor and the prose hunter would
+have had nothing to read.
+
+**Changed.** `counterfactual.py` derives Gap-3 from the goal structure and Gap-4
+from a plurality premise stated as a premise; Gap-1, Gap-2 and Gap-5 are
+documented as asserted, with the reason. `CLM-26262-TSC-01` left the argument
+(`gsn_goal=None`) with a recorded `out_of_scope_reason`; its clause reference
+narrowed to Part 4 Cl.6.4.3. `check_gsn_completeness()` separates declared
+exclusions from unmapped claims. New `tests/test_representation_consistency.py`.
+
+**What it revealed, and this is the important part.** The repository held two
+independent representations of which standards contribute to which goal, and they
+had drifted far enough to touch a published claim: an ISO 26262 claim mapped to G2
+made G2 report all four standards under `compute_goal_density()`, so the paper's
+"G5 is the only such node" survived only because the test happened to read the
+other representation. The adversarial pass had predicted this class of problem in
+the abstract (`passes/04_adversarial_critic.md`, Want 1). It turned out to be real
+and load-bearing. Two derivation attempts were needed: the first produced
+{Gap-2, Gap-3} against the published {Gap-3, Gap-4}, and diagnosing why the rule
+rather than the paper was wrong is what exposed the drift. Full record in
+REPO_AUDIT.md section 5b.
+
+**Ranking movement.** IDEAS.md candidate 4 closes. A new item enters above the
+rest of the list: representation drift is a defect class, not a single defect, and
+the same question should be asked of every fact the repository writes down twice.
+The GSN YAML and `build_integrated_gsn()` are the next such pair and are not yet
+checked against each other.
+
+**Cost.** Roughly three hours. Higher than iteration 1 because two derivation
+attempts were needed and because the G2 finding required a decision from the
+authors mid-flight, twice (the G2 to G4 move was tried and reverted).
+
+---
+
+## Iteration 2: camera-ready classifications the code had not absorbed
+
+**Why this next.** Found during iteration 1's standards-practitioner review and
+confirmed independently by the support reviewer. It is the same defect class as
+the crosswalk, with the paper carrying content the code lacked.
+
+**Risk named before building.** That making the fields multi-valued would change
+the 3/2/2 type split the paper's prose depends on, or would break the existing
+single-value contract that eight call sites rely on.
+
+**Changed.** Table 4's two-phase entries absorbed: F-1 gains Concept, F-3 gains
+Operation, via a new `additional_lifecycle_phases` field that leaves the primary
+`lifecycle_phase` untouched so no existing caller changes behaviour. F-2's
+coverage row gains ISO 24089. At I-2, a comment records that Table 3 tags DP-2
+"S, M" while the prose calls it structural in three places, the last two being
+camera-ready additions, and that the authors resolved this in favour of the prose.
+The type stays structural and the 3/2/2 split holds.
+
+**Verification.** 225 before, 231 after. Pipeline deterministic at seed 42. ISO
+24089 reaches the generated outputs.
+
+**Cost.** Under an hour. Small because the finding was already diagnosed and the
+decision already taken.
