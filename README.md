@@ -91,6 +91,22 @@ The GSN argument structure is defined in machine-readable YAML files (`gsn/`) an
 └── pyproject.toml
 ```
 
+## Where each claim comes from
+
+[TRACEABILITY.md](TRACEABILITY.md) is the single index. Every number, table and
+figure traces to one of three things, and the index says which: a passage in one
+of the papers, a clause in a named edition of a named standard, or a command here
+that regenerates it. It also lists the identifier crosswalk (the papers say DP-2
+and F-3 where the code says `I-2` and `Gap-3`) and the inconsistencies we know
+about, including one inside the camera-ready itself.
+
+The index is generated, so it cannot drift from the code:
+
+```bash
+make traceability                                  # rewrite it
+python -m src.results.traceability_index --check   # fail if stale
+```
+
 ## Three-layer repository structure
 
 The repository separates three kinds of artefact, which should not be conflated:

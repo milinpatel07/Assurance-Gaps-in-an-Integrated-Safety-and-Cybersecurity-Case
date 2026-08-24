@@ -9,6 +9,7 @@
 #   make gsn          — Render GSN diagrams from YAML (requires gsn2x)
 #   make figures      — Generate figures only
 #   make latex        — Generate LaTeX tables only
+#   make traceability — Regenerate the traceability index
 #   make clean        — Remove generated output
 #   make all          — Install, test, and generate results
 #
@@ -23,7 +24,7 @@ SCENES   ?= 50
 OUTDIR   ?= output
 GSN2X    ?= gsn/gsn2x
 
-.PHONY: all install test results figures latex gsn gsn-install clean help
+.PHONY: all install test results figures latex gsn gsn-install traceability clean help
 
 all: install test results
 
@@ -33,9 +34,10 @@ help:
 	@echo "  test         — Run test suite (pytest)"
 	@echo "  results      — Generate all results (JSON, CSV, LaTeX, figures)"
 	@echo "  gsn          — Render GSN diagrams from YAML via gsn2x"
-	@echo "  gsn-install  — Download gsn2x binary for Linux"
+	@echo "  gsn-install  — Download the gsn2x binary for this platform"
 	@echo "  figures      — Generate visualization figures only"
 	@echo "  latex        — Generate LaTeX tables only"
+	@echo "  traceability — Regenerate TRACEABILITY.md"
 	@echo "  clean        — Remove generated output directory"
 	@echo "  all          — install + test + results"
 	@echo ""
@@ -49,6 +51,10 @@ install:
 
 test:
 	$(PYTHON) -m pytest tests/ -v --tb=short
+
+# Regenerate the traceability index. Use --check in CI to fail on a stale copy.
+traceability:
+	$(PYTHON) -m src.results.traceability_index
 
 results: $(OUTDIR)/analysis_results.json
 
