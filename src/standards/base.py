@@ -113,8 +113,17 @@ class Claim:
         source_clause: The clause from which this claim is derived.
         claim_type: Classification of the claim.
         gsn_goal: The GSN goal node this claim maps to (e.g., 'G5').
+            None means the claim attaches to no node in this pattern. That is a
+            defect unless out_of_scope_reason says why.
         lifecycle_phase: Primary lifecycle phase of this claim.
         evidence_types: Types of evidence required to support this claim.
+        out_of_scope_reason: Why a claim with no gsn_goal is deliberately outside
+            the AI-component argument rather than missing from it. The pattern is
+            scoped to the AI component inside the encompassing system safety case
+            (ISO 26262-2 Cl.6.4.8), so some obligations a standard imposes belong
+            above that boundary. Recording the reason keeps the obligation visible
+            while keeping it out of the argument, and lets the completeness check
+            tell a deliberate exclusion apart from an unmapped claim.
     """
 
     claim_id: str
@@ -124,6 +133,12 @@ class Claim:
     gsn_goal: Optional[str] = None
     lifecycle_phase: Optional[LifecyclePhase] = None
     evidence_types: list[str] = field(default_factory=list)
+    out_of_scope_reason: str = ""
+
+    @property
+    def is_out_of_scope(self) -> bool:
+        """True when the claim is deliberately outside the argument's scope."""
+        return self.gsn_goal is None and bool(self.out_of_scope_reason)
 
     @property
     def standard_id(self) -> str:

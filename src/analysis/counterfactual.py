@@ -1,13 +1,58 @@
 """Counterfactual analysis: what each standard misses when applied in isolation.
 
-Demonstrates that Gap-3 and Gap-4 are integration-induced — they only
-become visible when standards are combined. This is the strongest
-contribution of the paper.
+Supports the paper's claim that Gap-3 and Gap-4 (F-3 and F-4 in the paper) are
+integration-induced: they become visible only when the standards are combined.
 
-For each standard, we show:
-- What it covers
-- What it explicitly excludes or does not address
-- Which gaps remain invisible from its perspective alone
+What in this module is computed and what is asserted
+----------------------------------------------------
+The distinction matters, because a module that asserts its own conclusion proves
+nothing. Read this before citing anything here.
+
+**Gap-3 is derived.** ``derive_gap3_invisibility()`` computes it from the goal
+structure in ``build_integrated_gsn()``, which is authored independently of this
+file. Gap-3 sits on the boundary between G7 and G8. No standard sources both
+goals, so no single-standard assessor holds both ends of the boundary, so the
+boundary is in no single view. Nothing about the answer is written into this
+module; change the goal sources and the computed answer changes with them.
+
+**Gap-4 is derived from a stated premise, not proved.** ``derive_gap4_invisibility()``
+computes the numbers, but the numbers only mean "invisible" under this premise:
+
+    Plurality premise. Gap-4 is the absence of a rule for combining evidence
+    across domains. That question exists at a node only where more than one
+    standard contributes evidence to it, because each standard brings its own
+    kind of evidence on its own measurement scale. Where one standard
+    contributes, there are no scales to reconcile and no such rule is missing.
+
+Under that premise the computation runs: G5 draws on all four normative standards
+in the union and on exactly one in any single-standard view, so the question is
+posed in the union and in no restriction. The contrast is not automatic, which is
+what makes the computation worth running: G3 and G7 draw on one standard even in
+the union, so no combining question arises at them at all.
+
+The unit is the standard, not the claim. Counting claims would give the wrong
+answer, because ISO 26262 alone carries several claims at G5 and they are all
+functional-safety verification on one scale.
+
+State the premise plainly rather than burying it, because the choice of premise
+carries part of the conclusion. A reader who rejects the plurality premise is not
+compelled by the computation. That is a real limit on this module and not a
+presentational quibble.
+
+**Gap-1, Gap-2 and Gap-5 are asserted, not computed.** The ``visible_gaps`` and
+``invisible_gaps`` fields below are hand-authored. What separates these three
+from Gap-3 and Gap-4 is whether a single standard's own text exhibits the
+deficiency by itself: ISO 21448 Clause 6.5 gives an acceptance framework with no
+values (Gap-1), ISO/PAS 8800 Clause 14.8.3 gives partial re-approval only
+(Gap-2), ISO/PAS 8800 Clause 8.4 prescribes data requirements with no thresholds
+(Gap-5). The repository holds no machine-readable representation of that
+"exhibits it alone" property. Adding a field for it would move the assertion into
+a new field rather than remove it, so it has not been added. These three remain
+declared judgments traceable to the clauses named in ``gaps.py``.
+
+An earlier derivation attempt and why it failed is recorded in ``REPO_AUDIT.md``.
+It is kept as evidence about the limits of deriving these claims, not deleted as
+a failed experiment.
 """
 
 from __future__ import annotations
@@ -45,7 +90,7 @@ class CounterfactualAnalysis:
                 standard_name="Functional Safety",
                 covers=[
                     "HARA and ASIL classification (Part 3, Cl.6)",
-                    "Technical safety concept (Part 4, Cl.6)",
+                    "Technical safety concept (Part 4, Cl.6.4.3)",
                     "MC/DC structural coverage (Part 6, Cl.9)",
                     "HW metrics: SPFM, LFM, PMHF (Part 5, Cl.9)",
                     "Change management (Part 8, Cl.8)",
@@ -172,6 +217,137 @@ class CounterfactualAnalysis:
             ),
         ]
 
+    # ── Derivations ──────────────────────────────────────────────────
+    # These compute from the goal structure rather than reading the
+    # hand-authored lists above. They are the part of this module a
+    # sceptical reader can check.
+
+    @staticmethod
+    def _goal_sources() -> dict[str, set[str]]:
+        """Standards contributing to each goal, from the GSN builder.
+
+        Imported here rather than at module scope to keep this module free of a
+        hard dependency on the GSN package for callers that only want the
+        hand-authored perspectives.
+        """
+        from src.gsn.integrated_pattern import build_integrated_gsn
+
+        return {g.element_id: set(g.source_standards or []) for g in build_integrated_gsn().get_goals()}
+
+    @classmethod
+    def derive_gap3_invisibility(cls) -> dict:
+        """Derive that Gap-3 is invisible from every single standard.
+
+        Gap-3 is the unowned boundary between G7 (SOTIF residual risk, ISO 21448)
+        and G8 (cybersecurity risk management, ISO/SAE 21434). Seeing a boundary
+        requires holding both of the things it lies between. So Gap-3 is visible
+        to a single-standard assessor only if that standard sources both G7 and
+        G8.
+
+        Nothing here encodes the answer. The result follows from which standards
+        source which goals.
+        """
+        sources = cls._goal_sources()
+        boundary_goals = ["G7", "G8"]
+        contributors = sorted({s for g in boundary_goals for s in sources.get(g, set())})
+
+        sees_both = sorted(
+            s for s in contributors if all(s in sources.get(g, set()) for g in boundary_goals)
+        )
+        return {
+            "gap_id": "Gap-3",
+            "boundary_goals": boundary_goals,
+            "sources_per_goal": {g: sorted(sources.get(g, set())) for g in boundary_goals},
+            "standards_sourcing_both": sees_both,
+            "invisible_from_every_single_standard": sees_both == [],
+            "derivation": (
+                "Gap-3 lies between G7 and G8. A single-standard assessor sees the "
+                "boundary only by sourcing both goals. No standard sources both, so "
+                "the boundary appears in no single-standard view."
+            ),
+        }
+
+    @classmethod
+    def derive_gap4_invisibility(cls, goal: str = "G5") -> dict:
+        """Derive Gap-4's invisibility under the plurality premise.
+
+        See the module docstring. The premise is that a combining question can be
+        posed only where an assessor holds more than one evidence strand at one
+        node. The premise is asserted. Only what follows from it is computed.
+        """
+        from src.standards.registry import StandardsRegistry
+
+        registry = StandardsRegistry()
+        claims_per_standard = {
+            standard.standard_id: len(
+                [c for c in standard.claims if getattr(c, "gsn_goal", None) == goal]
+            )
+            for standard in registry.normative_standards
+        }
+        union_contributors = sorted([s for s, n in claims_per_standard.items() if n > 0])
+
+        # The unit is the standard, not the claim. Each standard brings one kind
+        # of evidence on its own measurement scale, so the cross-domain question
+        # is posed by a plurality of standards at a node. Counting claims instead
+        # would give the wrong answer: ISO 26262 alone carries several claims at
+        # G5, but they are all functional-safety verification on one scale, and
+        # no cross-domain combining question arises among them.
+        contributors_in_any_single_view = 1
+
+        return {
+            "gap_id": "Gap-4",
+            "goal": goal,
+            "contributors_in_union": union_contributors,
+            "union_contributor_count": len(union_contributors),
+            "contributors_in_any_single_standard_view": contributors_in_any_single_view,
+            "claims_per_standard_at_goal": claims_per_standard,
+            "claims_note": (
+                "Reported as context only. Claim counts are not the basis of the "
+                "derivation; the basis is how many standards contribute."
+            ),
+            "premise": (
+                "Plurality premise (asserted, not proved): the cross-domain "
+                "combining question exists at a node only where more than one "
+                "standard contributes evidence there, since each standard brings "
+                "its own kind of evidence on its own measurement scale."
+            ),
+            "invisible_under_premise": (
+                len(union_contributors) > 1 and contributors_in_any_single_view == 1
+            ),
+            "derivation": (
+                f"In the union, {goal} draws on {len(union_contributors)} of the four "
+                f"normative standards, so the combining question is posed there. "
+                f"Restricted to any one standard, exactly one standard contributes, "
+                f"so no cross-domain combining question is posed. The contrast is not "
+                f"automatic: G3 and G7 draw on one standard even in the union, so no "
+                f"such question arises at them at all."
+            ),
+            "caveat": (
+                "The premise carries part of the conclusion. A reader who rejects "
+                "it is not compelled by these numbers."
+            ),
+        }
+
+    @classmethod
+    def derivation_report(cls) -> dict:
+        """Both derivations, plus the status of the three asserted gaps."""
+        return {
+            "derived": {
+                "Gap-3": cls.derive_gap3_invisibility(),
+                "Gap-4": cls.derive_gap4_invisibility(),
+            },
+            "asserted_not_computed": {
+                "Gap-1": "ISO 21448 Cl.6.5 gives a framework without values.",
+                "Gap-2": "ISO/PAS 8800 Cl.14.8.3 gives partial re-approval only.",
+                "Gap-5": "ISO/PAS 8800 Cl.8.4 prescribes requirements without thresholds.",
+                "reason": (
+                    "No machine-readable field records whether a single standard's own "
+                    "text exhibits the deficiency alone. Adding one would relocate the "
+                    "assertion rather than remove it."
+                ),
+            },
+        }
+
     def get_perspective(self, standard_id: str) -> StandardPerspective | None:
         for p in self.perspectives:
             if p.standard_id == standard_id:
@@ -224,4 +400,29 @@ class CounterfactualAnalysis:
         print(f"\n{'=' * 80}")
         print("CONCLUSION: Gap-3 and Gap-4 are invisible from ANY single standard.")
         print("They emerge only when the four standards are integrated into one GSN.")
+        print("=" * 80)
+
+        report = self.derivation_report()
+        g3 = report["derived"]["Gap-3"]
+        g4 = report["derived"]["Gap-4"]
+
+        print("\nHow much of that conclusion is computed:")
+        print(f"\n  Gap-3  DERIVED from the goal structure.")
+        for goal, srcs in g3["sources_per_goal"].items():
+            print(f"    {goal} sourced by: {', '.join(srcs) if srcs else '(none)'}")
+        print(f"    Standards sourcing both: "
+              f"{g3['standards_sourcing_both'] or 'none'}")
+        print(f"    Invisible from every single standard: "
+              f"{g3['invisible_from_every_single_standard']}")
+
+        print(f"\n  Gap-4  DERIVED FROM A STATED PREMISE.")
+        print(f"    {g4['premise']}")
+        print(f"    Standards contributing at {g4['goal']}: "
+              f"{g4['union_contributor_count']} in the union, "
+              f"{g4['contributors_in_any_single_standard_view']} in any single view")
+        print(f"    Invisible under the premise: {g4['invisible_under_premise']}")
+        print(f"    {g4['caveat']}")
+
+        print("\n  Gap-1, Gap-2, Gap-5  ASSERTED, not computed.")
+        print(f"    {report['asserted_not_computed']['reason']}")
         print("=" * 80)
