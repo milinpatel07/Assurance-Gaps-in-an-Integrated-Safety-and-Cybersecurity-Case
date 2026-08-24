@@ -14,18 +14,15 @@ the rendered diagram is visible to readers and, until this module, invisible to
 the suite.
 
 What is compared: the topology (the structural nodes and the support/context
-edges among them, and the number of evidence solutions under each goal), the set
-of standards contributing to each goal, and the two structural claims the paper
-rests on — that G5 is the only four-standard node and G3 the only single-standard
-retained goal.
+edges among them, and the evidence solutions under each goal, joined by
+solution id — the YAML uses the builder's ids by the authors' decision, so an
+inserted or reordered solution on either side is a visible mismatch rather than
+a silent positional shift), the set of standards contributing to each goal and
+to each solution, and the two structural claims the paper rests on — that G5 is
+the only four-standard node and G3 the only single-standard retained goal.
 
 What is NOT compared, and why:
 
-  * Solution node identifiers. The YAML names evidence positionally (``Sn1`` …
-    ``Sn21``); the builder names it semantically (``Sn-G5-mcdc`` …). The two
-    cannot be joined by id, so this module compares the *count* of solutions
-    under each goal, not their identity. Whether to align the two naming schemes
-    is an open decision for the authors.
   * Clause-reference strings. The YAML deliberately carries a simplified subset
     so the rendered diagram stays legible at poster size; the full,
     edition-bearing references live in ``TRACEABILITY.md``. Comparing them would
@@ -73,6 +70,32 @@ STANDARD_EXCEPTIONS = {
     ),
 }
 
+# Solutions where the two attribute a different standard set, for the same class
+# of reason. This is the goal-level G8 exception, seen at the solution that
+# carries it.
+SOLUTION_STANDARD_EXCEPTIONS = {
+    "Sn-G8-bridge": (
+        "The builder lists ISO 26262 alongside ISO/SAE 21434 on the RQ-15-06 "
+        "bridge solution; the YAML cites only the ISO/SAE 21434 requirement, "
+        "matching the paper's Table 2 (see the G8 entry in STANDARD_EXCEPTIONS)."
+    ),
+}
+
+# Solutions whose YAML text cites no clause at all — part of the poster
+# simplification the authors kept: a node with no citation states nothing,
+# rather than contradicting the builder. The full attribution lives in the
+# builder and TRACEABILITY.md. Guarded below so the set cannot grow silently.
+UNCITED_SOLUTIONS = {
+    "Sn-G3-distribution": (
+        "Poster rendering carries only the short evidence name; the ISO/PAS 8800 "
+        "attribution is stated at the sibling Sn-G3-data-quality and in the builder."
+    ),
+    "Sn-G3-annotation": (
+        "Poster rendering carries only the short evidence name; the ISO/PAS 8800 "
+        "attribution is stated at the sibling Sn-G3-data-quality and in the builder."
+    ),
+}
+
 # Goals excluded from the per-goal standard comparison, with the reason. G1 is
 # the top goal: its standards enter through the strategy S1 and the contexts
 # C1/C2, not through evidence solutions attached to it, so the YAML attributes no
@@ -96,7 +119,7 @@ def _is_goal(node_id: str) -> bool:
 
 
 def _is_solution(node_id: str) -> bool:
-    return re.fullmatch(r"Sn\d+", node_id) is not None
+    return node_id.startswith("Sn")
 
 
 def _norm(node_id: str) -> str:
@@ -129,8 +152,9 @@ def _yaml_skeleton(nodes: dict) -> dict:
         "g1_in_context_of": sorted(context("G1")),
         "s1_supports": sorted(c for c in supported("S1") if _is_goal(c)),
         "s1_in_context_of": sorted(context("S1")),
-        "solution_fanout": {
-            nid: sum(1 for c in supported(nid) if _is_solution(c)) for nid in goals
+        "solutions_by_goal": {
+            nid: sorted(c for c in supported(nid) if _is_solution(c))
+            for nid in goals
         },
     }
 
@@ -151,8 +175,8 @@ def _builder_skeleton() -> dict:
         "g1_in_context_of": sorted(g1.in_context_of),
         "s1_supports": sorted(c for c in s1.supported_by if _is_goal(c)),
         "s1_in_context_of": sorted(s1.in_context_of),
-        "solution_fanout": {
-            g.element_id: sum(1 for c in g.supported_by if is_sol(c))
+        "solutions_by_goal": {
+            g.element_id: sorted(c for c in g.supported_by if is_sol(c))
             for g in gsn.get_goals()
         },
     }
@@ -195,8 +219,16 @@ class TestTopologyMatches:
         assert _builder_skeleton()["undeveloped"] == ["G9"]
 
     def test_g5_carries_four_evidence_solutions_in_both(self, yaml_nodes):
-        assert _yaml_skeleton(yaml_nodes)["solution_fanout"]["G5"] == 4
-        assert _builder_skeleton()["solution_fanout"]["G5"] == 4
+        assert len(_yaml_skeleton(yaml_nodes)["solutions_by_goal"]["G5"]) == 4
+        assert len(_builder_skeleton()["solutions_by_goal"]["G5"]) == 4
+
+    def test_solution_node_sets_are_identical(self, yaml_nodes):
+        """Joined by id: an insertion or rename on one side is a mismatch."""
+        yaml_solutions = sorted(n for n in yaml_nodes if _is_solution(n))
+        builder_solutions = sorted(
+            s.element_id for s in build_integrated_gsn().get_solutions()
+        )
+        assert yaml_solutions == builder_solutions
 
 
 class TestPerGoalStandardsMatch:
@@ -239,8 +271,67 @@ class TestPerGoalStandardsMatch:
             )
 
     def test_every_exception_states_a_reason(self):
-        for g, reason in {**STANDARD_EXCEPTIONS, **STANDARD_UNCOMPARED}.items():
-            assert len(reason) > 40, f"{g} exception has no real reason"
+        recorded = {
+            **STANDARD_EXCEPTIONS,
+            **STANDARD_UNCOMPARED,
+            **SOLUTION_STANDARD_EXCEPTIONS,
+            **UNCITED_SOLUTIONS,
+        }
+        for node, reason in recorded.items():
+            assert len(reason) > 40, f"{node} exception has no real reason"
+
+
+class TestPerSolutionStandardsMatch:
+    """Each solution's cited standard against the builder's, joined by id."""
+
+    def test_solution_standards_match_the_builder(self, yaml_nodes):
+        builder = {
+            s.element_id: {x for x in (s.source_standards or []) if x in NORMATIVE}
+            for s in build_integrated_gsn().get_solutions()
+        }
+        mismatches = {
+            sid: (
+                sorted(_standards_in_text(yaml_nodes[sid].get("text", ""))),
+                sorted(builder[sid]),
+            )
+            for sid in builder
+            if sid not in SOLUTION_STANDARD_EXCEPTIONS
+            and sid not in UNCITED_SOLUTIONS
+            and _standards_in_text(yaml_nodes[sid].get("text", "")) != builder[sid]
+        }
+        assert not mismatches, (
+            "The YAML diagram and the builder cite different standards at: "
+            f"{mismatches}. Fix the side that is wrong, or record an exception "
+            "with a reason in SOLUTION_STANDARD_EXCEPTIONS — do not silence it."
+        )
+
+    def test_recorded_solution_exceptions_still_differ(self, yaml_nodes):
+        builder = {
+            s.element_id: {x for x in (s.source_standards or []) if x in NORMATIVE}
+            for s in build_integrated_gsn().get_solutions()
+        }
+        for sid in SOLUTION_STANDARD_EXCEPTIONS:
+            assert (
+                _standards_in_text(yaml_nodes[sid].get("text", "")) != builder[sid]
+            ), (
+                f"{sid} is a recorded exception but the two views now agree. "
+                "Delete the exception."
+            )
+
+    def test_uncited_solutions_are_exactly_the_recorded_ones(self, yaml_nodes):
+        """A solution that cites no clause must be on the recorded list, and a
+        listed one that gains a citation must come off it."""
+        uncited = {
+            sid
+            for sid in yaml_nodes
+            if _is_solution(sid)
+            and not _standards_in_text(yaml_nodes[sid].get("text", ""))
+        }
+        assert uncited == set(UNCITED_SOLUTIONS), (
+            f"uncited in the YAML: {sorted(uncited)}; recorded: "
+            f"{sorted(UNCITED_SOLUTIONS)}. Update UNCITED_SOLUTIONS with a "
+            "reason, or add the citation."
+        )
 
 
 class TestPaperStructuralClaimsHoldInBoth:
@@ -279,5 +370,15 @@ class TestTheCheckHasTeeth:
 
     def test_a_standard_re_pointing_is_caught(self, yaml_nodes):
         broken = copy.deepcopy(yaml_nodes)
-        broken["Sn4"]["text"] = broken["Sn4"]["text"] + " and ISO/SAE 21434 Cl.1"
+        broken["Sn-G3-data-quality"]["text"] += " and ISO/SAE 21434 Cl.1"
         assert _yaml_goal_standards(broken)["G3"] != {"ISOPAS8800"}
+
+    def test_a_renamed_solution_is_caught(self, yaml_nodes):
+        """The id join at work: a rename on one side is a visible difference."""
+        broken = copy.deepcopy(yaml_nodes)
+        broken["Sn-G5-mcdc-2"] = broken.pop("Sn-G5-mcdc")
+        broken["G5"]["supportedBy"] = [
+            "Sn-G5-mcdc-2" if c == "Sn-G5-mcdc" else c
+            for c in broken["G5"]["supportedBy"]
+        ]
+        assert _yaml_skeleton(broken) != _builder_skeleton()
