@@ -31,6 +31,8 @@ class GapClassification:
                 description="No AI-specific quantitative reliability target",
                 gap_type=GapType.MISSING_EVIDENCE,
                 lifecycle_phase=LifecyclePhase.VERIFICATION,
+                # Table 4 of the camera-ready gives "Concept, Verification".
+                additional_lifecycle_phases=[LifecyclePhase.CONCEPT],
                 partial_coverage=[
                     "ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, "
                     "PMHF < 10^-8 h^-1 — hardware only)",
@@ -47,6 +49,8 @@ class GapClassification:
                 partial_coverage=[
                     "ISO 26262-8 Cl.8 (change management — assumes conventional SW)",
                     "ISO/PAS 8800 Cl.14.8.3 (partial re-approval — incomplete)",
+                    "ISO 24089 (software update engineering; specifies the update "
+                    "process, not re-assurance of a modified AI model's argument)",
                     "ISO/IEC TR 5469 Table A.8 (change protocols — informative only)",
                 ],
                 integration_induced=False,
@@ -59,6 +63,8 @@ class GapClassification:
                 ),
                 gap_type=GapType.UNRESOLVED_INCONSISTENCY,
                 lifecycle_phase=LifecyclePhase.VERIFICATION,
+                # Table 4 of the camera-ready gives "Verification, Operation".
+                additional_lifecycle_phases=[LifecyclePhase.OPERATION],
                 partial_coverage=[
                     "ISO 21448 Cl.1 (explicitly excludes cybersecurity threats)",
                     "ISO/SAE 21434 Cl.15 (includes adversarial scenarios)",

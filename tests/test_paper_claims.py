@@ -415,6 +415,56 @@ class TestCounterfactualValidation:
             )
 
 
+class TestCameraReadyClassifications:
+    """Classifications the camera-ready carries that the code had not absorbed.
+
+    Table 4 gives two lifecycle phases for F-1 and F-3, and adds ISO 24089 to
+    F-2's coverage row. Table 3 tags DP-2 "S, M" while the prose calls it
+    structural in three places; the authors resolved that in favour of the prose,
+    so I-2 stays structural and the reasoning sits in decision_points.py.
+    """
+
+    @pytest.fixture
+    def gaps(self):
+        return GapClassification()
+
+    def test_f1_spans_concept_and_verification(self, gaps):
+        """Table 4, F-1: 'Concept, Verification'."""
+        assert gaps.get_by_id("Gap-1").lifecycle_phase_label == "Concept, Verification"
+
+    def test_f3_spans_verification_and_operation(self, gaps):
+        """Table 4, F-3: 'Verification, Operation'."""
+        assert gaps.get_by_id("Gap-3").lifecycle_phase_label == "Verification, Operation"
+
+    def test_f2_coverage_includes_iso_24089(self, gaps):
+        """Table 4, F-2, camera-ready addition."""
+        coverage = " ".join(gaps.get_by_id("Gap-2").partial_coverage)
+        assert "24089" in coverage
+
+    def test_f2_stays_single_phase(self, gaps):
+        """Table 4 gives F-2 'Modification' alone."""
+        assert gaps.get_by_id("Gap-2").lifecycle_phase_label == "Modification"
+
+    def test_primary_phase_is_unchanged_for_every_finding(self, gaps):
+        """The added phases must not disturb the existing single-value contract."""
+        primary = {g.gap_id: g.lifecycle_phase for g in gaps.gaps}
+        assert primary["Gap-1"] == LifecyclePhase.VERIFICATION
+        assert primary["Gap-2"] == LifecyclePhase.MODIFICATION
+        assert primary["Gap-3"] == LifecyclePhase.VERIFICATION
+        assert primary["Gap-4"] == LifecyclePhase.INTEGRATION
+        assert primary["Gap-5"] == LifecyclePhase.DESIGN
+
+    def test_i2_follows_the_prose_not_the_table(self):
+        """DP-2 is structural per the prose; Table 3's 'S, M' is a known
+        inconsistency inside the camera-ready, not a repository defect."""
+        catalogue = DecisionPointCatalogue()
+        assert catalogue.get_by_id("I-2").inconsistency_type == InconsistencyType.STRUCTURAL
+        stats = catalogue.summary_statistics()
+        assert stats["structural"] == 3
+        assert stats["terminological"] == 2
+        assert stats["methodological"] == 2
+
+
 class TestCounterfactualDerivation:
     """Check the derived half of the counterfactual claim.
 

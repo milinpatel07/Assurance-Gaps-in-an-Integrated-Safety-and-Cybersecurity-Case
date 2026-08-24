@@ -47,6 +47,18 @@ class DecisionPointCatalogue:
                     "to reconcile these into a single sufficiency judgement at G1."
                 ),
             ),
+            # Type follows the paper's prose, which calls DP-2 structural in three
+            # places: the list of structural decision points "(DP-1, DP-2, DP-5)",
+            # the subsection heading "DP-2: Evidence type asymmetry at V&V
+            # (structural decision point)", and the discussion, "the evidence
+            # asymmetry at G5 (DP-2) is a structural property of the applicable
+            # standards". The last two are camera-ready additions.
+            #
+            # Table 3 of the camera-ready tags DP-2 "S, M" instead. That is a known
+            # inconsistency inside the camera-ready, not a defect in this
+            # repository, and the authors resolved it in favour of the prose. The
+            # 3 structural / 2 terminological / 2 methodological split reported by
+            # summary_statistics() depends on DP-2 being counted once.
             Inconsistency(
                 inconsistency_id="I-2",
                 description="Evidence type asymmetry at V&V",

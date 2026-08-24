@@ -176,7 +176,12 @@ class AssuranceGap:
         gap_id: Identifier (e.g., 'Gap-1').
         description: Description of the gap.
         gap_type: Classification (missing claim, missing evidence, unresolved inconsistency).
-        lifecycle_phase: The lifecycle phase where the gap occurs.
+        lifecycle_phase: The primary lifecycle phase where the gap occurs.
+        additional_lifecycle_phases: Further phases the camera-ready table lists
+            for this finding. Table 4 gives two phases for F-1 ("Concept,
+            Verification") and for F-3 ("Verification, Operation"). The primary
+            field is kept so existing callers keep working; use
+            ``lifecycle_phases`` to get the full set the paper states.
         partial_coverage: Standards that provide partial coverage.
         integration_induced: Whether this gap only appears in the integrated argument.
     """
@@ -187,6 +192,19 @@ class AssuranceGap:
     lifecycle_phase: LifecyclePhase
     partial_coverage: list[str]
     integration_induced: bool = False
+    additional_lifecycle_phases: list[LifecyclePhase] = field(default_factory=list)
+
+    @property
+    def lifecycle_phases(self) -> list[LifecyclePhase]:
+        """Every phase the paper lists for this finding, primary first."""
+        return [self.lifecycle_phase, *self.additional_lifecycle_phases]
+
+    @property
+    def lifecycle_phase_label(self) -> str:
+        """Phases as the paper's Table 4 writes them, e.g. 'Concept, Verification'."""
+        order = list(LifecyclePhase)
+        phases = sorted(set(self.lifecycle_phases), key=order.index)
+        return ", ".join(p.display_name.split(" /")[0].split(" &")[0] for p in phases)
 
 
 @dataclass
