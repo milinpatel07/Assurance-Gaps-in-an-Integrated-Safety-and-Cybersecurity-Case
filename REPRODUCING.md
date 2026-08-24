@@ -10,6 +10,10 @@
 - gsn2x >= 4.2.3 (for GSN diagram rendering; optional)
 - Graphviz (for legacy Graphviz-based GSN rendering; optional)
 
+On Windows, clone with `git clone -c core.longpaths=true ...` or into a short
+directory: the camera-ready paper filenames are long enough that a deep target
+path exceeds the default 260-character limit and the checkout fails.
+
 ## Step 1: Clone and Install
 
 ```bash
