@@ -381,6 +381,36 @@ knowing who reads it.
 
 ---
 
+## 5c. Ranked first now: check the GSN YAML against the builder
+
+Added after the representation-drift finding. This displaces the previous head of
+the list, and the reason is evidence rather than preference.
+
+**What it is.** `gsn/integrated_pattern.gsn.yaml` and `build_integrated_gsn()`
+both describe the nine-goal argument. Nothing compares them. Compare node sets,
+support relations, context and assumption links, and undeveloped status, and fail
+the build on an unexplained difference, with the same recorded-exception
+mechanism used in `tests/test_representation_consistency.py`.
+
+**Why it now outranks everything else.** The identical defect class, a fact
+written down twice with nothing holding the copies together, was found to have
+reached a published claim (REPO_AUDIT.md section 5b.2). This is the one remaining
+pair of that kind, and `docs/working-practices.md` describes it in the same words
+that were used of the pair that had already drifted, "kept consistent" by hand.
+One difference is known to exist: the YAML still tags G9 `Gap-2`. The asymmetry
+that makes it urgent is that the rendered SVGs a poster reader sees come from the
+YAML, while every tested claim comes from the builder. A drift here is visible to
+readers and invisible to the suite.
+
+**Cell:** D9 verification regime, over the D6 argument structure.
+**Passes:** none. Found by building, which is itself worth noting: the seven
+generation passes did not predict it, and the adversarial pass predicted only its
+class.
+**Scores:** C3 med / C1 very high / C4 med / C5 very high (it adds no copy; it
+constrains two that exist).
+**Risk:** none while it only compares. Deciding which side wins where they differ
+is a paper-fidelity judgment for the authors, not a code change.
+
 ## 6. Added by iteration 1
 
 **D. Enforce every documentation table that asserts agreement with code.**
