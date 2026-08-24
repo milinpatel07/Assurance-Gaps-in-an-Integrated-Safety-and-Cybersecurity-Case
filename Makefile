@@ -62,6 +62,25 @@ traceability:
 gsn-view:
 	$(PYTHON) -m src.visualization.interactive_view
 
+# ── Reproducibility (Gate 3) ─────────────────────────────────────
+# One command from clone to every artefact both papers use, then prove the
+# committed references match what the code generates today. A non-empty diff
+# means a source changed without its references: fix the cause; never edit a
+# reference by hand. data/empirical_results/ is excluded by declaration: its
+# inputs belong to a paper in preparation (see that directory's README).
+reproduce: results verify-refs
+
+verify-refs:
+	$(PYTHON) -m src.results.generate_all --seed $(SEED) --scenes $(SCENES) \
+		--output $(OUTDIR)/_refcheck > /dev/null
+	diff $(OUTDIR)/_refcheck/csv/gaps.csv data/synthetic_illustrations/gaps.csv
+	diff $(OUTDIR)/_refcheck/csv/decision_points.csv data/synthetic_illustrations/decision_points.csv
+	diff $(OUTDIR)/_refcheck/csv/weather_evaluation.csv data/synthetic_illustrations/weather_evaluation_seed42.csv
+	diff $(OUTDIR)/_refcheck/summary_report.txt data/synthetic_illustrations/summary_report_seed42.txt
+	$(PYTHON) -m src.results.traceability_index --check
+	$(PYTHON) -m src.visualization.interactive_view --check
+	@echo "All committed references match regeneration."
+
 results: $(OUTDIR)/analysis_results.json
 
 $(OUTDIR)/analysis_results.json:

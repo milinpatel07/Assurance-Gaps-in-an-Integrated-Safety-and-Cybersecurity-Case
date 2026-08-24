@@ -3,7 +3,6 @@ ANALYSIS RESULTS SUMMARY
 Assurance Gaps in an Integrated Safety and Cybersecurity Case
 for an AI-Based Perception Component in Highly Automated Driving
 ================================================================================
-Generated: 2026-08-24 15:11:47
 Random seed: 42
 
 ------------------------------------------------------------
@@ -53,11 +52,11 @@ ASSURANCE GAPS
   Unresolved inconsistency:    1
   Integration-induced:         2
 
-  Gap-1: No AI-specific quantitative reliability target
-  Gap-2: No complete OTA re-assurance workflow for AI
-  Gap-3: Adversarial-SOTIF boundary unowned — adversarial inputs that exploit functional insufficiencies fall between G7 and G8 [INTEGRATION-INDUCED]
-  Gap-4: No cross-domain release decision criteria — four separate evidence sets with no combined evaluation [INTEGRATION-INDUCED]
-  Gap-5: Data acceptance threshold undefined — no standard prescribes when training data are sufficient
+  Gap-1: Quantitative acceptance criteria for AI components undefined; the standards defer values to context
+  Gap-2: No complete over-the-air (OTA) re-assurance workflow for AI
+  Gap-3: Adversarial-SOTIF boundary unowned: adversarial inputs that exploit functional insufficiencies fall between G7 and G8 [INTEGRATION-INDUCED]
+  Gap-4: No cross-domain release decision criteria: no standard defines how the per-domain residual risks combine into one release decision [INTEGRATION-INDUCED]
+  Gap-5: Data acceptance criteria for AI components undefined; the standards prescribe frameworks but defer thresholds to context
 
 ------------------------------------------------------------
 EVIDENCE CONVERGENCE AT G5 (CENTRAL FINDING)

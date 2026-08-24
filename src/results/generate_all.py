@@ -35,6 +35,8 @@ from src.results.export import export_json, export_csv_tables, export_summary_re
 from src.analysis.completeness import check_gsn_completeness
 from src.analysis.counterfactual import CounterfactualAnalysis
 from src.analysis.sensitivity import run_sensitivity_analysis
+from src.results.manifest import write_manifest
+from src.seeds import DEFAULT_SEED, DEFAULT_SCENES
 
 
 def run_step1(registry: StandardsRegistry) -> dict:
@@ -214,18 +216,24 @@ def main():
         description="Generate all results for the publication"
     )
     parser.add_argument(
-        "--seed", type=int, default=42,
-        help="Random seed for deterministic evaluation (default: 42)",
+        "--seed", type=int, default=DEFAULT_SEED,
+        help=f"Random seed for deterministic evaluation (default: {DEFAULT_SEED})",
     )
     parser.add_argument(
-        "--scenes", type=int, default=50,
-        help="Number of scenes per weather condition (default: 50)",
+        "--scenes", type=int, default=DEFAULT_SCENES,
+        help=f"Number of scenes per weather condition (default: {DEFAULT_SCENES})",
     )
     parser.add_argument(
         "--output", type=str, default="output",
         help="Output directory (default: output)",
     )
     args = parser.parse_args()
+
+    # Matplotlib embeds a creation date in PDF output; pinning
+    # SOURCE_DATE_EPOCH makes the figures byte-identical across runs, so the
+    # determinism check can diff whole output trees. The run's real time is in
+    # run_manifest.json.
+    os.environ.setdefault("SOURCE_DATE_EPOCH", "0")
 
     output_dir = args.output
     os.makedirs(output_dir, exist_ok=True)
@@ -374,6 +382,10 @@ def main():
     print("[Figures] Generating visualizations...")
     generate_figures(registry, gsn, eval_result, output_dir)
     print("  Saved to output/figures/")
+
+    # ── Run manifest ──────────────────────────────────────────────────
+    manifest_path = write_manifest(output_dir, seed=args.seed, scenes=args.scenes)
+    print(f"  Manifest: {manifest_path}")
 
     elapsed = time.time() - t0
     print()

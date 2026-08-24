@@ -78,7 +78,7 @@ The GSN argument structure is defined in machine-readable YAML files (`gsn/`) an
 │   └── visualization/          # Matplotlib figures
 │
 ├── paper/                      # Camera-ready sources of both papers
-├── tests/                      # 192 tests
+├── tests/                      # The test suite (285 tests)
 ├── notebooks/                  # Interactive Jupyter/Colab notebook
 ├── configs/                    # YAML descriptions of the standards and case study
 │                               #   (documentation only; no code loads them)
@@ -196,12 +196,13 @@ The `make results` command produces structured outputs in `output/`:
 pytest tests/ -v
 ```
 
-192 tests cover standards instantiation, GSN construction, inconsistency and gap classification, the perception module, the evaluation pipeline, result generation, paper claim validation, completeness checking, counterfactual analysis, generalisability classification, base pattern sensitivity, practitioner guidance, and threshold sensitivity.
+285 tests cover standards instantiation, GSN construction, inconsistency and gap classification, the perception module, the evaluation pipeline, result generation, paper claim validation, completeness checking, counterfactual analysis, generalisability classification, base pattern sensitivity, practitioner guidance, threshold sensitivity, representation consistency, the GSN YAML against the builder, and the interactive GSN view.
 
 The WAISE paper reports 193 tests. That count was correct when the paper was
 written. The gap classification was later revised from six gaps to five, which
-removed one test (commit `4d782b0`), and the suite has held at 192 since. The
-number in the paper has not been changed to match, and no test was added here to
+removed one test (commit `4d782b0`) and left the suite at 192; it has since
+grown as the repository gained consistency and view tests. The number in the
+paper has not been changed to match, and no test was removed or added here to
 make it agree.
 
 ## Reproducibility

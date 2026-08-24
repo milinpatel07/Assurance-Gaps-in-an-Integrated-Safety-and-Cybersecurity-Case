@@ -16,8 +16,16 @@
 git clone https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case.git
 cd Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case
 
-pip install -e ".[dev]"
+pip install -r requirements.lock
+pip install -e . --no-deps
 ```
+
+`requirements.lock` pins the exact versions the results were verified with.
+`pip install -e ".[dev]"` also works and takes the newest compatible versions
+instead. PyTorch is not required: `src/perception/` falls back to numpy, and no
+number either paper uses depends on it. Install it with
+`pip install -e ".[perception]"` only if you want the perception module's torch
+paths.
 
 ## Step 2: Run the Test Suite
 
@@ -25,7 +33,7 @@ pip install -e ".[dev]"
 pytest tests/ -v --tb=short
 ```
 
-All 192 tests should pass.
+The full suite (285 tests) should pass.
 
 ## Step 3: Generate All Results
 
@@ -65,17 +73,45 @@ This produces:
 - `gsn/integrated_pattern.gsn.svg` — the 9-goal integrated pattern (Figure 2)
 - `gsn/evidence_convergence.gsn.svg` — evidence convergence at G5 (Figure 3)
 
+## One command, and the drift check
+
+```bash
+make reproduce
+```
+
+regenerates every artefact both papers use and then diffs the committed
+reference outputs under `data/synthetic_illustrations/`, the traceability
+index, and the interactive GSN view against a fresh regeneration. CI runs the
+same check on every push. A non-empty diff means a source changed without its
+references; the rule is to fix the cause, never to edit a reference.
+
+## Seeds and the run manifest
+
+Every seed lives in `src/seeds.py`. Each `generate_all` run writes
+`output/run_manifest.json` recording the commit hash, timestamp, Python and
+package versions, the seeds used, and the SHA-256 of every YAML input. The
+manifest is the only run artefact allowed to differ between runs.
+
 ## Determinism
 
-All evaluation results are deterministic given the same random seed:
+All outputs are byte-identical given the same seed; no output carries a
+timestamp:
 
 ```bash
 python -m src.results.generate_all --seed 42 --scenes 50 --output output_run1
 python -m src.results.generate_all --seed 42 --scenes 50 --output output_run2
-diff output_run1/analysis_results.json output_run2/analysis_results.json
+diff -r output_run1 output_run2
 ```
 
-The JSON files will be identical except for the `generated` timestamp.
+Only `run_manifest.json` differs, in its `run_at` field.
+
+## What cannot be reproduced from this repository
+
+`data/empirical_results/` holds measurements whose training and evaluation
+scripts belong to a paper in preparation (P5) and are not in this repository.
+`make reproduce` does not regenerate them; their provenance README states what
+they are and where they come from. Neither paper in this repository claims
+them.
 
 ## LaTeX Integration
 

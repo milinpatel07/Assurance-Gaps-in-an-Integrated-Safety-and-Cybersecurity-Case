@@ -15,6 +15,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from src.evaluation.carla_evaluator import generate_synthetic_illustration
+from src.seeds import DEFAULT_SEED, DEFAULT_SCENES, SENSITIVITY_SEEDS
 
 
 @dataclass
@@ -57,19 +58,20 @@ class SensitivityResult:
 
 def run_sensitivity_analysis(
     seeds: list[int] | None = None,
-    scenes_per_weather: int = 50,
+    scenes_per_weather: int = DEFAULT_SCENES,
 ) -> SensitivityResult:
     """Run evaluation across multiple seeds and collect metrics.
 
     Args:
-        seeds: List of random seeds. Defaults to [42, 123, 256, 512, 1024].
+        seeds: List of random seeds. Defaults to ``SENSITIVITY_SEEDS``
+            in ``src/seeds.py``.
         scenes_per_weather: Scenes per weather condition per seed.
 
     Returns:
         SensitivityResult with per-seed and aggregate statistics.
     """
     if seeds is None:
-        seeds = [42, 123, 256, 512, 1024]
+        seeds = list(SENSITIVITY_SEEDS)
 
     overall_recall = []
     triggering_recall = []
@@ -118,8 +120,8 @@ class ThresholdSensitivityResult:
 def run_threshold_sensitivity(
     rain_thresholds: list[float] | None = None,
     visibility_thresholds: list[float] | None = None,
-    seed: int = 42,
-    scenes_per_weather: int = 50,
+    seed: int = DEFAULT_SEED,
+    scenes_per_weather: int = DEFAULT_SCENES,
 ) -> ThresholdSensitivityResult:
     """Vary the SOTIF triggering thresholds and measure the recall gap.
 
