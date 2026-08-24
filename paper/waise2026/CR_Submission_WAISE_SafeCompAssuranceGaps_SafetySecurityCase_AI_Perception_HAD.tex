@@ -1,0 +1,593 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{placeins}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows.meta, positioning, fit, calc, matrix}
+\usepackage{hyperref}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+\urlstyle{rm}
+
+% --- Change tracking (toggle for diff view or clean submission) ---
+\usepackage{xcolor}
+\def\cleanmode{} % ACTIVE this line for clean submission (no diff colours)
+\ifdefined\cleanmode
+\newcommand{\new}[1]{#1}
+\newcommand{\del}[1]{}
+\else
+\newcommand{\new}[1]{\textcolor{blue}{#1}}
+\newcommand{\del}[1]{\textcolor{red}{[--#1--]}}
+\fi
+
+% Slight line spacing reduction (common in published LNCS papers)
+\linespread{0.95}\selectfont
+
+% Float-text spacing (author-level, not template override)
+\setlength{\textfloatsep}{4pt plus 2pt minus 2pt}
+\setlength{\floatsep}{4pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+
+% Caption spacing
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{0pt}
+
+% List spacing for RQ and contribution lists
+\setlist{topsep=2pt, partopsep=0pt, parsep=1pt, itemsep=1pt}
+
+% Booktabs table rule spacing (author content — our own tables)
+\setlength{\abovetopsep}{0pt}
+\setlength{\belowbottomsep}{0pt}
+
+% Float placement tuning (author-level)
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.9}
+
+% Prevent page stretching (standard LaTeX setting)
+\raggedbottom
+
+% --- CR (correction-round) change marks ---------------------------------
+% Blue = text added/changed in this round. Red strikethrough = text deleted.
+% Set \crreviewfalse for a clean submission PDF (marks become plain/invisible).
+\usepackage[normalem]{ulem}
+\newif\ifcrreview
+\crreviewfalse
+\ifcrreview
+\newcommand{\crev}[1]{\textcolor{blue!75!black}{#1}}
+\newcommand{\crdel}[1]{\textcolor{red}{\sout{#1}}}
+\else
+\newcommand{\crev}[1]{#1}
+\newcommand{\crdel}[1]{}
+\fi
+% ------------------------------------------------------------------------
+
+% Bibliography spacing (scriptsize is 7pt, above 6pt minimum)
+\let\OLDthebibliography\thebibliography
+\renewcommand\thebibliography[1]{%
+	\OLDthebibliography{#1}%
+	\linespread{0.92}\scriptsize
+	\setlength{\parskip}{0pt}%
+	\setlength{\itemsep}{0pt}%
+}
+
+% Booktabs table rule spacing (author content)
+\setlength{\abovetopsep}{0pt}
+\setlength{\belowbottomsep}{0pt}
+
+\begin{document}
+	
+	\title{\new{Integrating Cybersecurity into the AI Safety Assurance Argument: A GSN Pattern for AI-Based Perception Components in Highly Automated Driving}}
+	
+	\titlerunning{\new{Integrating Cybersecurity into the AI Safety Assurance Argument}}
+	
+	\author{Milin Patel\inst{1}\orcidID{0000-0002-8357-6018} \and
+		Rolf Jung\inst{2}\orcidID{0000-0002-0366-4844}}
+	
+	\authorrunning{M. Patel and R. Jung}
+	
+	\institute{Institute for Driver Assistance and Connected Mobility,\\
+		Kempten University of Applied Sciences, Benningen, Germany\\
+		\and
+		Faculty of Computer Science,\\
+		Kempten University of Applied Sciences, Kempten, Germany\\
+		\email{\{milin.patel, rolf.jung\}@hs-kempten.de}}
+	
+	\maketitle
+	
+	\begin{abstract}
+		{\sloppy \new{Assuring an AI-based perception component for highly automated driving (HAD) requires evidence from ISO~26262 (functional safety), ISO~21448 (SOTIF, safety of the intended functionality), ISO/SAE~21434 (cybersecurity), and ISO/PAS~8800 (safety of AI in road vehicles). The standards cross-reference each other normatively at the level of requirements and evidence. No standard prescribes how the claims combine under a single top-level goal in Goal Structuring Notation (GSN), and the ISO/PAS~8800 Annex~B pattern does not integrate cybersecurity claims. This paper extends the Annex~B pattern with those cybersecurity claims, alongside SOTIF claims from ISO~21448 and functional safety claims from ISO~26262. The pattern is positioned at the AI component level inside the encompassing system safety case and instantiated for a LiDAR-based 3D object detection component. The contributions are (i)~an integrated GSN argument pattern with clause-level traceability to the cited standards, (ii)~a catalogue of decision points the engineer must resolve where the standards defer to application context, and (iii)~a classification of integration-induced findings that emerge only between standard scopes\crev{, distinguished from open methodological problems}. Combining the cited standards reveals an evidence asymmetry at the verification \crev{and validation} goal: the evidence types are disjoint by design, the cybersecurity evidence type (attack success rate) adds a fourth measurement scale to the three safety evidence types, and no standard prescribes their combination into a single sufficiency claim.}\par}
+		
+		\keywords{\new{AI-based perception} \and \new{Argument pattern} \and \new{Cybersecurity-safety integration} \and Goal Structuring Notation \and Highly automated driving \and \new{ISO/PAS~8800}}
+	\end{abstract}
+	
+	% ================================================================
+	\section{Introduction}
+	\label{sec:intro}
+	% ================================================================
+	
+	Highly automated driving (HAD), defined as SAE Level~4 and above~\cite{SAEJ3016}, requires an automated driving system (ADS) to perceive its environment, identify other road users, and plan manoeuvres in the absence of a human driver. Deep neural networks process LiDAR, camera, and radar data for this perception task. Unlike conventionally developed software, the behaviour of a neural network is defined by its training data rather than by written requirements, and its failure modes cannot be derived from a specification. A missed detection or a false classification can therefore propagate to planning and control without an opportunity for human intervention.
+	
+	The applicable international standards each cover a different assurance domain. ISO~26262~\cite{ISO26262} addresses functional safety through a hazard analysis and risk assessment (HARA) that assigns an Automotive Safety Integrity Level (ASIL) based on severity, exposure, and controllability. ISO~21448~\cite{ISO21448} addresses safety of the intended functionality (SOTIF) through triggering conditions and residual-risk acceptance criteria. ISO/SAE~21434~\cite{ISO21434} addresses cybersecurity through threat analysis and risk assessment (TARA). ISO/PAS~8800~\cite{ISOPAS8800} addresses AI-specific safety properties in road vehicles. ISO/TS~5083~\cite{ISOTS5083} addresses safety at the ADS level for SAE Level~3 and Level~4 and references ISO/PAS~8800 for AI-specific safety.
+	
+	An AI-based perception component falls within the scope of all applicable standards simultaneously: ISO~26262 (perception failure can contribute to ASIL~D hazardous events at SAE Level~4 because controllability is \crev{commonly} rated C3 in the absence of a driver), ISO~21448 (intended function can produce hazardous behaviour without fault), ISO/SAE~21434 (sensor data vulnerable to adversarial manipulation), and ISO/PAS~8800 (trained neural network). \new{Each standard defines its own scope, risk classification, assurance activities, and evidence types, while normatively cross-referencing the others at the level of requirements, activities, and evidence: ISO/PAS~8800 Clause~6 maps interactions with ISO~26262 and ISO~21448, Annex~B Assumption~A1.4 delegates hardware faults to ISO~26262, and ISO/SAE~21434 requirement RQ-15-06 derives safety impact ratings from ISO~26262-3 Clause~6.4.3. No standard prescribes the structure of the integrated argument that combines the claims under a single top-level goal.}
+	
+	A safety case is a structured argument, supported by evidence, that a required property has been achieved. \new{Argument structures in Goal Structuring Notation (GSN)~\cite{GSNstandard} for AI components in road vehicles include the ISO/PAS~8800 Annex~B pattern, organised by assurance activity, and two GSN examples in ISO~21448 Annex~A.1, organised by risk reduction.} ISO/SAE~21434 defines a cybersecurity case (Clause~3.1.11) not integrated with either structure.
+	
+	{\sloppy This paper \new{extends the ISO/PAS~8800 Annex~B GSN argument pattern for an AI-based perception component with cybersecurity claims from ISO/SAE~21434, alongside SOTIF claims from ISO~21448 and functional safety claims from ISO~26262. The integrated pattern is positioned at the AI component level inside the encompassing system safety case (Section~\ref{sec:toplevel}).} The construction is applied to a case study component (Section~\ref{sec:casestudy}), scoped to the standards and technical report identified in this section. The process identifies \new{decision points the engineer must resolve where the standards defer to application context, and integration-induced findings that emerge only between the scopes of individual standards.}\par}
+	
+	\crev{Section~\ref{sec:soa} reviews argument structures in the applicable standards and related work, Section~\ref{sec:method} the constructive integration process and the case study, Section~\ref{sec:gsn} the integrated GSN pattern, and Section~\ref{sec:results} the decision points and integration-induced findings; Section~\ref{sec:discussion} discusses the results and limitations, and Section~\ref{sec:conclusion} concludes.}
+	
+	\subsection{Research Questions and Contributions}
+	\label{sec:rqs}
+	
+	This paper addresses three research questions:
+	\begin{description}
+		\item[RQ1.] What structure does a GSN argument pattern take when it integrates assurance claims from all applicable safety and cybersecurity standards for an AI-based perception component in highly automated driving?
+		\item[RQ2.] What decision points must the engineer resolve where the applicable standards defer to application context, and how can these decision points be classified?
+		\item[RQ3.] What integration-induced findings emerge from the constructed argument that are not detectable from any single standard applied in isolation?
+	\end{description}
+	
+	The contributions, corresponding to RQ1--RQ3, are: (i)~an integrated GSN argument pattern for an AI-based perception component in highly automated driving, with clause-level traceability to the cited safety and cybersecurity standards, (ii)~a catalogue of decision points the engineer must resolve where the standards defer to application context, classified by type: terminological, methodological, and structural, and (iii)~a classification distinguishing integration-induced findings, which emerge only between standard scopes, from open methodological problems.
+	
+	% ================================================================
+	\section{State of the Art}
+	\label{sec:soa}
+	% ================================================================
+	
+	\subsection{Argument Structures in Applicable Standards}
+	\label{sec:existing_gsn}
+	The GSN annexes are informative rather than normative; they represent the standards committees' recommended argument patterns. ISO/PAS~8800 Annex~B defines a top-level goal (G1) claiming that the AI component satisfies its allocated safety requirements, decomposed into five sub-goals covering specification, data sets, design, verification and validation (V\&V), and monitoring (G2--G6). Assumption~A1.4 delegates hardware fault coverage to ISO~26262. No node addresses ISO~21448 or ISO/SAE~21434 requirements.
+	
+	ISO~21448 Annex~A.1 provides \new{two GSN examples (A.1.2 and A.1.3)} organised around the four-area model (Clause~5)\new{ and states that GSN can address goals derived from other standards such as the ISO~26262 series}. Sub-goals cover hazardous scenario identification, residual risk acceptance, verification, and post-release monitoring, with Assurance Claim Points referencing evidence tables (Tables~A.7--A.14).
+	
+	The two structures overlap on verification and monitoring but differ in organising principle: Annex~B organises by assurance activity, Annex~A.1 by risk reduction, and reconciling them requires a decision about which principle governs the integrated argument. ISO/SAE~21434 contributes the cybersecurity case (Clause~3.1.11) to neither structure.
+	
+	\subsection{Safety Argumentation for AI in Automated Driving}
+	\label{sec:relwork}
+	
+	No published work integrates the applicable standards into a single GSN argument with cybersecurity claims (Table~\ref{tab:relwork}); prior work addresses parts of the integration problem.
+	
+	\textbf{GSN pattern construction.} AMLAS~\cite{Hawkins2021} and SACE~\cite{Hawkins2022} provide GSN patterns for autonomous systems without clause-level traceability to automotive standards. Schwalbe and Knie~\cite{Schwalbe2020}, Mock et al.~\cite{Mock2021}, and Wozniak et al.~\cite{Wozniak2020} proposed automotive GSN patterns predating ISO/PAS~8800 and without cybersecurity claims. Hawkins~\cite{Hawkins2025BSI} applied ISO/PAS~8800 to a traffic sign detector without extending Annex~B. Borg et al.~\cite{Borg2023} combined AMLAS with SOTIF excluding ISO~26262. \crev{Warg and Skoglund~\cite{Warg2019} proposed generic multi-concern assurance patterns in the AMASS project, combining safety and cybersecurity through cross-concern interplay modules, without clause-level traceability to automotive standards and without addressing AI components.}
+	
+	\textbf{Assurance findings.} Burton et al.~\cite{Burton2020} categorised assurance gaps semantically, and Burton and Herd~\cite{Burton2023} quantified the gap between estimated and actual machine learning failure rates.
+	
+	\crev{\textbf{Multi-standard analysis.} Sun et al.~\cite{Sun2025} combine functional safety, SOTIF, and cybersecurity in a fusion risk-assessment method, and Abbaspour et al.~\cite{Abbaspour2026} combine functional safety, SOTIF, and AI safety for quality-managed perception components. Both reason across several applicable standards but do not construct a GSN argument in which cybersecurity claims are decomposed alongside the safety and AI claims.}
+	
+	The present paper distinguishes integration-induced findings (visible only between scopes) from open methodological problems (frameworks prescribed, values deferred to context); this distinction does not appear in the cited prior work.
+	
+	\begin{table}[t]
+		\caption{Scope of published safety argumentation work for AI in automated driving.}\label{tab:relwork}
+		\centering
+		\adjustbox{max width=\textwidth}{
+			\tiny
+			\begin{tabular}{@{}lccccc@{}}
+				\toprule
+				\textbf{Work} & \textbf{Functional} & \textbf{SOTIF} & \textbf{Cyber-} & \textbf{AI} & \textbf{GSN} \\
+				& \textbf{safety} & & \textbf{security} & \textbf{safety} & \\
+				\midrule
+				AMLAS~\cite{Hawkins2021} & --- & --- & --- & \checkmark & \checkmark \\
+				SACE~\cite{Hawkins2022} & --- & --- & --- & --- & \checkmark \\
+				Schwalbe \& Knie~\cite{Schwalbe2020} & --- & --- & --- & \checkmark & \checkmark \\
+				Mock et al.~\cite{Mock2021} & --- & --- & --- & \checkmark & \checkmark \\
+				Wozniak et al.~\cite{Wozniak2020} & \checkmark & --- & --- & --- & \checkmark \\
+				SMIRK~\cite{Borg2023} & --- & \checkmark & --- & \checkmark & \checkmark \\
+				Hawkins~\cite{Hawkins2025BSI} & --- & --- & --- & \checkmark & \checkmark \\
+				\crev{Warg \& Skoglund}~\cite{Warg2019} & \checkmark & --- & \checkmark & --- & \checkmark \\
+				\crev{Sun et al.~\cite{Sun2025}} & \crev{\checkmark} & \crev{\checkmark} & \crev{\checkmark} & \crev{---} & \crev{---} \\
+				\crev{Abbaspour et al.~\cite{Abbaspour2026}} & \crev{\checkmark} & \crev{\checkmark} & \crev{---} & \crev{\checkmark} & \crev{---} \\
+				\midrule
+				\textbf{Present work} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+				\bottomrule
+				\multicolumn{6}{@{}l@{}}{\checkmark\,Addressed. --- Not addressed.}\\
+			\end{tabular}
+		}
+	\end{table}
+	
+	% ================================================================
+	\section{Methodology}
+	\label{sec:method}
+	% ================================================================
+	
+	Standard interactions are analysed constructively rather than by clause-by-clause comparison: the integrated argument is built first and then examined, because integration-induced findings and decision points become visible when claims from multiple standards are combined in GSN.
+	
+	\subsection{Case Study: LiDAR-Based 3D Object Detection}
+	\label{sec:casestudy}
+	
+	The integrated argument is applied to a LiDAR-based 3D object detection module in a HAD system. The module uses the SECOND architecture~\cite{Yan2018} with a deep ensemble~\cite{Lakshminarayanan2017} for prediction uncertainty, mapped to G5 (verification evidence, ISO/PAS~8800 Clauses~8--9) and G6 (runtime monitoring, Clause~14), evaluated under SOTIF-relevant triggering conditions (rain, fog, reduced visibility) in the CARLA simulator~\cite{CARLA}. \crev{Evaluation of the case study component is reported in two companion studies: trained SECOND, PointPillars, and PV-RCNN detectors under weather configurations at the per-scenario level~\cite{PatelJungVEHITS2024}, and per-detection ensemble-disagreement uncertainty on the SOTIF-PCOD dataset (547 CARLA frames, 22 weather configurations) using simulated ensemble outputs calibrated to published LiDAR uncertainty distributions~\cite{PatelJungVEHITS2026}. Validation with trained ensemble inference is future work.}
+	
+	\subsection{Constructive Integration Process}
+	\label{sec:process}
+	
+	The constructive process proceeds in five steps: Steps~1--3 construct the integrated argument, and Steps~4--5 analyse it for decision points and integration-induced findings.
+	
+	\textbf{Step~1: Claim extraction.} Each applicable standard is read at clause level. A claim is a normative requirement, a defined work product, or a required lifecycle activity; each extracted claim is traceable to a specific clause.
+	
+	\textbf{Step~2: Lifecycle-phase mapping.} The extracted claims are mapped onto six lifecycle phases: concept and requirements, design and training, V\&V, integration and deployment, operation and monitoring, and modification and re-assurance.
+	
+	\textbf{Step~3: GSN construction.} The ISO/PAS~8800 Annex~B pattern serves as the base structure because it is the published GSN pattern designed for AI components in road vehicles (Section~\ref{sec:existing_gsn}). The integration retains the activity-based decomposition, attaches claims from other standards to existing goals where the assurance domain matches, and creates new goals only where no equivalent exists; each added node references its source clause. The output is the integrated GSN pattern (Figure~\ref{fig:gsn}, Table~\ref{tab:goals}).
+	
+	\textbf{Step~4: Junction-point analysis.} Each node where claims from two or more standards meet is examined for decision points where the standards defer to application context. Three types are distinguished: terminological (different terms for the same concept), methodological (different methods for the same objective), and structural (frameworks requiring decisions that no standard prescribes). The output is the decision-point catalogue (Table~\ref{tab:inconsistencies}).
+	
+	\textbf{Step~5: Integration-induced finding identification.} The integrated GSN is examined for two categories of findings: integration-induced findings, which emerge only between the scopes of individual standards and are not detectable from any single standard in isolation, and open methodological problems, where the standards prescribe a framework (e.g., ISO~21448 Clause~6.5 acceptance-criteria principles) but no published method specifies application-specific values for AI components. The output is the findings classification (Table~\ref{tab:gaps}).
+	
+	\FloatBarrier
+	% ================================================================
+	\section{Integrated GSN Argument Pattern}
+	\label{sec:gsn}
+	% ================================================================
+	
+	The integrated GSN pattern (Steps~1--3) extends the ISO/PAS~8800 Annex~B structure with the goals G7 (SOTIF residual risk), G8 (cybersecurity risk management), and G9 (modification re-assurance), adds Context~C1 and Context~C2, and retains the hardware-fault Assumption~A1.4. Each retained goal (G2--G6) receives claims from one or more other standards (Table~\ref{tab:goals}). Figure~\ref{fig:gsn}(a) shows the top two levels; Figure~\ref{fig:gsn}(b) expands G5. Each node carries a reference to the clause from which its claim derives, encoded in machine-readable form in the supplementary material.
+	
+	\subsection{Top-Level Structure}
+	\label{sec:toplevel}
+	
+	The integrated pattern is positioned at the AI component level (ISO/PAS~8800 Clause~3) inside the encompassing system safety case rooted in ISO~26262-2 Clause~6.4.8, as established by ISO/PAS~8800 Clause~8.3.1 Notes~1 and~2.
+	
+	On this basis, the integrated pattern reformulates the Annex~B top-level goal~G1 from ``the AI component satisfies its allocated safety requirements'' to ``the AI-based perception component satisfies the integrated safety and cybersecurity requirements allocated to it'', because the integrated strategy (S1) argues over four assurance domains, two of which (SOTIF and cybersecurity) are outside the scope of the original claim. Context~C1 carries the ASIL from the ISO~26262-3 HARA (ASIL~D for the case study), and Context~C2 carries the TARA results from ISO/SAE~21434. The strategy argues that AI-specific insufficiencies are controlled (ISO/PAS~8800), functional insufficiencies produce acceptable residual risk (ISO~21448), cybersecurity risks are managed (ISO/SAE~21434), and hardware faults in the non-AI elements are controlled (ISO~26262, delegated through Assumption~A1.4). \crev{An alternative top-level structure is a concern hierarchy in which functional safety and SOTIF are sub-concerns of safety, with cybersecurity as a co-concern, as in the multi-concern assurance patterns of Warg and Skoglund~\cite{Warg2019}. The flat decomposition over four domains is retained here because it preserves the activity-based structure of the Annex~B base pattern and keeps each leg traceable to the clauses of one standard.}
+	
+	\begin{figure}[!t]
+		\centering
+		{\footnotesize (a)}\\[1pt]
+		\resizebox{0.72\textwidth}{!}{
+			\begin{tikzpicture}[
+				goal/.style={rectangle, draw, thick, minimum width=1.2cm, minimum height=0.6cm, align=center, font=\tiny},
+				strategy/.style={trapezium, trapezium left angle=75, trapezium right angle=105, draw, thick, minimum width=1.8cm, minimum height=0.45cm, align=center, font=\tiny},
+				context/.style={rounded rectangle, draw, thick, minimum width=1.3cm, minimum height=0.4cm, align=center, font=\tiny},
+				assumption/.style={ellipse, draw, thick, minimum width=1.2cm, minimum height=0.4cm, align=center, font=\tiny},
+				gapnode/.style={rectangle, draw, thick, dashed, minimum width=1.8cm, minimum height=0.6cm, align=center, font=\tiny},
+				arr/.style={-{Stealth[length=1.8mm]}, thick},
+				ctxarr/.style={-{Triangle[open, length=1.8mm]}, thick},
+				srclbl/.style={font=\tiny\itshape, text=blue!60!black},
+				]
+				\useasboundingbox (-5.8,-5.0) rectangle (5.8,0.5);
+				\node[goal, fill=black!8, minimum width=3.8cm] (G1) at (0,0) {G1: AI-based perception component\\satisfies integrated safety and\\cybersecurity requirements};
+				\node[context] (C1) at (-4.2,0) {C1: ASIL D\\(26262-3 Cl.6)};
+				\node[context] (C2) at (4.2,0) {C2: TARA results\\(21434 Cl.15)};
+				\node[assumption] (A14) at (-4.8,-0.95) {A1.4: HW faults\\$\to$ ISO 26262};
+				\node[strategy, minimum width=4.0cm] (S1) at (0,-1.05) {S1: Argue over four assurance domains};
+				\draw[arr] (G1) -- (S1);
+				\draw[ctxarr] (C1) -- (G1);
+				\draw[ctxarr] (C2) -- (G1);
+				\draw[ctxarr] (A14) -- (S1);
+				\node[goal, fill=blue!8] (G2) at (-4.0,-2.15) {G2: Specification\\sufficient};
+				\node[goal, fill=blue!8] (G3) at (-2.0,-2.15) {G3: Data sets\\sufficient};
+				\node[goal, fill=blue!8] (G4) at (0,-2.15) {G4: Design\\sufficient};
+				\node[goal, fill=blue!8] (G5) at (2.0,-2.15) {G5: V\&V\\sufficient};
+				\node[goal, fill=blue!8] (G6) at (4.0,-2.15) {G6: Monitoring\\sufficient};
+				\node[goal, fill=orange!12] (G7) at (-3.0,-3.85) {G7: SOTIF residual\\risk acceptable};
+				\node[goal, fill=red!8] (G8) at (3.0,-3.85) {G8: Cybersecurity\\risks managed};
+				\node[gapnode] (G9) at (0,-3.85) {G9: Modification\\assurance [undeveloped]};
+				\draw[thick] (S1.south) -- (0,-1.6);
+				\draw[thick] (-5.2,-1.6) -- (5.5,-1.6);
+				\draw[arr] (-4.0,-1.6) -- (G2.north);
+				\draw[arr] (-2.0,-1.6) -- (G3.north);
+				\draw[arr] (0,-1.6) -- (G4.north);
+				\draw[arr] (2.0,-1.6) -- (G5.north);
+				\draw[arr] (4.0,-1.6) -- (G6.north);
+				\draw[arr] (-5.2,-1.6) -- (-5.2,-3.3) -- (-3.0,-3.3) -- (G7.north);
+				\draw[arr] (5.5,-1.6) -- (5.5,-3.3) -- (3.0,-3.3) -- (G8.north);
+				\draw[arr, dashed] (1.15,-1.6) -- (1.15,-3.3) -- (0,-3.3) -- (G9.north);
+				\node[srclbl, align=center] at (-4.0,-2.85) {8800 + 21448\\+ 21434};
+				\node[srclbl] at (-2.0,-2.8) {8800 only};
+				\node[srclbl, align=center] at (0,-2.85) {8800 + 21448\\+ 21434};
+				\node[srclbl] at (2.0,-2.8) {All four};
+				\node[srclbl, align=center] at (4.0,-2.85) {8800 + 21448\\+ 21434};
+				\node[font=\tiny\itshape, text=orange!70!black] at (-3.0,-4.4) {21448 Cl.6.5};
+				\node[font=\tiny\itshape, text=red!70!black] at (3.0,-4.4) {21434 Cl.3.1.11};
+				\node[goal, fill=blue!8, minimum width=0.5cm, minimum height=0.18cm] at (-3.5,-4.75) {};
+				\node[anchor=west, font=\tiny] at (-3.20,-4.75) {ISO/PAS 8800};
+				\node[goal, fill=orange!12, minimum width=0.5cm, minimum height=0.18cm] at (-0.8,-4.75) {};
+				\node[anchor=west, font=\tiny] at (-0.55,-4.75) {ISO 21448};
+				\node[goal, fill=red!8, minimum width=0.5cm, minimum height=0.18cm] at (1.5,-4.75) {};
+				\node[anchor=west, font=\tiny] at (1.75,-4.75) {ISO/SAE 21434};
+				\node[gapnode, minimum width=0.5cm, minimum height=0.18cm] at (4.1,-4.75) {};
+				\node[anchor=west, font=\tiny] at (4.4,-4.75) {Undeveloped};
+			\end{tikzpicture}
+		}\\[4pt]
+		{\footnotesize (b)}\\[1pt]
+		\resizebox{0.66\textwidth}{!}{
+			\begin{tikzpicture}[
+				goal/.style={rectangle, draw, thick, align=center, font=\scriptsize, minimum height=0.7cm},
+				strat/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw, thick, align=center, font=\scriptsize, minimum height=0.55cm},
+				soln/.style={circle, draw, thick, align=center, font=\tiny, minimum size=1.9cm},
+				arr/.style={-{Stealth[length=2mm]}, thick},
+				]
+				\node[goal, fill=blue!8, minimum width=6.0cm] (g5) at (0,0) {G5: Verification and validation evidence\\sufficient across all assurance domains};
+				\node[strat, fill=black!4, minimum width=3.4cm] (s5) at (0,-1.5) {S5: Argue over the four evidence types\\prescribed by the cited standards};
+				\draw[arr] (g5) -- (s5);
+				\draw[thick] (s5.south) -- (0,-2.15);
+				\draw[thick] (-5.4,-2.15) -- (5.4,-2.15);
+				\node[soln, dashed, fill=gray!5] (e1) at (-3.9,-3.7) {(a) MC/DC of\\non-AI software\\(26262-6 Cl.9)\\\emph{not produced}};
+				\node[soln, dashed, fill=gray!5] (e2) at (-1.3,-3.7) {(b) SOTIF scenario\\coverage\\(21448 Cl.9--11)\\\emph{not produced}};
+				\node[soln, fill=green!12] (e3) at (1.3,-3.7) {(c) Ensemble\\disagreement\\evidence:\\provided\\(simulated)};
+				\node[soln, dashed, fill=gray!5] (e4) at (3.9,-3.7) {(d) Adversarial\\penetration test\\(21434 Cl.10)\\\emph{not produced}};
+				\draw[arr] (-3.9,-2.15) -- (e1.north);
+				\draw[arr] (-1.3,-2.15) -- (e2.north);
+				\draw[arr] (1.3,-2.15) -- (e3.north);
+				\draw[arr] (3.9,-2.15) -- (e4.north);
+				\node[font=\tiny\itshape, anchor=north] at (1.3,-4.8) {\cite{PatelJungVEHITS2026}};
+			\end{tikzpicture}
+		}
+		\caption{Integrated GSN argument pattern. (a)~Top two levels: G2--G6 retained from ISO/PAS~8800 Annex~B, G7--G9 added; the originating standard is noted below each goal. (b)~Decomposition of G5 into the four evidence types prescribed by the cited standards; labels (a)--(d) match the evidence set in Section~\ref{sec:inconsistencies}. The solid circle marks the evidence type instantiated for the case study~\cite{PatelJungVEHITS2026}; dashed circles mark required evidence not produced. The differing measurement types are decision point DP-2.}
+		\label{fig:gsn}
+	\end{figure}
+	\subsection{Sub-Goal Decomposition}
+	\label{sec:subgoals}
+	
+	The integrated pattern retains the five sub-goals of Annex~B (G2--G6) and adds sub-goals derived from ISO~21448 and ISO/SAE~21434. \crev{In Table~\ref{tab:goals}, each entry in the column ``Claims added from other standards'' is a sub-claim attached to the corresponding goal and traceable to the cited clause; these entries are not separate goals.}
+	
+	\textbf{G2--G4 (Specification, data set, design sufficiency).} G2 now covers AI-specific completeness (semantic and syntactic input space per ISO/PAS~8800 Clause~6.2, derived from the system-level operational design domain), SOTIF triggering condition coverage, and cybersecurity requirements (Table~\ref{tab:goals}). \crev{G3 relies on the data quality requirements of ISO/PAS~8800;} ISO/IEC~TR~5469~\cite{TR5469}, an informative technical report, links data distributions to HARA-identified risks (Clause~9.3.2) but lacks normative force. G4 reconciles AI design decisions with SOTIF mitigation measures (ISO~21448 Table~A.9) and with cybersecurity controls (ISO/SAE~21434 Clause~10).
+	
+	\textbf{G5 (V\&V sufficiency).} G5 is the node where all the applicable standards contribute claims. \crev{Figure~\ref{fig:gsn}(b) shows the decomposition of G5 into the four prescribed evidence types and the single leg instantiated for the case study;} the convergence is analysed as DP-2 in Section~\ref{sec:inconsistencies}.
+	
+	\textbf{G6 (Monitoring)} and \textbf{G7 (SOTIF residual risk).} G6 coordinates three parallel monitoring scopes (AI, SOTIF, cybersecurity) whose interaction no standard defines. G7 claims that residual risk from functional insufficiencies meets acceptance criteria (ISO~21448 Clause~6.5); it is separate from G5 because it represents an acceptability judgement, not a verification activity.
+	
+	\textbf{G8 (Cybersecurity risk management).} G8 claims that cybersecurity risks identified through TARA are treated to an acceptable level (ISO/SAE~21434 Clause~3.1.11 cybersecurity case). \crev{G8 is distinct from the cybersecurity controls verified under G4: G4 claims that the design satisfies the allocated cybersecurity requirements (a verification activity), whereas G8 claims that the residual cybersecurity risk is acceptable (an acceptability judgement), mirroring the separation of G7 from G5.} \new{Two normative bridges connect G8 to the other domains: requirement RQ-15-06 derives the TARA safety impact ratings from ISO~26262-3 Clause~6.4.3 severity classes (connecting G8 to Context~C1), and adversarial perturbations exploiting the same component sensitivities that produce SOTIF triggering conditions allocate evidence to both G8 and G7 (DP-5, Section~\ref{sec:inconsistencies}).}
+	
+	\textbf{G9 (Modification assurance).} G9 addresses re-assurance when the AI component is modified through over-the-air (OTA) updates or retraining; it is marked undeveloped because no single standard prescribes the complete re-assurance workflow for a modified AI model.
+	
+	\begin{table}[t]
+		\caption{Sub-goal decomposition with clause-level traceability.}\label{tab:goals}
+		\centering
+		\tiny
+		\adjustbox{max width=\textwidth}{
+			\begin{tabular}{@{}lp{3.2cm}p{1.8cm}p{3.8cm}@{}}
+				\toprule
+				\textbf{Goal} & \textbf{Claim} & \textbf{Source} & \textbf{Claims added from other standards} \\
+				\midrule
+				G1 (Top-level) & The AI-based perception component satisfies the integrated safety and cybersecurity requirements allocated to it & 8800 Annex~B (reformulated) & C1: ASIL from HARA (26262-3 Cl.6); C2: TARA results (21434 Cl.15) \\
+				G2 (Specification) & The specification is sufficient for all applicable assurance domains & 8800 Annex~B & 21448 Table~A.8 (17 items); 21434 [RQ-06-01] \\
+				G3 (Data sets) & Training and test data are sufficient & 8800 Annex~B & TR~5469 Cl.9.3.2 (data linked to HARA risks) \\
+				G4 (Design) & The AI design satisfies safety and cybersecurity requirements & 8800 Annex~B & 21448 Table~A.9 (SOTIF measures); 21434 Cl.10 (cybersecurity controls) \\
+				G5 (V\&V) & Verification and validation evidence is sufficient across all assurance domains & 8800 Annex~B & 21448 Cl.9--11; 21434 Cl.10 (cyber verification); 26262-4 Cl.8 \\
+				G6 (Monitoring) & Operational monitoring covers AI, SOTIF, and cybersecurity & 8800 Annex~B & 21448 Tables~A.13--14; 21434 Cl.8 (cyber monitoring) \\
+				\midrule
+				G7 (SOTIF risk) & Residual risk from functional insufficiencies meets acceptance criteria & 21448 Annex~A.1 (added) & 21448 Table~A.10; Cl.6.5 acceptance criteria \\
+				G8 (Cybersecurity) & Cybersecurity risks are treated to an acceptable level & 21434 Cl.3.1.11 (added) & TARA (Cl.15); [RQ-15-06] safety bridge \\
+				\midrule
+				G9 (Modification) & AI model modifications are controlled with re-assurance criteria & \textit{Partial coverage} & 26262-8 Cl.8; 8800 Cl.14.8.3; TR~5469 Table~A.8 \\
+				\bottomrule
+				\multicolumn{4}{@{}l@{}}{G2--G6: retained from Annex~B. G7--G8: added. G9: undeveloped, with partial coverage across the cited standards.}\\
+			\end{tabular}
+		}
+	\end{table}
+	
+	% ================================================================
+	\section{\new{Decision Points and Integration-Induced Findings}}
+	\label{sec:results}
+	% ================================================================
+	
+	The analysis identifies decision points and integration-induced findings at the junction points and evidence nodes of the constructed argument.
+	
+	\subsection{\new{Decision Points Where Standards Defer to Context}}
+	\label{sec:inconsistencies}
+	
+	Step~4 identifies seven \new{decision points} (Table~\ref{tab:inconsistencies}). Terminological (DP-3, DP-4) and methodological (DP-6, DP-7) \new{decision points} can be resolved within a project by defining common vocabulary or selecting a preferred method. Structural \new{decision points} (DP-1, DP-2, DP-5) require decisions that no standard prescribes and are discussed below.
+	
+	\textbf{DP-1: \new{Risk classifications across three frameworks}.} G1 must carry risk context from ISO~26262 (ASIL~D for the case study, Part~3 Clause~6.4.3), ISO~21448 (residual risk acceptance criteria, Clause~6.5), and ISO/SAE~21434 (risk values, Clause~15.8). \new{Each framework addresses a distinct risk source (random hardware faults, functional insufficiencies, threat scenarios) and the frameworks are not interchangeable by design.} No standard defines how to reconcile these into a single sufficiency judgement \new{for the integrated top-level goal}.
+	
+	\textbf{DP-2: Evidence type asymmetry at V\&V \new{(structural decision point)}.} The evidence types at G5 (Section~\ref{sec:subgoals}) \new{are disjoint by design: each standard requires evidence addressing a distinct attribute of the system}. For the case study component, the evidence set includes: (a)~modified condition/decision coverage (MC/DC) of the surrounding non-AI software; (b)~SOTIF triggering condition coverage in CARLA under controlled rain and fog intensities; (c)~deep ensemble disagreement as uncertainty indicator, measured by area under the receiver operating characteristic curve (AUROC); and (d)~adversarial penetration testing against LiDAR spoofing and perturbation. \crev{For evidence type~(c), the companion study reports geometric disagreement among ensemble members as the uncertainty indicator with the highest separation of correct from incorrect detections (AUROC 0.982 among the indicators tested) and a three-indicator acceptance gate that retains 22.0\% of detections with no false acceptances observed in the retained sample, measured on simulated ensemble outputs~\cite{PatelJungVEHITS2026}. Evidence types~(a), (b), and~(d) are not instantiated for the case study.} \new{Each standard prescribes the evidence within its own scope, but no standard defines how the disjoint evidence types combine to support a single sufficiency claim at G5; the integrated V\&V strategy is the engineer's responsibility.} Figure~\ref{fig:gsn}(b) shows the four evidence types converging at G5.
+	
+	\textbf{DP-5: Cybersecurity-SOTIF boundary \new{(allocation decision)}.} For the case study component, adversarial point cloud perturbations can cause false negative detections. Such a failure mode is simultaneously a cybersecurity threat scenario (ISO/SAE~21434) and a triggering condition producing a functional insufficiency (ISO~21448). \new{The G7/G8 boundary is not bridged at the standards level, leaving the allocation of evidence to either branch as a project decision.} \crev{Table~\ref{tab:dp5} traces this failure mode through both analysis paths.}
+	
+	\begin{table}[t]
+		\caption{\crev{Worked example for DP-5: one failure mode of the case study component (false negative detection caused by reduced point density) analysed through the two paths that meet at the G7/G8 boundary.}}\label{tab:dp5}
+		\centering
+		\adjustbox{max width=\textwidth}{
+			\scriptsize
+			\begin{tabular}{@{}lp{4.6cm}p{4.6cm}@{}}
+				\toprule
+				& \textbf{SOTIF path (ISO 21448)} & \textbf{Cybersecurity path (ISO/SAE 21434)} \\
+				\midrule
+				Cause of point density reduction & Heavy rain attenuating LiDAR returns & Adversarial point cloud perturbation or LiDAR spoofing \\
+				Analysis activity & Triggering condition identification (Cl.9) & Threat scenario identification in TARA (Cl.15) \\
+				Evidence prescribed & Scenario coverage under controlled rain and fog intensities (Cl.9--11) & Adversarial penetration testing (Cl.10) \\
+				Goal receiving the evidence & G7: residual risk acceptable & G8: cybersecurity risks managed \\
+				\midrule
+				\multicolumn{3}{@{}p{11.4cm}@{}}{Open allocation decision: ISO~21448 Cl.1 excludes cybersecurity threats and ISO/SAE~21434 contains no reference to ISO~21448, so no standard assigns a failure mode that is simultaneously a triggering condition and a threat scenario to either goal; the allocation is a project decision (finding F-3).}\\
+				\bottomrule
+			\end{tabular}
+		}
+	\end{table}
+	
+	\begin{table}[t]
+		\caption{\new{Decision points} at junction points of the integrated GSN.}\label{tab:inconsistencies}
+		\centering
+		\adjustbox{max width=\textwidth}{
+			\tiny
+			\begin{tabular}{@{}lp{2.8cm}p{1.5cm}p{3.0cm}p{1.1cm}c@{}}
+				\toprule
+				\textbf{ID} & \textbf{\new{Decision point}} & \textbf{Standards} & \textbf{Clauses} & \textbf{GSN node} & \textbf{Type} \\
+				\midrule
+				DP-1 & Risk classification \new{across three frameworks} & 26262, 21448, 21434 & 26262-3 Cl.6; 21448 Cl.6.5; 21434 Cl.15.8 & G1 & S \\
+				DP-2 & Evidence type asymmetry at V\&V & All four & 26262-6 Cl.9; 21448 Cl.9--11; 8800 Cl.8; 21434 Cl.10 & G5 & S, M \\
+				DP-3 & AI error terminology differs & 26262, 21448, TR\,5469 & 26262-1 Cl.1; 21448 Cl.3; TR\,5469 Cl.6.1 & G2, G7 & T \\
+				DP-4 & ``Validation'' defined differently & 26262, 21448, 8800 & 26262-1 Cl.1.122; 21448 Cl.3.37; 8800 Cl.3 & G5 & T \\
+				DP-5 & Cybersecurity-SOTIF boundary \new{not bridged at standards level} & 21448, 21434, TR\,5469 & 21448 Cl.1; 21434 Cl.15; TR\,5469 Cl.8.5.1 & G7, G8 & S \\
+				DP-6 & Monitoring scope overlap & 21448, 21434, 8800 & 21448 Cl.13; 21434 Cl.8; 8800 Cl.14 & G6 & M \\
+				DP-7 & Data sufficiency \new{deferred to context} & 8800, TR\,5469 & 8800 Cl.8.4; TR\,5469 Cl.9.3.2 & G3 & M \\
+				\bottomrule
+				\multicolumn{6}{@{}l@{}}{T\,=\,terminological, M\,=\,methodological, S\,=\,structural.}\\
+			\end{tabular}
+		}
+	\end{table}
+	
+	\subsection{\new{Integration-Induced Findings and Open Methodological Problems}}
+	\label{sec:gaps}
+	
+	\new{Step~5 distinguishes integration-induced findings from open methodological problems (Section~\ref{sec:process}); Table~\ref{tab:gaps} summarises both categories.}
+	
+	\new{\textbf{Integration-induced findings.}}
+	
+	\textbf{F-3: Adversarial-SOTIF boundary unowned (integration-induced).} As a direct consequence of \new{decision point DP-5}, adversarial inputs that exploit functional insufficiencies fall between G7 and G8 without belonging to either\new{ (Table~\ref{tab:dp5}). The boundary is unowned at the standards level}. For the case study component, a LiDAR spoofing attack exploiting the same point density sensitivity that causes detection failures in heavy rain is not assigned to either branch \new{by any applicable standard}.
+	
+	\textbf{F-4: No cross-domain release decision criteria (integration-induced).} Each standard produces its own assessment (functional safety, cybersecurity case, SOTIF evaluation, AI safety argument). A component can individually satisfy each standard, yet no standard requires evaluating the combined residual risk across domains\new{; the cross-domain release decision becomes visible only under a single top-level goal}. \crev{ISO~26262-2 Clause~6.4.8 collects the per-domain assessments in the encompassing system safety case but does not define how their residual risks combine into one release decision.}
+	
+	\new{\textbf{Open methodological problems.}}
+	
+	\textbf{F-1: \new{Quantitative acceptance criteria for AI components}.} ISO~26262 Part~5 defines quantitative hardware reliability targets at ASIL~D: single-point fault metric (SPFM~$\geq$~99\%), latent fault metric (LFM~$\geq$~90\%), and probabilistic metric for random hardware failures (PMHF~$<$~$10^{-8}$~h$^{-1}$). \new{ISO~21448 Clause~6.5 establishes the framework for residual-risk acceptance criteria, listing factors and risk tolerability principles (GAMAB, GAME, positive risk balance), but defers quantitative values to context, and ISO/PAS~8800 does not prescribe AI-specific numerical targets. No published method derives application-specific quantitative targets for an AI component such as the LiDAR detector AUROC metric.} ISO/IEC~TR~5469 Clause~9.2.2 acknowledges that non-separability of training data effects makes such targets difficult to define.
+	
+	{\sloppy \textbf{F-2: \new{OTA re-assurance workflow (partial coverage)}.} The partial coverage sources for G9 each fall short for AI components: ISO~26262-8 Clause~8 assumes change impact traceable to specific requirements, which does not hold for a retrained neural network where the entire weight space changes, ISO/PAS~8800 Clause~14.8.3 does not define when partial re-assurance is sufficient, and ISO/IEC~TR~5469 Table~A.8 lacks normative force. \crev{ISO~24089~\cite{ISO24089} specifies the software-update engineering process but not the re-assurance of a modified AI model's safety argument, so it does not close F-2.}\par}
+	
+	\textbf{F-5: \new{Data acceptance criteria for AI components}.} ISO/IEC~TR~5469 Clause~9.3.3 defines four criteria for training data and \new{ISO/PAS~8800 Clause~8.4 prescribes data quality requirements, but both defer thresholds to context. No published method derives an application-specific threshold for when training data are sufficient in quantity, distribution coverage, annotation quality, and domain representativeness for an AI-based perception component.}
+	
+	\begin{table}[t]
+		\caption{\new{Integration-induced findings and open methodological problems}.}\label{tab:gaps}
+		\centering
+		\adjustbox{max width=\textwidth}{
+			\tiny
+			\begin{tabular}{@{}lp{2.4cm}p{2.0cm}cp{3.8cm}@{}}
+				\toprule
+				\textbf{ID} & \textbf{\new{Finding}} & \textbf{Lifecycle phase} & \textbf{\new{Category}} & \textbf{Related clauses} \\
+				\midrule
+				\new{F-3} & Adversarial-SOTIF boundary unowned & Verification, Operation & \new{II} & 21448 Cl.1 (excludes); 21434 Cl.15 (includes) \\
+				F-4 & No cross-domain release criteria & Integration & \new{II} & 26262-2 Cl.6.4; 21434 Cl.3.1.11; 21448 Cl.12 \\
+				\midrule
+				F-1 & \new{Quantitative acceptance criteria for AI components} & \new{Concept, Verification} & \new{OM} & 26262-5 (HW only); 21448 Cl.6.5 \new{(framework)} \\
+				F-2 & \new{OTA re-assurance workflow (partial coverage)} & Modification & \new{OM} & 26262-8 Cl.8; 8800 Cl.14.8.3; TR\,5469 Table A.8 \crev{; 24089} \\
+				F-5 & \new{Data acceptance criteria for AI components} & Design & \new{OM} & 8800 Cl.8.4 \new{(framework)}; TR\,5469 Cl.9.3.2 \\
+				\bottomrule
+				\multicolumn{5}{@{}l@{}}{\new{II\,=\,integration-induced finding, OM\,=\,open methodological problem.}}\\
+			\end{tabular}
+		}
+	\end{table}
+	
+	% ================================================================
+	\section{Discussion}
+	\label{sec:discussion}
+	% ================================================================
+	
+	\subsection{Evidence Asymmetry and Integration-Induced Findings}
+	
+	The evidence asymmetry at G5 (DP-2) is a structural property of the applicable standards: the evidence types prescribed by the cited standards are disjoint by design. When the integrated argument places them under a single sufficiency claim at G5, the asymmetry propagates to G1. A safety engineer who has completed all the prescribed verification at G5 still cannot state whether the combined evidence is sufficient because no standard prescribes the combination rule.
+	
+	Burton et al.~\cite{Burton2024} proposed Subjective Logic for quantifying assurance uncertainty at individual argument nodes, addressing the quantification problem within a single evidence strand. The cross-strand combination problem (aggregating evidence with different measurement scales at one node) remains open. \crev{This combination problem is recognised in assurance research; the contribution here is its localisation: it arises at the V\&V goal (G5) for an AI-based perception component, where the cybersecurity evidence type (attack success rate) adds a fourth measurement scale to the three safety evidence types.}
+	
+	\crev{Although the case study is automotive, the distinction between integration-induced findings and open methodological problems applies to any domain that assures one component against several concern-specific standards, such as aviation or medical devices; the specific findings reported here are automotive.}
+	
+	\subsection{Implications for Assurance Practice}
+	
+	{\sloppy \new{ISO/PAS~8800 Table~1-1 lists relationships with ISO~26262, ISO~21448, ISO/IEC~TR~5469, ISO/IEC~22989, and ISO/TS~5083 but omits ISO/SAE~21434, and ISO/SAE~21434 normatively references only ISO~26262-3. The only normative cybersecurity-safety bridge is requirement RQ-15-06, which derives safety impact ratings in TARA from ISO~26262-3 Clause~6.4.3; it operates at the impact-rating level and does not specify how the cybersecurity case integrates into the AI safety assurance argument at the GSN level.}\par}
+	
+	\new{The integrated argument in this paper provides one such integration at the AI component level. The structural decisions it requires are: (a)~allocating evidence at G7/G8 for failure modes that are both adversarial inputs and SOTIF triggering conditions (DP-5, F-3), (b)~deriving the cybersecurity acceptance claim at G8 from the encompassing-system TARA results in Context~C2, and (c)~positioning the cybersecurity case alongside the AI safety assurance argument inside the encompassing system safety case (ISO~26262-2 Clause~6.4.8).}
+	
+	\new{\subsubsection{Project-Level Decisions.}}
+	
+	\crev{The adversarial-SOTIF boundary (DP-5, F-3) requires a project-level ownership policy that assigns each identified failure mode to either G7 or G8, a decision no standard prescribes.} The V\&V sufficiency claim at G5 requires an evidence admissibility policy defining how the prescribed evidence types relate to one another. ISO~26262 Parts~4 and~6 provide a precedent: the documented rationale required when an alternative verification method replaces a recommended one can be extended to cross-domain evidence combination.
+	
+	\subsection{Verification and Limitations}
+	
+	The claim extraction (Step~1) was performed by a single assessor; inter-rater reliability was not assessed, and the extraction's completeness depends on the assessor's reading. An automated test suite of 193~tests in the supplementary material\footnote{{\def\UrlBreaks{\do\/\do\-}\url{https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case}}} checks that all extracted claims map to GSN nodes, all lifecycle phases are covered, and the integration-induced findings do not appear in any single standard's claim set.
+	
+	The analysis addresses ISO~26262 Parts~2, 3, 4, and~6 in depth, draws terminology from Part~1, and references specific clauses of Parts~5 and~8 where they bear on AI-component-level claims (Tables~\ref{tab:inconsistencies} and~\ref{tab:gaps}); Parts~9--12 of ISO~26262, UL~4600, the EU AI Act, and UNECE~R155/R156 are out of scope. The integrated pattern identifies where evidence is needed. \crev{The case study instantiates evidence type~(c) at G5 (Section~\ref{sec:inconsistencies}); the remaining evidence types and validation with trained ensemble inference are future work.}
+	
+	\FloatBarrier
+	% ================================================================
+	\section{Conclusion and Future Work}
+	\label{sec:conclusion}
+	% ================================================================
+	
+	Combining the cited standards into a single GSN argument reveals an evidence asymmetry at the V\&V goal: the prescribed evidence types are disjoint by design, the cybersecurity evidence type (attack success rate) is structurally different from the safety evidence types (MC/DC coverage, scenario coverage, ensemble uncertainty), and no standard prescribes how they combine into a single sufficiency claim at G5.
+	
+	The constructive integration methodology, applied to a LiDAR-based 3D object detection component, extended ISO/PAS~8800 Annex~B with goals G7 (SOTIF residual risk), G8 (cybersecurity risk management), and G9 (modification re-assurance), alongside functional safety claims attached to retained goals (RQ1, Figure~\ref{fig:gsn}). The analysis identified the decision points DP-1 to DP-7 where the standards defer to application context (RQ2, Table~\ref{tab:inconsistencies}) and distinguished the integration-induced findings (F-3, F-4), detectable only when standards are combined under a single top-level goal, from the open methodological problems (F-1, F-2, F-5) (RQ3, Table~\ref{tab:gaps}). Future work follows three directions: (i)~a method for combining disjoint evidence types into a single sufficiency judgement at the V\&V goal, (ii)~application-specific quantitative acceptance criteria (F-1) and data acceptance criteria (F-5) building on ISO~21448 Clause~6.5 and ISO/PAS~8800 Clause~8.4, and (iii)~extension of the analysis to ISO/TS~5083 at the ADS level, the EU AI Act, and UNECE~R155/R156.
+	
+	\begin{credits}
+		\subsubsection{\discintname}
+		The authors have no competing interests to declare that are relevant to the content of this article.
+	\end{credits}
+	
+	\bibliographystyle{splncs04}
+	
+	\begin{thebibliography}{99}
+		
+		\bibitem{SAEJ3016}
+		SAE International: Taxonomy and Definitions for Terms Related to Driving Automation Systems for On-Road Motor Vehicles. SAE Standard J3016\_202104 (2021)
+		
+		\bibitem{ISO26262}
+		ISO: Road vehicles --- Functional safety. ISO~26262:2018, Parts 1--12. ISO, Geneva (2018)
+		
+		\bibitem{ISO21448}
+		ISO: Road vehicles --- Safety of the intended functionality. ISO~21448:2022. ISO, Geneva (2022)
+		
+		\bibitem{ISO21434}
+		ISO/SAE: Road vehicles --- Cybersecurity engineering. ISO/SAE~21434:2021. ISO, Geneva (2021)
+		
+		\bibitem{ISOPAS8800}
+		ISO: Road vehicles --- Safety and artificial intelligence. ISO/PAS~8800:2024. ISO, Geneva (2024)
+		
+		\new{\bibitem{ISOTS5083}
+			ISO: Road vehicles --- Safety for automated driving systems --- Design, verification and validation. ISO/TS~5083:2025. ISO, Geneva (2025)}
+		
+		\bibitem{TR5469}
+		ISO/IEC: Artificial intelligence --- Functional safety and AI systems. ISO/IEC~TR~5469:2024. ISO, Geneva (2024)
+		
+		\bibitem{ISO24089}
+		\crev{ISO: Road vehicles --- Software update engineering. ISO~24089:2023. ISO, Geneva (2023)}
+		
+		\bibitem{GSNstandard}
+		{Goal Structuring Notation Community Standard}, Version 3. Assurance Case Working Group (ACWG) (2021)
+		
+		\bibitem{Hawkins2021}
+		Hawkins, R., Paterson, C., Picardi, C., Jia, Y., Calinescu, R., Habli, I.: Guidance on the Assurance of Machine Learning in Autonomous Systems (AMLAS). University of York (2021)
+		
+		\bibitem{Hawkins2022}
+		Hawkins, R., Habli, I., McDermid, J.: Guidance on the safety assurance of autonomous systems in complex environments (SACE). University of York (2022). arXiv:2208.00853
+		
+		\bibitem{Schwalbe2020}
+		Schwalbe, G., Knie, B., S\"amann, T., Dobberphul, T., Gauerhof, L., Raafatnia, S., Rocco, V.: Structuring the safety argumentation for deep neural network based perception in automotive applications. In: SafeComp 2020 Workshops, LNCS, vol.~12235, pp.~383--394. Springer (2020)
+		
+		\bibitem{Mock2021}
+		Mock, M., Scholz, S., Blank, F., H\"uger, F., Rohatschek, A., Schwarz, L., Stauner, T.: An integrated approach to a safety argumentation for AI-based perception functions in automated driving. In: SafeComp 2021 Workshops, LNCS, vol.~12853, pp.~265--271. Springer (2021)
+		
+		\bibitem{Borg2023}
+		Borg, M., Henriksson, J., Socha, K., Lennartsson, O., Sonnsj\"o L\"onegren, E., Bui, T., Tomaszewski, P., Sathyamoorthy, S.R., Brink, S., Helali Moghadam, M.: Ergo, SMIRK is safe: a safety case for a machine learning component in a pedestrian automatic emergency brake system. Softw. Qual. J. \textbf{31}(2), 335--403 (2023)
+		
+		\bibitem{Burton2020}
+		Burton, S., Habli, I., Lawton, T., McDermid, J., Morgan, P., Porter, Z.: Mind the gaps: assuring the safety of autonomous systems from an engineering, ethical, and legal perspective. Artif. Intell. \textbf{279}, 103201 (2020)
+		
+		\bibitem{Burton2023}
+		Burton, S., Herd, B.: Addressing uncertainty in the safety assurance of machine-learning. Front. Comput. Sci. \textbf{5}, 1132580 (2023)
+		
+		\bibitem{Burton2024}
+		Burton, S., Herd, B., Zacchi, J.V.: Uncertainty-aware evaluation of quantitative ML safety requirements. In: SafeComp 2024 Workshops, LNCS, vol.~14989, pp.~391--404. Springer (2024)
+		
+		\bibitem{Wozniak2020}
+		Wozniak, E., Carlan, C., Acar-Celik, E., Putzer, H.J.: A safety case pattern for systems with machine learning components. In: SafeComp 2020 Workshops, LNCS, vol.~12235, pp.~370--382. Springer (2020)
+		
+		\bibitem{Warg2019}
+		Warg, F., Skoglund, M.: Argument patterns for multi-concern assurance of connected automated driving systems. In: 4th International Workshop on Security and Dependability of Critical Embedded Real-Time Systems (CERTS 2019), Article~3, pp.~3:1--3:13. OASIcs, Schloss Dagstuhl (2019). \url{https://doi.org/10.4230/OASIcs.CERTS.2019.3}
+		
+		\bibitem{Hawkins2025BSI}
+		Hawkins, R.: Use case application of PD ISO/PAS~8800 for machine learning (ML) components. BSI/Centre for Connected and Autonomous Vehicles (2025)
+		
+	\bibitem{Sun2025}
+	\crev{Sun, B., Yang, S., Wang, Y., Lu, J., Pang, Z., Feng, X., Guang, H., Cao, Y.: A fusion safety and security analysis framework for intelligent and connected vehicles. PLOS ONE \textbf{20}(9), e0332050 (2025). \url{https://doi.org/10.1371/journal.pone.0332050}}
+		
+		\bibitem{Abbaspour2026}
+		\crev{Abbaspour, A.R., Mahadevan, S., Zwirglmaier, K., Stafford, J.: The necessity of a holistic safety evaluation framework for AI-based automation features. In: WCX SAE World Congress Experience. SAE International (2026)}
+		
+		\bibitem{Lakshminarayanan2017}
+		Lakshminarayanan, B., Pritzel, A., Blundell, C.: Simple and scalable predictive uncertainty estimation using deep ensembles. In: NeurIPS 2017, pp.~6402--6413 (2017)
+		
+		\bibitem{Yan2018}
+		Yan, Y., Mao, Y., Li, B.: SECOND: sparsely embedded convolutional detection. Sensors \textbf{18}(10), 3337 (2018)
+		
+		\bibitem{CARLA}
+		Dosovitskiy, A., Ros, G., Codevilla, F., L\'{o}pez, A., Koltun, V.: CARLA: an open urban driving simulator. In: CoRL 2017, PMLR, vol.~78, pp.~1--16 (2017)
+		
+		\bibitem{PatelJungVEHITS2024}
+		Patel, M., Jung, R.: Simulation-based performance evaluation of 3D object detection methods with deep learning for a LiDAR point cloud dataset in a SOTIF-related use case. In: VEHITS 2024, pp.~415--426. SciTePress (2024). \url{https://doi.org/10.5220/0012707300003702}
+		
+		\bibitem{PatelJungVEHITS2026}
+		Patel, M., Jung, R.: Uncertainty evaluation to support safety of the intended functionality analysis for identifying performance insufficiencies in ML-based LiDAR object detection. In: VEHITS 2026, pp.~154--167. SciTePress (2026). \url{https://doi.org/10.5220/0014967200004030}
+		
+	\end{thebibliography}
+	
+\end{document}
