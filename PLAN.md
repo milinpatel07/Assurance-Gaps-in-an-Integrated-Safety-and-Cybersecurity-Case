@@ -281,3 +281,59 @@ stale or undeclared.
 cannot verify, which fails the first half of the purpose. Without the visual
 layer the reviewer must read Python to follow the argument, which fails the
 second. Everything else on this list serves those two.
+
+---
+
+## Alternative ordering: the phone reader criterion
+
+Added 2026-08-24 at the authors' request, after the YAML-versus-builder check
+landed. The criterion: what does a reviewer arriving from the poster QR code,
+on a phone, in daylight, with under a minute, actually encounter?
+
+What that reader meets, in order: the QR target (Phase 8's landing page), the
+README's first screen with the argument figure (Phase 7's output, framed by
+Phase 4's layout), the top-level file list, and at most one tap further, most
+likely the Colab badge, which is the notebooks item. That reader never meets
+the edition-keyed clause data, the lockfile, the run manifest, the test suite,
+or the GSN YAML source.
+
+| Remaining item | The phone reader sees it? |
+|---|---|
+| Phase 7 visual layer | Yes; it is most of the first screen |
+| Phase 8 landing page | Yes; it is the QR target itself |
+| Phase 4 layout | Yes, one swipe down |
+| Notebook verification | One tap away, and its first cell makes an unverified claim |
+| Edition-keyed clause data | Never; it serves the 2031 re-runner |
+| Phase 6 reproducibility | Never directly; it serves the desk reviewer |
+| Phase 9 adversarial pass | Never; it serves the authors |
+
+**What this criterion selects.** Reach: the sixty seconds in which most poster
+visitors decide whether to return at a desk. Its pure ordering is visual layer,
+landing page, layout, notebook verification, then everything invisible in any
+order, with the edition-keyed clause data last.
+
+**What it sacrifices.** Verifiability. It ships the shop window before the goods
+are checked. Phase 8 is gated on Phase 6 by this plan's own rule, since a DOI on
+an unreproducible snapshot is worse than no DOI, and the landing page invites
+exactly the verification that Gate 3 makes possible. Ordering purely by
+visibility reproduces, at repository scale, the defect class this session kept
+finding: a public representation held to nothing.
+
+**Where it beats the existing ranking.** It demotes the edition-keyed clause
+data, which this plan already lists as the second most cuttable item and which
+no conference reader meets. And it promotes the visual layer, whose main
+fidelity risk, drift between the rendered YAML and the tested builder, was
+closed by `tests/test_gsn_yaml_builder_consistency.py`. The renderer blocker
+recorded under Phase 7 above is also stale: gsn2x 4.3.1 is on PATH on this host
+and checked the YAML today.
+
+**Recommended merged order.** Neither pure ordering. The phone criterion decides
+what leads; the gating rule decides what may not trail.
+
+1. Phase 7 visual layer (phone-visible; its prerequisites cleared today)
+2. Phase 6 reproducibility (invisible, but gates the release)
+3. Phase 4 layout
+4. Notebook verification (the unverified first-cell claim sits one tap from the poster)
+5. Phase 8 landing page and release
+6. Edition-keyed clause data
+7. Phase 9 adversarial pass
