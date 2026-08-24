@@ -147,9 +147,10 @@ def build_integrated_gsn() -> GSNArgument:
         supported_by=["Sn-G3-data-quality", "Sn-G3-distribution", "Sn-G3-annotation"],
         metadata={
             "note": (
-                "Only goal where a single standard (ISO/PAS 8800) is the sole "
-                "source of normative claims. Data quality for AI remains isolated "
-                "from other applicable standards."
+                "ISO/PAS 8800 is the only standard making normative claims at "
+                "this goal, and G3 is the only retained goal (G2 to G6) with a "
+                "single contributing standard. No other applicable standard "
+                "addresses data quality for AI."
             )
         },
     )
@@ -201,9 +202,9 @@ def build_integrated_gsn() -> GSNArgument:
         ],
         metadata={
             "note": (
-                "Only node where ALL four applicable standards contribute "
-                "claims simultaneously. Evidence type asymmetry (I-2) is "
-                "the central finding of the analysis."
+                "The only node where all four applicable standards contribute "
+                "claims at once. The four evidence types measure on scales "
+                "that do not combine."
             ),
             "inconsistency": "I-2",
         },
@@ -214,8 +215,9 @@ def build_integrated_gsn() -> GSNArgument:
         element_id="G6",
         element_type=None,
         text=(
-            "Operational monitoring covers AI (OOD detection, distributional "
-            "drift), SOTIF (field performance, new triggering conditions), "
+            "Operational monitoring covers AI (out-of-distribution detection, "
+            "distributional drift), SOTIF (safety of the intended "
+            "functionality: field performance, new triggering conditions), "
             "and cybersecurity (vulnerabilities, incidents)."
         ),
         source_standards=["ISOPAS8800", "ISO21448", "ISO21434"],
@@ -417,6 +419,8 @@ def _build_solutions() -> list[Solution]:
                 "Modified condition/decision coverage at ASIL D. "
                 "Deterministic pass/fail metric. Applies to non-AI code only."
             ),
+            # Figure 2(b): evidence leg (a), dashed.
+            instantiation="not produced",
         ),
         Solution(
             element_id="Sn-G5-scenario",
@@ -428,9 +432,12 @@ def _build_solutions() -> list[Solution]:
             source_standards=["ISO21448"],
             evidence_type="scenario_coverage",
             evidence_description=(
-                "CARLA evaluation under parametrically controlled rain and fog. "
-                "Scenario count with demonstrated triggering condition coverage."
+                "Scenario count with demonstrated triggering condition "
+                "coverage, under parametrically controlled conditions such "
+                "as rain and fog."
             ),
+            # Figure 2(b): evidence leg (b), dashed.
+            instantiation="not produced",
         ),
         Solution(
             element_id="Sn-G5-ensemble-uncertainty",
@@ -442,10 +449,17 @@ def _build_solutions() -> list[Solution]:
             source_standards=["ISOPAS8800"],
             evidence_type="statistical_metric",
             evidence_description=(
-                "Geometric divergence metric from independently trained SECOND "
-                "instances. AUROC for out-of-distribution detection. "
-                "Statistical distribution, not binary."
+                "Geometric disagreement among ensemble members as the "
+                "uncertainty indicator; AUROC measures the separation of "
+                "correct from incorrect detections. A statistical "
+                "distribution, not a binary pass/fail. Reported on simulated "
+                "ensemble outputs calibrated to published LiDAR uncertainty "
+                "distributions; validation with trained ensemble inference "
+                "is future work."
             ),
+            # Figure 2(b): evidence leg (c), solid: the case study's one
+            # instantiated leg, on simulated outputs.
+            instantiation="provided (simulated)",
         ),
         Solution(
             element_id="Sn-G5-pentest",
@@ -460,15 +474,23 @@ def _build_solutions() -> list[Solution]:
                 "Attack success rates against LiDAR spoofing and point cloud "
                 "perturbation under defined threat models."
             ),
+            # Figure 2(b): evidence leg (d), dashed.
+            instantiation="not produced",
         ),
         # G6 solutions
         Solution(
             element_id="Sn-G6-ood",
             element_type=None,
-            text="OOD detection and drift monitoring (ISO/PAS 8800 Cl.14)",
+            text=(
+                "Out-of-distribution (OOD) detection and drift monitoring "
+                "(ISO/PAS 8800 Cl.14)"
+            ),
             source_standards=["ISOPAS8800"],
             evidence_type="runtime_monitor",
-            evidence_description="Runtime ensemble disagreement as OOD indicator.",
+            evidence_description=(
+                "Runtime ensemble disagreement as an out-of-distribution "
+                "indicator."
+            ),
         ),
         Solution(
             element_id="Sn-G6-sotif-field",
@@ -484,7 +506,10 @@ def _build_solutions() -> list[Solution]:
             text="Continuous cybersecurity monitoring (ISO/SAE 21434 Cl.8)",
             source_standards=["ISO21434"],
             evidence_type="security_monitoring",
-            evidence_description="Vulnerability scanning, incident detection, threat intelligence.",
+            evidence_description=(
+                "Vulnerability scanning, incident detection and threat "
+                "intelligence feeds."
+            ),
         ),
         # G7 solutions
         Solution(
@@ -528,7 +553,8 @@ def _build_solutions() -> list[Solution]:
             evidence_type="impact_assessment",
             evidence_description=(
                 "Assessment of safety impact of each threat scenario "
-                "using ISO 26262-3 severity classes."
+                "using ISO 26262-3 severity classes. ISO 26262 enters here "
+                "as a normative bridge, not as a source of claims at G8."
             ),
         ),
     ]

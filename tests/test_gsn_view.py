@@ -112,9 +112,19 @@ class TestEveryNodeIsPresent:
         )
         assert g9_panel is not None
         text = g9_panel.group(1)
-        assert "Undeveloped" in text
+        assert "undeveloped" in text
         assert "F-2" in text and "Gap-2" in text
-        assert "Partial coverage" in text
+        assert "What existing standards cover, and where they stop" in text
+
+    def test_g5_evidence_carries_the_papers_instantiation_status(self, html):
+        """Figure 2(b): one leg provided (simulated), three not produced.
+        Without these the cards read as evidence that exists."""
+        assert html.count("not produced") == 3
+        assert html.count("provided (simulated)") == 1
+
+    def test_all_seven_decision_points_are_surfaced(self, html):
+        for n in range(1, 8):
+            assert f"DP-{n}" in html, f"decision point DP-{n} missing"
 
     def test_paper_identifiers_lead(self, html):
         assert "F-2 (Gap-2 in the code)" in html
@@ -151,4 +161,7 @@ class TestProvenance:
         assert "Generated file; do not edit by hand" in html
         assert "gsn/integrated_pattern.gsn.yaml" in html
         assert "src/gsn/integrated_pattern.py" in html
+        assert "src/analysis/gaps.py" in html
+        assert "src/analysis/decision_points.py" in html
+        assert "src/visualization/standard_colors.py" in html
         assert "python -m src.visualization.interactive_view" in html

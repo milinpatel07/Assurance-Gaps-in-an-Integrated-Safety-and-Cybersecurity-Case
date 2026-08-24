@@ -55,17 +55,16 @@ the paper and reading the code needs this table.
 | DP-5 | `I-5` | Cybersecurity-SOTIF boundary undefined for adversarial inputs | `src/analysis/decision_points.py` |
 | DP-6 | `I-6` | Monitoring scope overlap — three regimes on one component | `src/analysis/decision_points.py` |
 | DP-7 | `I-7` | Data sufficiency threshold undefined | `src/analysis/decision_points.py` |
-| F-1 | `Gap-1` | No AI-specific quantitative reliability target | `src/analysis/gaps.py` |
-| F-2 | `Gap-2` | No complete OTA re-assurance workflow for AI | `src/analysis/gaps.py` |
-| F-3 | `Gap-3` | Adversarial-SOTIF boundary unowned — adversarial inputs that exploit functional insufficiencies fall between G7 and G8 | `src/analysis/gaps.py` |
-| F-4 | `Gap-4` | No cross-domain release decision criteria — four separate evidence sets with no combined evaluation | `src/analysis/gaps.py` |
-| F-5 | `Gap-5` | Data acceptance threshold undefined — no standard prescribes when training data are sufficient | `src/analysis/gaps.py` |
+| F-1 | `Gap-1` | Quantitative acceptance criteria for AI components undefined; the standards defer values to context | `src/analysis/gaps.py` |
+| F-2 | `Gap-2` | No complete over-the-air (OTA) re-assurance workflow for AI | `src/analysis/gaps.py` |
+| F-3 | `Gap-3` | Adversarial-SOTIF boundary unowned: adversarial inputs that exploit functional insufficiencies fall between G7 and G8 | `src/analysis/gaps.py` |
+| F-4 | `Gap-4` | No cross-domain release decision criteria: no standard defines how the per-domain residual risks combine into one release decision | `src/analysis/gaps.py` |
+| F-5 | `Gap-5` | Data acceptance criteria for AI components undefined; the standards prescribe frameworks but defer thresholds to context | `src/analysis/gaps.py` |
 
 The paper calls DP-N "decision points" and F-N "integration-induced
 findings and open methodological problems". The code calls them
 inconsistencies (`I-N`) and gaps (`Gap-N`). The numbers correspond exactly;
-only the prefixes differ. `gsn/integrated_pattern.gsn.yaml` still tags G9
-with the older "Gap-2" spelling.
+only the prefixes differ.
 
 ## 3. Goals of the integrated pattern
 
@@ -78,7 +77,7 @@ PAPER: Table 2 and Figure 2 of the WAISE paper. COMMAND: `python -m src.results.
 | G3 | Training and test data are sufficient in quantity, distribution coverage, annotation qu... | retained | ISOPAS8800 | ISO/PAS 8800 Cl.8.4 (data quality); ISO/IEC TR 5469 Cl.9.3.2 (data linked to HARA, informative) |
 | G4 | The AI design satisfies safety and cybersecurity requirements. Architecture decisions r... | retained | ISO21434, ISO21448, ISOPAS8800 | ISO/PAS 8800 Cl.7 (AI design principles); ISO 21448 Table A.9 (SOTIF design measures); ISO/SAE 21434 Cl.10 (cybersecurity control design) |
 | G5 | Verification and validation evidence is sufficient across all assurance domains. Four e... | retained | ISO21434, ISO21448, ISO26262, ISOPAS8800 | ISO/PAS 8800 Cl.8-9 (AI V&V); ISO 26262-6 Cl.9 (MC/DC at ASIL D); ISO 21448 Cl.9-11 (scenario testing, triggering conditions); ISO/SAE 21434 Cl.10 (vulnerability analysis, pen testing) |
-| G6 | Operational monitoring covers AI (OOD detection, distributional drift), SOTIF (field pe... | retained | ISO21434, ISO21448, ISOPAS8800 | ISO/PAS 8800 Cl.14 (AI monitoring); ISO 21448 Tables A.13-A.14 (field monitoring); ISO/SAE 21434 Cl.8 (continuous cybersecurity monitoring) |
+| G6 | Operational monitoring covers AI (out-of-distribution detection, distributional drift),... | retained | ISO21434, ISO21448, ISOPAS8800 | ISO/PAS 8800 Cl.14 (AI monitoring); ISO 21448 Tables A.13-A.14 (field monitoring); ISO/SAE 21434 Cl.8 (continuous cybersecurity monitoring) |
 | G7 | Residual risk from functional insufficiencies meets the acceptance criteria defined per... | new | ISO21448 | ISO 21448 Cl.6.5 (acceptance criteria); ISO 21448 Table A.10 (acceptance criteria evidence); ISO 21448 Annex A.1 (GSN, Example 2) |
 | G8 | Cybersecurity risks identified through TARA are treated to an acceptable level. The saf... | new | ISO21434, ISO26262 | ISO/SAE 21434 Cl.3.1.11 (cybersecurity case); ISO/SAE 21434 Cl.15 (TARA); ISO/SAE 21434 [RQ-15-06] (safety bridge) |
 | G9 | AI model modifications (OTA updates, retraining) are controlled with re-assurance crite... | undeveloped | (none) | ISO 26262-8 Cl.8 (change management, partial); ISO/PAS 8800 Cl.14.8.3 (partial re-approval, partial); ISO/IEC TR 5469 Table A.8 (change protocols, informative) |
@@ -153,8 +152,8 @@ Lifecycle phases follow that table.
 
 | Paper | Code | Lifecycle phase | Integration-induced | Partial coverage |
 |---|---|---|---|---|
-| F-1 | `Gap-1` | Concept, Verification | no | ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, PMHF < 10^-8 h^-1 — hardware only); ISO 21448 Cl.6.5 (establishes the acceptance-criteria framework, including risk tolerability principles, but defers quantitative values to context); ISO/IEC TR 5469 Cl.9.2.2 (non-separability acknowledged) |
-| F-2 | `Gap-2` | Modification | no | ISO 26262-8 Cl.8 (change management — assumes conventional SW); ISO/PAS 8800 Cl.14.8.3 (partial re-approval — incomplete); ISO 24089 (software update engineering; specifies the update process, not re-assurance of a modified AI model's argument); ISO/IEC TR 5469 Table A.8 (change protocols — informative only) |
+| F-1 | `Gap-1` | Concept, Verification | no | ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, PMHF < 10^-8 h^-1, hardware only); ISO 21448 Cl.6.5 (establishes the acceptance-criteria framework, including risk tolerability principles, but defers quantitative values to context); ISO/IEC TR 5469 Cl.9.2.2 (non-separability acknowledged) |
+| F-2 | `Gap-2` | Modification | no | ISO 26262-8 Cl.8 (change management, assumes conventional software); ISO/PAS 8800 Cl.14.8.3 (partial re-approval, incomplete); ISO 24089 (software update engineering; specifies the update process, not re-assurance of a modified AI model's argument); ISO/IEC TR 5469 Table A.8 (change protocols, informative only) |
 | F-3 | `Gap-3` | Verification, Operation | yes | ISO 21448 Cl.1 (explicitly excludes cybersecurity threats); ISO/SAE 21434 Cl.15 (includes adversarial scenarios) |
 | F-4 | `Gap-4` | Integration | yes | ISO 26262-2 Cl.6.4.8 (the encompassing system safety case collects the per-domain assessments but does not define how their residual risks combine into one release decision); ISO/SAE 21434 Cl.3.1.11 (cybersecurity case); ISO 21448 Cl.12 (SOTIF release decision) |
 | F-5 | `Gap-5` | Design | no | ISO/PAS 8800 Cl.8.4, Annex B G3 (prescribes data quality requirements as a framework, but defers thresholds to context); ISO/IEC TR 5469 Cl.9.3.2 (data linked to HARA, informative); ISO/IEC TR 5469 Cl.9.3.3 (four criteria, informative) |

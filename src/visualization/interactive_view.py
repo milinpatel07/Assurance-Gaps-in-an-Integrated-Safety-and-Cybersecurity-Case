@@ -5,17 +5,21 @@ the integrated argument for a reader arriving from the poster on a phone. It is
 generated, never edited by hand, and ``tests/test_gsn_view.py`` rebuilds it and
 fails if the committed copy differs.
 
-Two generated sources, joined by node id, no hand-authored node data:
+Generated sources, joined by node id, no hand-authored node data:
 
-  * ``gsn/integrated_pattern.gsn.yaml`` — the argument structure and the node
-    text a poster reader sees. The YAML's solution ids are the builder's ids by
-    the authors' decision, so the join is exact.
-  * ``build_integrated_gsn()`` — the clause references, evidence descriptions,
-    provenance and recorded notes that the YAML deliberately omits to stay
-    legible at poster size.
+  * ``gsn/integrated_pattern.gsn.yaml`` — the argument structure and the short
+    button text a poster reader sees. The YAML's solution ids are the
+    builder's ids by the authors' decision, so the join is exact.
+  * ``build_integrated_gsn()`` — the panel body text, clause references,
+    evidence descriptions, instantiation status and recorded notes that the
+    YAML deliberately omits to stay legible at poster size.
+  * ``src/analysis/gaps.py`` — the findings shown at their goals.
+  * ``src/analysis/decision_points.py`` — the decision points shown at their
+    goals.
+  * ``standard_colors.py`` — every colour.
 
-``tests/test_gsn_yaml_builder_consistency.py`` holds the two sources together;
-this module trusts that and does not re-check them.
+``tests/test_gsn_yaml_builder_consistency.py`` fails if the YAML and the
+builder disagree; this module trusts that and does not re-check them.
 
 Display rules, decided by the authors:
 
@@ -26,8 +30,10 @@ Display rules, decided by the authors:
     enter through its contexts and strategy, G9 is undeveloped.
   * Paper identifiers lead, code identifiers follow: "F-2 (Gap-2 in the
     code)", "DP-2 (I-2 in the code)".
-  * At G5 the four evidence types are shown side by side without a combined
-    score, total, or shared axis: the point is that the scales do not combine.
+  * At G5 the four evidence types are shown together without a combined
+    score, total, or shared axis: the point is that the scales do not
+    combine. Each carries the instantiation status the paper's Figure 2(b)
+    states: one provided (simulated), three not produced.
   * Colours come from ``standard_colors.py`` and nowhere else.
 
 Output is byte-deterministic: no timestamp, fixed ordering throughout.
@@ -46,6 +52,7 @@ import sys
 
 import yaml
 
+from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GAP_GOAL_MAP, GapClassification
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.visualization.standard_colors import (
@@ -66,6 +73,14 @@ REBUILD_COMMAND = "python -m src.visualization.interactive_view"
 NORMATIVE = set(STANDARD_COLORS)
 
 GAPS = GapClassification()
+CATALOGUE = DecisionPointCatalogue()
+
+# Legend order follows the paper's Figure 2(a) legend.
+LEGEND_ORDER = ["ISOPAS8800", "ISO21448", "ISO21434", "ISO26262"]
+
+# The paper's Figure 2(b) letters its G5 evidence legs (a) to (d); the
+# builder's supported_by order matches.
+G5_LEG_LETTERS = ["(a)", "(b)", "(c)", "(d)"]
 
 # Goals whose chip row is intentionally absent (see module docstring).
 NO_CHIP_ROW = {"G1", "G9"}
@@ -125,16 +140,34 @@ def _clause_list(refs: list[str]) -> str:
 
 
 def _evidence_cards(gsn, solution_ids: list[str], grid: bool) -> str:
-    """Evidence entries, from the builder, in the goal's declared order."""
+    """Evidence entries, from the builder, in the goal's declared order.
+
+    These are the kinds of evidence the argument calls for, not claims that
+    the evidence exists. Where the paper states whether the case study
+    produced a leg (Figure 2(b) at G5), the card carries that status.
+    """
     cards = []
-    for sid in solution_ids:
+    for index, sid in enumerate(solution_ids):
         sol = gsn.get_element(sid)
         stds = sorted(s for s in (sol.source_standards or []) if s in NORMATIVE)
         kind = _esc(sol.evidence_type.replace("_", " "))
+        letter = f"{G5_LEG_LETTERS[index]} " if grid else ""
+        status = ""
+        if sol.instantiation:
+            css_status = (
+                "status-provided"
+                if sol.instantiation.startswith("provided")
+                else "status-missing"
+            )
+            status = (
+                f'<p class="status {css_status}">Case study: '
+                f"{_esc(sol.instantiation)}</p>"
+            )
         cards.append(
             '<div class="evidence">'
             + _chip_row(stds)
-            + f"<h4>{_esc(sol.text)}</h4>"
+            + f"<h4>{letter}{_esc(sol.text)}</h4>"
+            + status
             + f'<p class="kind">Evidence kind: {kind}</p>'
             + f"<p>{_esc(sol.evidence_description)}</p>"
             + "</div>"
@@ -145,35 +178,47 @@ def _evidence_cards(gsn, solution_ids: list[str], grid: bool) -> str:
 
 def _goal_panel(gsn, nodes: dict, goal_id: str) -> str:
     goal = gsn.get_element(goal_id)
-    yaml_text = nodes[goal_id]["text"].strip()
     solution_ids = [
         c for c in (nodes[goal_id].get("supportedBy", []) or [])
         if c.startswith("Sn")
     ]
 
-    parts = [f'<p class="node-text">{_esc(yaml_text)}</p>']
+    # Panel body text comes from the builder: it writes acronyms out in full
+    # where the YAML's poster text abbreviates them.
+    parts = [f'<p class="node-text">{_esc(goal.text)}</p>']
 
     origin = getattr(goal, "origin", "")
     if origin == "retained":
-        parts.append('<p class="origin">Retained from ISO/PAS 8800 Annex B.</p>')
+        parts.append(
+            '<p class="origin">The authors kept this goal from '
+            "ISO/PAS 8800 Annex B.</p>"
+        )
     elif origin == "new":
-        parts.append('<p class="origin">New goal, added by the integration.</p>')
+        parts.append(
+            '<p class="origin">The authors added this goal; '
+            "ISO/PAS 8800 Annex B has no equivalent.</p>"
+        )
 
     if goal_id not in NO_CHIP_ROW:
         stds = _yaml_goal_standards(nodes, goal_id)
         parts.append("<h3>Contributing standards</h3>")
         parts.append(_chip_row(stds))
 
-    parts.append(_clause_list(getattr(goal, "clause_references", []) or []))
+    # G9 gets one clause list, the partial-coverage list below, which carries
+    # the same references with the reason each falls short.
+    if goal_id != "G9":
+        parts.append(_clause_list(getattr(goal, "clause_references", []) or []))
 
     note = (goal.metadata or {}).get("note")
     if note:
         parts.append(f'<p class="note">{_esc(note)}</p>')
 
-    inconsistency = (goal.metadata or {}).get("inconsistency")
-    if inconsistency:
+    # Decision points at this goal, from the catalogue the analysis reads.
+    for inc in CATALOGUE.get_for_goal(goal_id):
         parts.append(
-            f'<p class="crosswalk">Decision point {_esc(_paper_name(inconsistency))}.</p>'
+            '<p class="crosswalk">Decision point '
+            f"{_esc(_paper_name(inc.inconsistency_id))}: "
+            f"{_esc(inc.description)}.</p>"
         )
 
     # Findings that sit at this goal, from the same map the analysis reads.
@@ -190,21 +235,24 @@ def _goal_panel(gsn, nodes: dict, goal_id: str) -> str:
                 f"<li>{_esc(pc)}</li>" for pc in finding.partial_coverage
             )
             parts.append(
-                f"<h3>Partial coverage</h3><ul class='clauses'>{coverage}</ul>"
+                "<h3>What existing standards cover, and where they stop</h3>"
+                f"<ul class='clauses'>{coverage}</ul>"
             )
 
     if goal_id == "G5":
-        parts.append("<h3>The evidence asymmetry: four scales side by side</h3>")
+        parts.append(
+            "<h3>Four kinds of evidence, four scales that do not combine</h3>"
+        )
         parts.append(_evidence_cards(gsn, solution_ids, grid=True))
     elif goal_id == "G9":
         gap = (goal.metadata or {}).get("gap", "")
         parts.insert(
             1,
-            f'<p class="undeveloped-banner">Undeveloped — finding '
-            f"{_esc(_paper_name(gap))}.</p>",
+            '<p class="undeveloped-banner">This goal is undeveloped. '
+            f"The paper records it as finding {_esc(_paper_name(gap))}.</p>",
         )
     elif solution_ids:
-        parts.append("<h3>Evidence</h3>")
+        parts.append("<h3>Evidence the argument calls for</h3>")
         parts.append(_evidence_cards(gsn, solution_ids, grid=False))
 
     return "".join(parts)
@@ -212,13 +260,11 @@ def _goal_panel(gsn, nodes: dict, goal_id: str) -> str:
 
 def _support_panel(gsn, nodes: dict, node_id: str) -> str:
     """Panel for S1, C1, C2 and A1.4."""
-    yaml_key = node_id.replace(".", "_")
     element = gsn.get_element(node_id)
-    yaml_text = nodes[yaml_key]["text"].strip()
     stds = sorted(
         s for s in (element.source_standards or []) if s in NORMATIVE
     )
-    parts = [f'<p class="node-text">{_esc(yaml_text)}</p>']
+    parts = [f'<p class="node-text">{_esc(element.text)}</p>']
     if stds:
         parts.append("<h3>Contributing standards</h3>")
         parts.append(_chip_row(stds))
@@ -256,7 +302,7 @@ def _node_button(gsn, nodes: dict, node_id: str, kind: str) -> str:
         if c.startswith("Sn")
     )
     badge = (
-        f'<span class="badge">{evidence_count} evidence</span>'
+        f'<span class="badge">{evidence_count} evidence types</span>'
         if evidence_count
         else ""
     )
@@ -299,12 +345,12 @@ def _templates(gsn, nodes: dict) -> str:
 
 
 def _legend() -> str:
-    chips = "".join(_chip(s) for s in sorted(STANDARD_COLORS))
+    chips = "".join(_chip(s) for s in LEGEND_ORDER)
     return (
+        f'<p class="chips legend">{chips}</p>'
         '<p class="chips legend">'
-        + chips
-        + f'<span class="chip" style="--c:{GAP_GREY}">Undeveloped (gap)</span>'
-        + "</p>"
+        f'<span class="chip" style="--c:{GAP_GREY}">'
+        "Undeveloped goal (a gap in the standards)</span></p>"
     )
 
 
@@ -312,8 +358,8 @@ def _placeholder_banner() -> str:
     if not PLACEHOLDERS_PENDING:
         return ""
     return (
-        '<p class="placeholder-warning">Colour placeholders: the four standard '
-        "colours await the talk deck's palette and are not the design.</p>"
+        '<p class="placeholder-warning">Placeholder colours. The final '
+        "palette is set in standard_colors.py.</p>"
     )
 
 
@@ -406,6 +452,10 @@ header p { margin: 4px 0; }
   background: #f5f5f5; border-left: 4px dashed #757575;
   padding: 6px 10px; margin: 8px 0; font-weight: 600;
 }
+.status { font-weight: 700; margin: 2px 0; }
+.status-missing { color: #555; }
+.status-missing::before { content: "\25CB "; }
+.status-provided::before { content: "\25CF "; }
 .crosswalk { color: #444; font-size: 0.85rem; }
 .clauses { margin: 4px 0; padding-left: 20px; }
 .evidence { border: 1px solid #bbb; border-radius: 8px; padding: 8px 10px; }
@@ -445,8 +495,8 @@ JS = """
   document.querySelectorAll('[data-node]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       opener = btn;
-      show(btn.dataset.node, btn.querySelector('.node-id').textContent + ' - ' +
-        btn.querySelector('.node-label').textContent);
+      show(btn.dataset.node, btn.querySelector('.node-id').textContent + ': ' +
+        btn.querySelector('.node-kind').textContent);
     });
   });
   close.addEventListener('click', hide);
@@ -466,13 +516,17 @@ def build_html() -> str:
         "<!doctype html>\n"
         '<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        "<title>Integrated safety and cybersecurity argument — interactive GSN</title>\n"
+        "<title>Integrated safety and cybersecurity argument: "
+        "interactive GSN view</title>\n"
         f"<style>{CSS}</style>\n</head>\n<body>\n"
         "<header>\n"
         "<h1>Integrated safety and cybersecurity argument</h1>\n"
-        "<p>The nine-goal GSN pattern for an AI-based LiDAR perception component "
-        "(SAE Level 4+). Tap a node for its clause references, contributing "
-        "standards and evidence.</p>\n"
+        "<p>This page shows a Goal Structuring Notation (GSN) argument: a "
+        "claim at the top, a strategy for supporting it, and the sub-goals "
+        "and evidence underneath. It integrates four standards for an "
+        "AI-based perception component in a driverless vehicle, instantiated "
+        "for LiDAR. Tap any node to see which standards it draws on, what "
+        "evidence it calls for, and where the standards leave a gap.</p>\n"
         + _placeholder_banner()
         + _legend()
         + "</header>\n<main>\n"
@@ -485,11 +539,15 @@ def build_html() -> str:
         '<div id="sheet-body"></div>\n</div>\n'
         + _templates(gsn, nodes)
         + "\n<footer>\n"
-        "<p>Generated file; do not edit by hand. Structure and node text come "
-        "from <code>gsn/integrated_pattern.gsn.yaml</code>; clause references "
-        "and evidence detail from <code>src/gsn/integrated_pattern.py</code>. "
-        "The two are held together by "
-        "<code>tests/test_gsn_yaml_builder_consistency.py</code>. "
+        "<p>Generated file; do not edit by hand. Structure and button text "
+        "come from <code>gsn/integrated_pattern.gsn.yaml</code>; panel text, "
+        "clause references and evidence detail from "
+        "<code>src/gsn/integrated_pattern.py</code>; findings and decision "
+        "points from <code>src/analysis/gaps.py</code> and "
+        "<code>src/analysis/decision_points.py</code>; colours from "
+        "<code>src/visualization/standard_colors.py</code>. "
+        "<code>tests/test_gsn_yaml_builder_consistency.py</code> fails if the "
+        "structure sources disagree. "
         f"Rebuild: <code>{REBUILD_COMMAND}</code></p>\n"
         "</footer>\n"
         f"<script>{JS}</script>\n"

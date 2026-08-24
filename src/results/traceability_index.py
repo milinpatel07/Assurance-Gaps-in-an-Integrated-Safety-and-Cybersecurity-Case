@@ -125,8 +125,7 @@ def _crosswalk_section(catalogue: DecisionPointCatalogue, gaps: GapClassificatio
         'The paper calls DP-N "decision points" and F-N "integration-induced',
         'findings and open methodological problems". The code calls them',
         "inconsistencies (`I-N`) and gaps (`Gap-N`). The numbers correspond exactly;",
-        "only the prefixes differ. `gsn/integrated_pattern.gsn.yaml` still tags G9",
-        'with the older "Gap-2" spelling.',
+        "only the prefixes differ.",
         "",
     ]
     return lines

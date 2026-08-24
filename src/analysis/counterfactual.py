@@ -109,7 +109,10 @@ class CounterfactualAnalysis:
                     "Data quality for training",
                     "Runtime monitoring for ML",
                 ],
-                visible_gaps=["Gap-1 (no AI reliability target)", "Gap-2 (no OTA re-assurance)"],
+                visible_gaps=[
+                    "Gap-1 (no quantitative acceptance criteria)",
+                    "Gap-2 (no OTA re-assurance)",
+                ],
                 invisible_gaps=[
                     "Gap-3 (adversarial-SOTIF boundary — not aware SOTIF excludes cyber)",
                     "Gap-4 (cross-domain release — only sees safety assessment)",

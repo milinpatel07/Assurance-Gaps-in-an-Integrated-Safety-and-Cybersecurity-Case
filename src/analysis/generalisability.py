@@ -127,7 +127,9 @@ def classify_finding_generalisability() -> list[FindingGeneralisability]:
         # ── Gaps ─────────────────────────────────────────────────
         FindingGeneralisability(
             finding_id="Gap-1",
-            description="No AI quantitative reliability target",
+            description=(
+                "Quantitative acceptance criteria for AI components undefined"
+            ),
             scope="universal",
             rationale=(
                 "Hardware metrics (SPFM, LFM, PMHF) exist at all ASIL levels. "
