@@ -84,8 +84,11 @@ def check_gsn_completeness() -> CompletenessCheckResult:
 
     if is_complete:
         explanation = (
-            f"The 9-goal GSN is structurally complete. All {len(all_claims)} claims "
-            f"from {len(registry.all_standards)} standards map to goal nodes. "
+            f"The 9-goal GSN is structurally complete. "
+            f"{len(all_claims) - len(unmapped) - len(out_of_scope)} of "
+            f"{len(all_claims)} claims from {len(registry.all_standards)} standards "
+            f"map to GSN nodes; {len(out_of_scope)} recorded as outside the "
+            f"AI-component scope; none unmapped. "
             f"All {len(all_phases)} lifecycle phases are covered. "
             f"G9 is intentionally undeveloped (Gap-2: no re-assurance workflow). "
             f"The extension from 6 to 9 goals is justified: G7 (SOTIF), G8 (cybersecurity), "

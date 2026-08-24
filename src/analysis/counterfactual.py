@@ -25,10 +25,16 @@ computes the numbers, but the numbers only mean "invisible" under this premise:
     contributes, there are no scales to reconcile and no such rule is missing.
 
 Under that premise the computation runs: G5 draws on all four normative standards
-in the union and on exactly one in any single-standard view, so the question is
-posed in the union and in no restriction. The contrast is not automatic, which is
-what makes the computation worth running: G3 and G7 draw on one standard even in
-the union, so no combining question arises at them at all.
+in the union and on one in any single-standard view, so the question is posed in
+the union and in no restriction.
+
+Be clear about the reach of that. The premise does not single out G5. Every node
+with more than one contributing standard satisfies it, which is most of the
+pattern; only G3, G7 and G8 fail it. So the computation establishes that the
+finding is invisible from any single standard. It does not establish that G5 is
+where the finding belongs. That comes from the paper, which locates F-4 there.
+Restricting to one standard gives a contributor count of one by construction, and
+that is not reported as a discovery.
 
 The unit is the standard, not the claim. Counting claims would give the wrong
 answer, because ISO 26262 alone carries several claims at G5 and they are all
@@ -247,8 +253,10 @@ class CounterfactualAnalysis:
         Nothing here encodes the answer. The result follows from which standards
         source which goals.
         """
+        from src.analysis.gaps import GAP_GOAL_MAP
+
         sources = cls._goal_sources()
-        boundary_goals = ["G7", "G8"]
+        boundary_goals = GAP_GOAL_MAP["Gap-3"]
         contributors = sorted({s for g in boundary_goals for s in sources.get(g, set())})
 
         sees_both = sorted(
@@ -292,7 +300,11 @@ class CounterfactualAnalysis:
         # would give the wrong answer: ISO 26262 alone carries several claims at
         # G5, but they are all functional-safety verification on one scale, and
         # no cross-domain combining question arises among them.
-        contributors_in_any_single_view = 1
+        #
+        # Restricted to one standard the contributor count is 1 by construction,
+        # for any node that standard reaches. That is not a computed discovery and
+        # is not reported as one.
+        contributors_in_any_single_view = 1 if union_contributors else 0
 
         return {
             "gap_id": "Gap-4",
@@ -316,11 +328,17 @@ class CounterfactualAnalysis:
             ),
             "derivation": (
                 f"In the union, {goal} draws on {len(union_contributors)} of the four "
-                f"normative standards, so the combining question is posed there. "
-                f"Restricted to any one standard, exactly one standard contributes, "
-                f"so no cross-domain combining question is posed. The contrast is not "
-                f"automatic: G3 and G7 draw on one standard even in the union, so no "
-                f"such question arises at them at all."
+                f"normative standards, so a cross-domain combining question is posed "
+                f"there. Restricted to any one standard, one standard contributes, so "
+                f"no such question is posed."
+            ),
+            "what_this_does_not_show": (
+                "The premise does not single out this goal. Any node with more than "
+                "one contributing standard satisfies it, which is most of the "
+                "pattern; only the single-standard goals (G3, G7, G8) fail it. G5 is "
+                "where F-4 sits because the paper locates it there, not because this "
+                "computation selects it. What the computation establishes is the "
+                "invisibility from a single standard, not the choice of node."
             ),
             "caveat": (
                 "The premise carries part of the conclusion. A reader who rejects "

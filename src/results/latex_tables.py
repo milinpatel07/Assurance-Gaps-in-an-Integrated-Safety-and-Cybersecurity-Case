@@ -325,7 +325,11 @@ def generate_table6_gaps() -> str:
 
     for gap in gaps_cls.gaps:
         tl = type_map[gap.gap_type]
-        phase = gap.lifecycle_phase.display_name
+        # Escape the phase. "Verification & Validation" contains an ampersand,
+        # which unescaped opened an extra column and stopped the table compiling.
+        # Use the paper's findings-table wording, which carries every phase for the
+        # finding rather than only the primary one.
+        phase = _latex_escape(gap.lifecycle_phase_label)
         induced = r"$\dagger$" if gap.integration_induced else "---"
         desc = _latex_escape(gap.description)
         lines.append(f"  {gap.gap_id} & {tl} & {phase} & {induced} & {desc} \\\\")

@@ -178,7 +178,8 @@ class AssuranceGap:
         gap_type: Classification (missing claim, missing evidence, unresolved inconsistency).
         lifecycle_phase: The primary lifecycle phase where the gap occurs.
         additional_lifecycle_phases: Further phases the camera-ready table lists
-            for this finding. Table 4 gives two phases for F-1 ("Concept,
+            for this finding. The paper's findings table (tab:gaps) gives two
+            phases for F-1 ("Concept,
             Verification") and for F-3 ("Verification, Operation"). The primary
             field is kept so existing callers keep working; use
             ``lifecycle_phases`` to get the full set the paper states.
@@ -201,7 +202,7 @@ class AssuranceGap:
 
     @property
     def lifecycle_phase_label(self) -> str:
-        """Phases as the paper's Table 4 writes them, e.g. 'Concept, Verification'."""
+        """Phases as the paper's findings table writes them, e.g. 'Concept, Verification'."""
         order = list(LifecyclePhase)
         phases = sorted(set(self.lifecycle_phases), key=order.index)
         return ", ".join(p.display_name.split(" /")[0].split(" &")[0] for p in phases)

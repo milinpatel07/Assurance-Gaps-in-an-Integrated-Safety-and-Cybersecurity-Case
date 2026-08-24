@@ -3,7 +3,7 @@ ANALYSIS RESULTS SUMMARY
 Assurance Gaps in an Integrated Safety and Cybersecurity Case
 for an AI-Based Perception Component in Highly Automated Driving
 ================================================================================
-Generated: 2026-05-18 23:06:07
+Generated: 2026-08-24 15:11:47
 Random seed: 42
 
 ------------------------------------------------------------
@@ -79,9 +79,9 @@ evidence types into a single sufficiency claim at G5.
 GSN COMPLETENESS CHECK
 ------------------------------------------------------------
   Complete: True
-  Claims mapped: 40/40
+  Claims mapped: 39/40
   Phases covered: Concept / Requirements, Design / Training, Integration / Deployment, Modification / Re-assurance, Operation / Monitoring, Verification & Validation
-  The 9-goal GSN is structurally complete. All 40 claims from 5 standards map to goal nodes. All 6 lifecycle phases are covered. G9 is intentionally undeveloped (Gap-2: no re-assurance workflow). The extension from 6 to 9 goals is justified: G7 (SOTIF), G8 (cybersecurity), and G9 (modification) are required to host claims that have no home in the base ISO/PAS 8800 Annex B pattern.
+  The 9-goal GSN is structurally complete. 39 of 40 claims from 5 standards map to GSN nodes; 1 recorded as outside the AI-component scope; none unmapped. All 6 lifecycle phases are covered. G9 is intentionally undeveloped (Gap-2: no re-assurance workflow). The extension from 6 to 9 goals is justified: G7 (SOTIF), G8 (cybersecurity), and G9 (modification) are required to host claims that have no home in the base ISO/PAS 8800 Annex B pattern.
 
 ------------------------------------------------------------
 COUNTERFACTUAL ANALYSIS

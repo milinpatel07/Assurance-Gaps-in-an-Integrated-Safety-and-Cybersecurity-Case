@@ -176,6 +176,38 @@ class TestOutOfScopeClaimsAreDeclared:
         ]
         assert not silent, f"claims with no goal and no reason: {silent}"
 
+    def test_the_out_of_scope_set_is_exactly_what_was_agreed(self):
+        """Pin the set, so the reason field cannot become an escape hatch.
+
+        Without this, any claim could be quietly removed from the argument by
+        setting gsn_goal=None and writing a sentence, and every other test would
+        still pass while mapped_claims silently dropped.
+        """
+        registry = StandardsRegistry()
+        out_of_scope = sorted(
+            c.claim_id
+            for s in registry.all_standards
+            for c in s.claims
+            if c.is_out_of_scope
+        )
+        assert out_of_scope == ["CLM-26262-TSC-01"], (
+            "The set of claims held outside the AI-component argument changed. "
+            "That is a scope decision for the authors, not a code change."
+        )
+
+    def test_completeness_numbers_reconcile(self):
+        """mapped + out_of_scope + unmapped must equal total."""
+        from src.analysis.completeness import check_gsn_completeness
+
+        r = check_gsn_completeness()
+        assert (
+            r.mapped_claims + len(r.out_of_scope_claims) + len(r.unmapped_claims)
+            == r.total_claims
+        )
+        assert str(r.total_claims) not in r.explanation.split("map to GSN nodes")[0].split(
+            "of "
+        )[0], "explanation must not claim all claims map"
+
     def test_the_technical_safety_concept_claim_is_recorded_out_of_scope(self):
         """It is kept, not deleted, so the obligation stays visible."""
         registry = StandardsRegistry()

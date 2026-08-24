@@ -432,7 +432,7 @@ def plot_gap_lifecycle_distribution(
 
     phase_counts: dict[str, dict[str, int]] = {}
     for gap in gaps_cls.gaps:
-        phase = gap.lifecycle_phase.display_name
+        phase = gap.lifecycle_phase_label
         if phase not in phase_counts:
             phase_counts[phase] = {"standard": 0, "integration": 0}
         if gap.integration_induced:

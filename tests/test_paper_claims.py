@@ -504,6 +504,35 @@ class TestCounterfactualDerivation:
         assert result["contributors_in_any_single_standard_view"] == 1
         assert result["invisible_under_premise"] is True
 
+    def test_gap4_premise_does_not_by_itself_select_g5(self):
+        """The premise holds at most nodes, so it cannot be sold as selective.
+
+        Guards against overstating the derivation: if this ever returns only G5,
+        the claim in the docstring has changed and must be re-read.
+        """
+        satisfying = [
+            g
+            for g in ("G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8")
+            if CounterfactualAnalysis.derive_gap4_invisibility(g)["invisible_under_premise"]
+        ]
+        assert "G5" in satisfying
+        assert len(satisfying) > 1, (
+            "The premise is being presented as selective. It is not."
+        )
+        for single_standard_goal in ("G3", "G7"):
+            assert single_standard_goal not in satisfying
+
+    def test_gap4_states_the_limit_of_what_it_shows(self):
+        result = CounterfactualAnalysis.derive_gap4_invisibility()
+        assert "does not single out" in result["what_this_does_not_show"]
+
+    def test_gap3_boundary_goals_come_from_the_shared_map(self):
+        """counterfactual.py must not keep its own copy of the gap-to-goal map."""
+        from src.analysis.gaps import GAP_GOAL_MAP
+
+        result = CounterfactualAnalysis.derive_gap3_invisibility()
+        assert result["boundary_goals"] == GAP_GOAL_MAP["Gap-3"]
+
     def test_gap4_derivation_states_its_premise(self):
         """The premise is asserted, so it must be visible to a reader."""
         result = CounterfactualAnalysis.derive_gap4_invisibility()

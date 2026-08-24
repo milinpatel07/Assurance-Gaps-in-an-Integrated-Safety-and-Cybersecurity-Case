@@ -14,10 +14,23 @@ from __future__ import annotations
 from src.standards.base import AssuranceGap, GapType, LifecyclePhase
 
 
+# Where each finding sits in the argument. Single source: counterfactual.py and
+# traceability.py both read this rather than keeping their own copies, because a
+# fact written down twice with nothing holding the copies together is how G2 came
+# to contradict a published claim (REPO_AUDIT.md section 5b.2).
+GAP_GOAL_MAP: dict[str, list[str]] = {
+    "Gap-1": ["G1"],
+    "Gap-2": ["G9"],
+    "Gap-3": ["G7", "G8"],
+    "Gap-4": ["G5"],
+    "Gap-5": ["G3"],
+}
+
+
 class GapClassification:
     """The five assurance gaps identified in the analysis.
 
-    Each gap corresponds to a row in Table 6 of the paper.
+    Each finding corresponds to a row in the paper's findings table (tab:gaps).
     Two gaps (Gap-3, Gap-4) are integration-induced.
     """
 
@@ -31,12 +44,14 @@ class GapClassification:
                 description="No AI-specific quantitative reliability target",
                 gap_type=GapType.MISSING_EVIDENCE,
                 lifecycle_phase=LifecyclePhase.VERIFICATION,
-                # Table 4 of the camera-ready gives "Concept, Verification".
+                # The camera-ready findings table (tab:gaps) gives "Concept, Verification".
                 additional_lifecycle_phases=[LifecyclePhase.CONCEPT],
                 partial_coverage=[
                     "ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, "
                     "PMHF < 10^-8 h^-1 — hardware only)",
-                    "ISO 21448 Cl.6.5 (qualitative acceptance criteria)",
+                    "ISO 21448 Cl.6.5 (establishes the acceptance-criteria framework, "
+                    "including risk tolerability principles, but defers "
+                    "quantitative values to context)",
                     "ISO/IEC TR 5469 Cl.9.2.2 (non-separability acknowledged)",
                 ],
                 integration_induced=False,
@@ -63,7 +78,7 @@ class GapClassification:
                 ),
                 gap_type=GapType.UNRESOLVED_INCONSISTENCY,
                 lifecycle_phase=LifecyclePhase.VERIFICATION,
-                # Table 4 of the camera-ready gives "Verification, Operation".
+                # The camera-ready findings table (tab:gaps) gives "Verification, Operation".
                 additional_lifecycle_phases=[LifecyclePhase.OPERATION],
                 partial_coverage=[
                     "ISO 21448 Cl.1 (explicitly excludes cybersecurity threats)",
@@ -80,7 +95,9 @@ class GapClassification:
                 gap_type=GapType.MISSING_CLAIM,
                 lifecycle_phase=LifecyclePhase.INTEGRATION,
                 partial_coverage=[
-                    "ISO 26262-2 Cl.6.4 (functional safety assessment)",
+                    "ISO 26262-2 Cl.6.4.8 (the encompassing system safety case collects "
+                    "the per-domain assessments but does not define how their "
+                    "residual risks combine into one release decision)",
                     "ISO/SAE 21434 Cl.3.1.11 (cybersecurity case)",
                     "ISO 21448 Cl.12 (SOTIF release decision)",
                 ],
@@ -95,7 +112,8 @@ class GapClassification:
                 gap_type=GapType.MISSING_EVIDENCE,
                 lifecycle_phase=LifecyclePhase.DESIGN,
                 partial_coverage=[
-                    "ISO/PAS 8800 Cl.8.4, Annex B G3 (claim exists)",
+                    "ISO/PAS 8800 Cl.8.4, Annex B G3 (prescribes data quality "
+                    "requirements as a framework, but defers thresholds to context)",
                     "ISO/IEC TR 5469 Cl.9.3.2 (data linked to HARA, informative)",
                     "ISO/IEC TR 5469 Cl.9.3.3 (four criteria, informative)",
                 ],
@@ -116,12 +134,14 @@ class GapClassification:
         return [g for g in self.gaps if g.integration_induced]
 
     def get_by_phase(self, phase: LifecyclePhase) -> list[AssuranceGap]:
-        return [g for g in self.gaps if g.lifecycle_phase == phase]
+        # Match any phase the paper lists for the finding, not only the primary
+        # one. tab:gaps gives two phases each for F-1 and F-3.
+        return [g for g in self.gaps if phase in g.lifecycle_phases]
 
     def print_classification(self):
-        """Print the gap classification (Table 6)."""
+        """Print the findings classification (paper table tab:gaps)."""
         print("=" * 80)
-        print("ASSURANCE GAPS (Step 5 Output — Table 6)")
+        print("FINDINGS (Step 5 output; paper table tab:gaps)")
         print("=" * 80)
 
         type_labels = {

@@ -148,15 +148,16 @@ System-level obligation. Cl.6.2 defines the technical safety concept as the tech
 
 ## 5. Findings
 
-PAPER: Table 4 of the WAISE paper. Lifecycle phases follow that table.
+PAPER: the findings table of the WAISE paper, labelled `tab:gaps`.
+Lifecycle phases follow that table.
 
 | Paper | Code | Lifecycle phase | Integration-induced | Partial coverage |
 |---|---|---|---|---|
-| F-1 | `Gap-1` | Concept, Verification | no | ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, PMHF < 10^-8 h^-1 — hardware only); ISO 21448 Cl.6.5 (qualitative acceptance criteria); ISO/IEC TR 5469 Cl.9.2.2 (non-separability acknowledged) |
+| F-1 | `Gap-1` | Concept, Verification | no | ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, PMHF < 10^-8 h^-1 — hardware only); ISO 21448 Cl.6.5 (establishes the acceptance-criteria framework, including risk tolerability principles, but defers quantitative values to context); ISO/IEC TR 5469 Cl.9.2.2 (non-separability acknowledged) |
 | F-2 | `Gap-2` | Modification | no | ISO 26262-8 Cl.8 (change management — assumes conventional SW); ISO/PAS 8800 Cl.14.8.3 (partial re-approval — incomplete); ISO 24089 (software update engineering; specifies the update process, not re-assurance of a modified AI model's argument); ISO/IEC TR 5469 Table A.8 (change protocols — informative only) |
 | F-3 | `Gap-3` | Verification, Operation | yes | ISO 21448 Cl.1 (explicitly excludes cybersecurity threats); ISO/SAE 21434 Cl.15 (includes adversarial scenarios) |
-| F-4 | `Gap-4` | Integration | yes | ISO 26262-2 Cl.6.4 (functional safety assessment); ISO/SAE 21434 Cl.3.1.11 (cybersecurity case); ISO 21448 Cl.12 (SOTIF release decision) |
-| F-5 | `Gap-5` | Design | no | ISO/PAS 8800 Cl.8.4, Annex B G3 (claim exists); ISO/IEC TR 5469 Cl.9.3.2 (data linked to HARA, informative); ISO/IEC TR 5469 Cl.9.3.3 (four criteria, informative) |
+| F-4 | `Gap-4` | Integration | yes | ISO 26262-2 Cl.6.4.8 (the encompassing system safety case collects the per-domain assessments but does not define how their residual risks combine into one release decision); ISO/SAE 21434 Cl.3.1.11 (cybersecurity case); ISO 21448 Cl.12 (SOTIF release decision) |
+| F-5 | `Gap-5` | Design | no | ISO/PAS 8800 Cl.8.4, Annex B G3 (prescribes data quality requirements as a framework, but defers thresholds to context); ISO/IEC TR 5469 Cl.9.3.2 (data linked to HARA, informative); ISO/IEC TR 5469 Cl.9.3.3 (four criteria, informative) |
 
 F-3 and F-4 are the integration-induced findings. F-3's invisibility from
 any single standard is derived in `src/analysis/counterfactual.py`. F-4's
@@ -165,7 +166,8 @@ than proves. F-1, F-2 and F-5 are asserted, and that module says so.
 
 ## 6. Decision points
 
-PAPER: Table 3 of the WAISE paper.
+PAPER: the decision-point table of the WAISE paper, labelled
+`tab:inconsistencies`.
 
 | Paper | Code | Type | Standards | GSN node |
 |---|---|---|---|---|
@@ -224,7 +226,8 @@ repository. Its claims trace to CLAUSE and to PAPER, never to COMMAND.
 
 Recorded here so a reader meets them rather than discovering them alone.
 
-**DP-2 is typed differently in the paper's own table and prose.** Table 3
+**DP-2 is typed differently in the paper's own table and prose.** The
+decision-point table (`tab:inconsistencies`)
 tags DP-2 "S, M". The prose calls it structural in three places: the
 structural list "(DP-1, DP-2, DP-5)", the subsection heading "DP-2:
 Evidence type asymmetry at V&V (structural decision point)", and the

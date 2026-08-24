@@ -217,6 +217,9 @@ def export_results(registry, gsn, catalogue, gaps, eval_result):
                     "description": g.description,
                     "type": g.gap_type.value,
                     "lifecycle_phase": g.lifecycle_phase.value,
+                    # Every phase the paper lists, not only the primary one.
+                    "lifecycle_phases": [p.value for p in g.lifecycle_phases],
+                    "lifecycle_phase_label": g.lifecycle_phase_label,
                     "integration_induced": g.integration_induced,
                 }
                 for g in gaps.gaps
