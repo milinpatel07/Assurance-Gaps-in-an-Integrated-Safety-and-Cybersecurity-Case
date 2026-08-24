@@ -10,6 +10,7 @@
 #   make figures      — Generate figures only
 #   make latex        — Generate LaTeX tables only
 #   make traceability — Regenerate the traceability index
+#   make gsn-view     — Regenerate the interactive GSN view
 #   make clean        — Remove generated output
 #   make all          — Install, test, and generate results
 #
@@ -38,6 +39,7 @@ help:
 	@echo "  figures      — Generate visualization figures only"
 	@echo "  latex        — Generate LaTeX tables only"
 	@echo "  traceability — Regenerate TRACEABILITY.md"
+	@echo "  gsn-view     — Regenerate docs/gsn_view.html (interactive GSN)"
 	@echo "  clean        — Remove generated output directory"
 	@echo "  all          — install + test + results"
 	@echo ""
@@ -55,6 +57,10 @@ test:
 # Regenerate the traceability index. Use --check in CI to fail on a stale copy.
 traceability:
 	$(PYTHON) -m src.results.traceability_index
+
+# Regenerate the interactive GSN view. Use --check in CI to fail on a stale copy.
+gsn-view:
+	$(PYTHON) -m src.visualization.interactive_view
 
 results: $(OUTDIR)/analysis_results.json
 
