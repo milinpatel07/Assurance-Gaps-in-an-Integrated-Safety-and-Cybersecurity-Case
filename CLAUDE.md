@@ -1,86 +1,105 @@
-# Working rules for this repository
+# CLAUDE.md
 
-## What this is
-Supplementary material for two SAFECOMP 2026 contributions by Milin Patel and
-Rolf Jung (Kempten University of Applied Sciences): the WAISE 2026 paper on a
-GSN argument pattern integrating ISO 26262, ISO 21448, ISO/SAE 21434 and
-ISO/PAS 8800 for an AI-based LiDAR perception component, and the SAFECOMP 2026
-position paper on two operational assurance gaps. It is also the target of the
-QR code on the conference poster.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Audience: SAFECOMP reviewers, functional safety engineers, and researchers who
-will reuse the pattern. Assume they know the standards and do not know Python.
+## What this repository is
 
-## Non-negotiable
-- Accuracy over polish. Never state an unverified thing as fact. Write
-  "unverified" and what would settle it.
-- Never invent a citation, clause number, file path, result, or DOI.
-- Do not change a computed number, threshold, or seed while doing structural work.
-- Do not remove content without stating the justification first.
-- Never update a reference output to make a failing test pass.
-- Do not claim the repository proves anything the papers only argue.
+Supplementary material for academic papers on integrating cybersecurity into the AI safety
+assurance argument for an AI-based LiDAR perception component in highly automated driving.
+It is **not** a software product: the `src/` code exists to make the papers' claims
+machine-checkable and reproducible, and `paper/` holds the LaTeX sources themselves.
 
-## Terminology (must not drift)
-- concern: one of the three assurance dimensions (SOTIF, AI safety, cybersecurity)
-- concern label: the tag identifying which concern owns an anomaly
-- one judgment: a single verdict on whether the assurance argument still holds
-- one top claim: the root claim the argument supports
-- assignment gap: no clause assigns an unlabeled runtime anomaly to a concern
-- resolution gap: no clause resolves per-concern re-evaluations into one judgment
+There are **two papers** (see `paper/`), both by Patel & Jung, Kempten University:
 
-Use the paper's wording, not a paraphrase of it. If a term appears in the papers,
-grep the papers before inventing a phrasing for it here.
+- `paper/waise2026/` (LLNCS format) — the GSN integration pattern paper. The `src/` code
+  backs *this* paper: the 9-goal integrated pattern, 7 inconsistencies, 5 gaps.
+- `paper/safecomp2026-position/` (IEEEtran) — a position paper on the operational
+  concern-assignment gap (assigning a runtime anomaly to SOTIF / AI-safety / cybersecurity).
+  It is argued at the clause level and is not backed by the `src/` analysis code.
 
-## Decisions
-Decide rather than asking. State the criterion the decision was made on, and
-name the alternative that was rejected and why. A decision with no stated
-criterion is a subjective decision and is not acceptable here.
+A poster is also in scope on this branch (`restructure/two-papers-plus-poster`).
 
-Where two options are genuinely equal on the stated criterion, pick the one a
-reader can verify faster, and say so.
+## Commands
 
-## Prose written into this repository
-Every README, comment, docstring, and commit message.
+```bash
+pip install -e ".[dev]"          # install (make install)
+pytest tests/ -v --tb=short      # run all 192 tests (make test)
+pytest tests/test_paper_claims.py -v                       # one file
+pytest tests/test_paper_claims.py::TestGapClaims -v        # one class
+pytest "tests/test_paper_claims.py::TestGapClaims::test_exactly_five_gaps" -v  # one test
+python -m src.results.generate_all --seed 42 --scenes 50 --output output  # regenerate all outputs (make results)
+python -m src.analysis.run_analysis   # five-step methodology with console output
+black src tests && ruff check src tests   # format / lint (line-length 100, py39)
+make gsn-install && make gsn      # render GSN YAML → SVG via gsn2x (Linux binary)
+```
 
-- No em-dashes. Parentheses or a full stop.
-- Banned: comprehensive, novel, robust, significant, seamless, leverage, delve,
-  crucial, key, powerful, cutting-edge, streamline, unlock, dive into,
-  it is worth noting, in today's landscape.
-- No sentence that restates its heading. No "This section explains".
-- No tricolon padding ("faster, cleaner, and more maintainable").
-- Vary sentence length. Uniform rhythm reads as generated.
-- No bullet list where two sentences work.
-- Scope claims exactly: "none of the four standards examined", not "no standard".
-- Abbreviate after first use, then stay consistent.
-- A reader must be able to check every claim in the docs against a file in the
-  repository. If they cannot, the claim does not belong in the docs.
+Note: `make gsn-install` downloads a **Linux** gsn2x binary; on Windows install gsn2x
+manually. Graphviz is optional — `generate_all` warns and continues if PNG/PDF rendering
+of the GSN diagram fails, still writing the `.dot` source.
 
-## Visual and structural output
-- One colour per standard (ISO 26262, ISO 21448, ISO/SAE 21434, ISO/PAS 8800),
-  the same four across diagrams, the talk deck, and the poster. No fifth accent.
-- Diagrams are generated from gsn/*.yaml at build time. The YAML is the single
-  source of truth. Never hand-author node data into HTML or SVG.
-- Anything a visitor may open from the poster QR code must be readable on a
-  phone in portrait at 380px, in bright outdoor light. High contrast. No thin
-  grey text on white.
-- No decorative element that carries no information.
+## Architecture
 
-## Tools
-- Prefer Serena symbol tools over reading whole files in src/ and tests/.
-- Use subagents for independent review passes and for parallel exploration where
-  the branches do not depend on each other. State what each subagent was asked.
-- Use the repository's own tests and Makefile targets to verify. Verify by
-  running, never by reasoning about what the code would do.
+The whole `src/` package is an executable encoding of the WAISE paper's five-step
+"constructive integration" methodology. Data flows in one direction:
 
-## Before declaring any phase done
-Self-review as four readers and fix what each finds:
-1. A domain expert checking whether the standards claims are correct.
-2. A first-time visitor arriving by phone from the poster.
-3. A reviewer checking whether the repository supports what the papers claim.
-4. A reader hunting for generated prose. Rewrite what they flag; do not delete it.
+1. **Standards** (`src/standards/`) — one module per standard (`iso26262`, `iso21448`,
+   `iso21434`, `iso8800`, `tr5469`), each a `Standard` (see `base.py`) holding hand-coded
+   `Clause` and `Claim` objects. `registry.py`'s `StandardsRegistry` aggregates them and
+   answers cross-standard queries (`compute_coverage_matrix`, `compute_goal_density`,
+   `get_claims_for_goal`). This is Steps 1–2.
+2. **GSN** (`src/gsn/`) — `model.py` is the GSN data model (`GSNArgument`, `Goal`,
+   `Strategy`, `Context`, …). `integrated_pattern.py`'s `build_integrated_gsn()` constructs
+   the 9-goal pattern by extending ISO/PAS 8800 Annex B (Step 3). This is the single source
+   of truth for the argument structure in code.
+3. **Analysis** (`src/analysis/`) — Steps 4–5 and validation. `decision_points.py`'s
+   `DecisionPointCatalogue` holds the 7 **inconsistencies** (I-1…I-7); despite the file
+   name, "decision points" and "inconsistencies" are the same objects (the file was
+   renamed). `gaps.py`'s `GapClassification` holds the 5 gaps. `counterfactual.py`,
+   `completeness.py`, `traceability.py`, `sensitivity.py`, `evidence_convergence.py` support
+   the paper's secondary claims.
+4. **Case study** (`src/perception/`, `src/evaluation/`) — the SECOND detector + deep
+   ensemble and the CARLA weather evaluation. **The CARLA weather numbers are synthetic**:
+   `evaluation/carla_evaluator.py::generate_synthetic_illustration()` never touches CARLA or
+   a detector — it is a deterministic seeded function (seed=42). Do not present these as
+   measurements.
+5. **Results** (`src/results/`) — `generate_all.py` orchestrates the whole pipeline and
+   writes JSON / CSV / LaTeX tables / figures to `output/`. `latex_tables.py` emits booktabs
+   tables meant for `\input{}` into the paper.
 
-## Process
-- Read before proposing. Propose before editing.
-- Small commits, plain messages, no generated-sounding commit prose.
-- Report findings in files, not in chat. In chat, give at most ten lines naming
-  the highest-severity items.
+### The paper↔code contract
+
+`tests/test_paper_claims.py` is the contract: nearly every test docstring cites the exact
+paper section, table, or figure it validates (e.g. "Section 4.2: G5 is the only node where
+all four applicable standards contribute"). Load-bearing invariants the tests enforce:
+
+- 9 goals total (6 retained from Annex B + 3 new/undeveloped); 2 contexts; 1 assumption.
+- G5 is the only node where all 4 normative standards contribute (the "central finding", I-2).
+- 7 inconsistencies = 3 structural + 2 terminological + 2 methodological.
+- 5 gaps, of which exactly 2 (Gap-3, Gap-4) are integration-induced and invisible from any
+  single standard.
+
+**If you change a number in the paper, you must change the corresponding hard-coded value in
+`src/` and its assertion in `test_paper_claims.py` together** — the three are kept in lockstep
+by design. Run the test file after any such edit.
+
+### Three-layer data separation (do not conflate)
+
+`data/` is deliberately split, each layer with its own README documenting provenance:
+
+- `data/synthetic_illustrations/` — deterministic seeded (seed=42) reference outputs of the
+  analysis/evaluation pipeline. Illustrative, **not measurements**.
+- `data/empirical_results/` — real measured AUROC and MDR/MFAR from a trained **PointPillars**
+  deep ensemble on KITTI/nuScenes, supporting the G5/G6 claims. Note the paper text names
+  SECOND as the case-study architecture; the empirical evaluation substitutes PointPillars
+  (both OpenPCDet voxel single-stage detectors) — this substitution is stated in that README,
+  not the paper.
+- `gsn/*.gsn.yaml` — GSN argument in gsn2x YAML, the source of truth for the *rendered*
+  figures (kept consistent with `build_integrated_gsn()` but separate from it).
+
+## Conventions
+
+- Python ≥3.9, `from __future__ import annotations` throughout; PEP 604-style hints.
+- Deterministic by construction: same `--seed` must reproduce byte-identical output except
+  for a `generated` timestamp (see REPRODUCING.md).
+- The registry distinguishes `normative_standards` (excludes TR 5469) from `all_standards`;
+  goal-density and "all four standards" claims count the four normative ones.
