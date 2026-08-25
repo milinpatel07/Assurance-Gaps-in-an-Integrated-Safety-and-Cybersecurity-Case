@@ -115,7 +115,7 @@ def _figure_svg() -> str:
         ".t-lifecycle{font:700 15px system-ui,sans-serif;fill:#111}"
         ".t-where{font:12px system-ui,sans-serif;fill:#444}"
         ".t-scale{font:12px system-ui,sans-serif;fill:#111}"
-        ".t-kind{font:10px system-ui,sans-serif;fill:#555}"
+        ".t-kind{font:11px system-ui,sans-serif;fill:#555}"
         ".t-gap{font:700 12px system-ui,sans-serif;fill:#333}"
         ".t-link{font:italic 12px system-ui,sans-serif;fill:#333}"
         "</style>"

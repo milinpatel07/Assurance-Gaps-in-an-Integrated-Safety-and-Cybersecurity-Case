@@ -31,7 +31,10 @@ STANDARD_COLORS: dict[str, str] = {
 PLACEHOLDERS_PENDING = False
 
 # Reserved for undeveloped/gap nodes (G9). Not a standard's colour.
-GAP_GREY = "#9E9E9E"
+# #757575 reaches 4.6:1 against white, where the previous #9E9E9E reached only
+# 2.68:1 and fell below the 3:1 a meaningful interface element needs to stay
+# legible in daylight. It matches the dashed borders already used for absences.
+GAP_GREY = "#757575"
 
 # Short display names, as used throughout the papers and this repository.
 STANDARD_LABELS: dict[str, str] = {
