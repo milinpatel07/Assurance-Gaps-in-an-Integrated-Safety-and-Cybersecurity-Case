@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assurance gaps in an integrated safety and cybersecurity case</title>
+<meta name="description" content="Supplementary material for two SAFECOMP 2026 papers on integrating four standards into one assurance argument for AI-based perception.">
+<style>
+:root {
+  color-scheme: light;
+  --c8800: #1565C0;
+  --c21448: #E65100;
+  --c21434: #C62828;
+  --c26262: #2E7D32;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #fff; color: #111;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px; line-height: 1.5;
+}
+header, .panels, footer { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 24px; }
+h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 8px; }
+.byline { color: #333; margin: 0 0 12px; }
+.lede { margin: 0 0 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; padding: 0; }
+.chip {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  border: 2px solid var(--c); background: #fff; color: #111;
+  font-size: 0.85rem; white-space: nowrap;
+}
+.chip::before {
+  content: ""; display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--c); margin-right: 6px;
+}
+.panels { display: grid; gap: 14px; margin: 20px auto 8px; }
+.panel {
+  display: block; border: 2px solid #222; border-radius: 10px;
+  padding: 14px 16px; text-decoration: none; color: inherit;
+  border-top-width: 8px;
+}
+.panel:focus-visible { outline: 3px solid #111; outline-offset: 3px; }
+.accent-four { border-top-color: var(--c8800); }
+.accent-seam { border-top-color: var(--c21448); }
+.accent-trace { border-top-color: var(--c21434); }
+.accent-papers { border-top-color: var(--c26262); }
+.kicker {
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: #444; font-weight: 700;
+}
+.panel h2 { font-size: 1.15rem; margin: 4px 0 6px; }
+.panel p { margin: 0 0 10px; }
+.cta { font-weight: 700; text-decoration: underline; }
+footer {
+  border-top: 1px solid #ccc; margin-top: 20px; padding-top: 14px;
+  padding-bottom: 28px; font-size: 0.9rem; color: #333;
+}
+footer code {
+  display: inline-block; background: #f2f2f2; border: 1px solid #ddd;
+  border-radius: 4px; padding: 1px 6px; font-size: 0.85rem;
+}
+footer a { color: #111; }
+@media (min-width: 620px) { .panels { grid-template-columns: 1fr 1fr; }
+  .panel:first-child { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<header>
+<h1>Assurance gaps in an integrated safety and cybersecurity case</h1>
+<p class="byline">Milin Patel and Rolf Jung, Kempten University of Applied Sciences. Two SAFECOMP 2026 papers, both accepted.</p>
+<p class="lede">Four standards apply at once to an AI perception component in a driverless vehicle, and each one prescribes its own evidence. These papers build the single argument the four jointly imply, then report what the combination exposes.</p>
+<p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span><span class="chip" style="--c:#E65100">ISO 21448</span><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#2E7D32">ISO 26262</span></p></header>
+<main class="panels"><a class="panel accent-four" href="gsn_view.html"><span class="kicker">Explore</span><h2>The argument, one node at a time</h2><p>All 9 goals, with the standards behind each, the evidence it calls for, and the points where the standards leave a gap. Built for a phone.</p><span class="cta">Open the argument</span></a><a class="panel accent-seam" href="seam.html"><span class="kicker">Connect</span><h2>One problem at two lifecycle points</h2><p>Each paper reports the same junction: evidence on scales that do not convert, and no clause combining them. One before release, one in service. A synthesis drawn here, not a claim either paper makes.</p><span class="cta">See the connection</span></a><a class="panel accent-trace" href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/TRACEABILITY.md"><span class="kicker">Check</span><h2>Where every claim comes from</h2><p>One index. Every number, table and figure traces to a passage in a paper, a clause in a named standard edition, or a command that regenerates it.</p><span class="cta">Open the index</span></a><a class="panel accent-papers" href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/paper"><span class="kicker">Read</span><h2>The two papers</h2><p>The design-time paper catalogues 7 decision points and 5 findings across 4 standards. The position paper asks who owns an alarm once the vehicle is in service.</p><span class="cta">Open the camera-ready sources</span></a></main><footer>
+<p>Reproduce every artefact both papers use, and fail if anything drifted: <code>make reproduce</code>. See <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/REPRODUCING.md">REPRODUCING.md</a>, and <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/ERRATA.md">ERRATA.md</a> for what this work found about the camera-ready papers.</p>
+<p>Source: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case">github.com/milinpatel07</a>. Cite the papers: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/CITATION.cff">CITATION.cff</a>. MIT licence.</p>
+<p>Generated page; do not edit by hand. Rebuild: <code>python -m src.visualization.landing_page</code></p>
+</footer>
+</body>
+</html>

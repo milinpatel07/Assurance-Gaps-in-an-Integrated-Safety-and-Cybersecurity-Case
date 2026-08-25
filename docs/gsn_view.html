@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integrated safety and cybersecurity argument: interactive GSN view</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #fff; color: #111;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px; line-height: 1.45;
+}
+header, main, footer { max-width: 720px; margin: 0 auto; padding: 0 12px; }
+header h1 { font-size: 1.25rem; margin: 16px 0 4px; }
+header p { margin: 4px 0; }
+.placeholder-warning {
+  background: #fff3cd; border: 1px solid #856404; color: #533f03;
+  padding: 8px; border-radius: 6px; font-weight: 600;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; padding: 0; }
+.chip {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  border: 2px solid var(--c); color: #111; font-size: 0.85rem;
+  background: #fff; white-space: nowrap;
+}
+.chip::before {
+  content: ""; display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--c); margin-right: 6px;
+}
+.argument { list-style: none; margin: 12px 0 24px; padding: 0; }
+.argument li + li { margin-top: 10px; }
+.argument li + li::before {
+  content: ""; display: block; width: 2px; height: 10px;
+  background: #999; margin: -10px auto 0;
+}
+.node {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  background: #fff; color: #111; border: 2px solid #333;
+  border-radius: 8px; padding: 10px 12px; font: inherit;
+}
+.node:focus-visible { outline: 3px solid #111; outline-offset: 2px; }
+.node.strategy { border-radius: 0; transform: skewX(-6deg); }
+.node.strategy > * { display: inline-block; transform: skewX(6deg); }
+.node.context { border-radius: 999px; border-style: solid; }
+.node.assumption { border-radius: 999px; border-style: dotted; }
+.node.gap { border-style: dashed; border-color: #757575; background: #f5f5f5; }
+.node-id { font-weight: 700; }
+.node-kind {
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: #444; margin-left: 6px;
+}
+.node-label { display: block; margin-top: 2px; }
+.node-meta { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--c); border: 1px solid #111; display: inline-block;
+}
+.badge {
+  margin-left: auto; font-size: 0.75rem; color: #333;
+  border: 1px solid #999; border-radius: 4px; padding: 1px 6px;
+}
+#backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+}
+#sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; max-height: 80vh;
+  overflow-y: auto; background: #fff; border-top: 3px solid #111;
+  border-radius: 12px 12px 0 0; padding: 12px 16px 24px;
+  max-width: 720px; margin: 0 auto;
+}
+.sheet-head { display: flex; align-items: baseline; gap: 8px; }
+.sheet-head h2 { font-size: 1.1rem; margin: 4px 0; }
+.sheet-head button {
+  margin-left: auto; font-size: 1.4rem; line-height: 1;
+  background: none; border: 2px solid #333; border-radius: 6px;
+  padding: 2px 10px; cursor: pointer;
+}
+#sheet h3 { font-size: 0.95rem; margin: 14px 0 4px; }
+#sheet h4 { font-size: 0.9rem; margin: 6px 0 2px; }
+.node-text { white-space: pre-line; }
+.origin, .kind { color: #444; font-size: 0.85rem; margin: 2px 0; }
+.note {
+  background: #f5f5f5; border-left: 4px solid #757575;
+  padding: 6px 10px; margin: 8px 0;
+}
+.undeveloped-banner {
+  border: 2px dashed #757575; background: #f5f5f5;
+  padding: 8px 10px; font-weight: 600;
+}
+.finding {
+  background: #f5f5f5; border-left: 4px dashed #757575;
+  padding: 6px 10px; margin: 8px 0; font-weight: 600;
+}
+.status { font-weight: 700; margin: 2px 0; }
+.status-missing { color: #555; }
+.status-missing::before { content: "CB "; }
+.status-provided::before { content: "CF "; }
+.crosswalk { color: #444; font-size: 0.85rem; }
+.clauses { margin: 4px 0; padding-left: 20px; }
+.evidence { border: 1px solid #bbb; border-radius: 8px; padding: 8px 10px; }
+.evidence-list .evidence + .evidence { margin-top: 8px; }
+.evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 460px) { .evidence-grid { grid-template-columns: 1fr; } }
+footer {
+  border-top: 1px solid #ccc; margin-top: 24px; padding: 12px;
+  font-size: 0.8rem; color: #444;
+}
+[hidden] { display: none; }
+</style>
+</head>
+<body>
+<header>
+<h1>Integrated safety and cybersecurity argument</h1>
+<p>This page shows a Goal Structuring Notation (GSN) argument: a claim at the top, a strategy for supporting it, and the sub-goals and evidence underneath. It integrates four standards for an AI-based perception component in a driverless vehicle, instantiated for LiDAR. Tap any node to see which standards it draws on, what evidence it calls for, and where the standards leave a gap.</p>
+<p class="chips legend"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span><span class="chip" style="--c:#E65100">ISO 21448</span><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#2E7D32">ISO 26262</span></p><p class="chips legend"><span class="chip" style="--c:#757575">Undeveloped goal (a gap in the standards)</span></p></header>
+<main>
+<ol class="argument"><li><button class="node goal" data-node="G1" aria-haspopup="dialog"><span class="node-id">G1</span> <span class="node-kind">Goal</span><span class="node-label">The AI-based perception component satisfies the integrated safety and cyberse...</span><span class="node-meta"></span></button></li><li><button class="node context" data-node="C1" aria-haspopup="dialog"><span class="node-id">C1</span> <span class="node-kind">Context</span><span class="node-label">ASIL D assigned from HARA (ISO 26262-3 Cl.6) Controllability C3 at SAE Level 4+</span><span class="node-meta"></span></button></li><li><button class="node context" data-node="C2" aria-haspopup="dialog"><span class="node-id">C2</span> <span class="node-kind">Context</span><span class="node-label">TARA results with risk values (ISO/SAE 21434 Cl.15) LiDAR spoofing, adversari...</span><span class="node-meta"></span></button></li><li><button class="node strategy" data-node="S1" aria-haspopup="dialog"><span class="node-id">S1</span> <span class="node-kind">Strategy</span><span class="node-label">Argue over four assurance domains: (a) AI-specific insufficiencies controlled...</span><span class="node-meta"></span></button></li><li><button class="node assumption" data-node="A1.4" aria-haspopup="dialog"><span class="node-id">A1.4</span> <span class="node-kind">Assumption</span><span class="node-label">HW random faults and systematic faults in non-AI elements are controlled by I...</span><span class="node-meta"></span></button></li><li><button class="node goal" data-node="G2" aria-haspopup="dialog"><span class="node-id">G2</span> <span class="node-kind">Goal</span><span class="node-label">Specification sufficient for all applicable assurance domains [8800 + 21448 +...</span><span class="node-meta"><span class="dot" style="--c:#C62828" title="ISO/SAE 21434"></span><span class="dot" style="--c:#E65100" title="ISO 21448"></span><span class="dot" style="--c:#1565C0" title="ISO/PAS 8800"></span><span class="badge">3 evidence types</span></span></button></li><li><button class="node goal" data-node="G3" aria-haspopup="dialog"><span class="node-id">G3</span> <span class="node-kind">Goal</span><span class="node-label">Training and test data sufficient [8800 only]</span><span class="node-meta"><span class="dot" style="--c:#1565C0" title="ISO/PAS 8800"></span><span class="badge">3 evidence types</span></span></button></li><li><button class="node goal" data-node="G4" aria-haspopup="dialog"><span class="node-id">G4</span> <span class="node-kind">Goal</span><span class="node-label">AI design satisfies safety and cybersecurity requirements [8800 + 21448 + 21434]</span><span class="node-meta"><span class="dot" style="--c:#C62828" title="ISO/SAE 21434"></span><span class="dot" style="--c:#E65100" title="ISO 21448"></span><span class="dot" style="--c:#1565C0" title="ISO/PAS 8800"></span><span class="badge">3 evidence types</span></span></button></li><li><button class="node goal" data-node="G5" aria-haspopup="dialog"><span class="node-id">G5</span> <span class="node-kind">Goal</span><span class="node-label">V&amp;V evidence sufficient across all assurance domains [All four standards]</span><span class="node-meta"><span class="dot" style="--c:#C62828" title="ISO/SAE 21434"></span><span class="dot" style="--c:#E65100" title="ISO 21448"></span><span class="dot" style="--c:#2E7D32" title="ISO 26262"></span><span class="dot" style="--c:#1565C0" title="ISO/PAS 8800"></span><span class="badge">4 evidence types</span></span></button></li><li><button class="node goal" data-node="G6" aria-haspopup="dialog"><span class="node-id">G6</span> <span class="node-kind">Goal</span><span class="node-label">Operational monitoring covers AI, SOTIF, and cybersecurity [8800 + 21448 + 21...</span><span class="node-meta"><span class="dot" style="--c:#C62828" title="ISO/SAE 21434"></span><span class="dot" style="--c:#E65100" title="ISO 21448"></span><span class="dot" style="--c:#1565C0" title="ISO/PAS 8800"></span><span class="badge">3 evidence types</span></span></button></li><li><button class="node goal" data-node="G7" aria-haspopup="dialog"><span class="node-id">G7</span> <span class="node-kind">Goal</span><span class="node-label">Residual risk from functional insufficiencies meets acceptance criteria (ISO ...</span><span class="node-meta"><span class="dot" style="--c:#E65100" title="ISO 21448"></span><span class="badge">2 evidence types</span></span></button></li><li><button class="node goal" data-node="G8" aria-haspopup="dialog"><span class="node-id">G8</span> <span class="node-kind">Goal</span><span class="node-label">Cybersecurity risks treated to acceptable level (ISO/SAE 21434 Cl.3.1.11)</span><span class="node-meta"><span class="dot" style="--c:#C62828" title="ISO/SAE 21434"></span><span class="badge">3 evidence types</span></span></button></li><li><button class="node goal gap" data-node="G9" aria-haspopup="dialog"><span class="node-id">G9</span> <span class="node-kind">Goal</span><span class="node-label">AI model modifications controlled with re-assurance criteria [UNDEVELOPED - F-2]</span><span class="node-meta"></span></button></li></ol></main>
+<div id="backdrop" hidden></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+<div class="sheet-head"><h2 id="sheet-title"></h2><button id="sheet-close" aria-label="Close">&times;</button></div>
+<div id="sheet-body"></div>
+</div>
+<template id="panel-G1"><p class="node-text">The AI-based perception component satisfies the integrated safety and cybersecurity requirements allocated to it.</p><p class="origin">The authors kept this goal from ISO/PAS 8800 Annex B.</p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Annex B G1 (reformulated)</li><li>ISO 26262-3 Cl.6 (ASIL context)</li><li>ISO/SAE 21434 Cl.15 (TARA context)</li></ul><p class="crosswalk">Decision point DP-1 (I-1 in the code): Incompatible risk classification frameworks.</p><p class="finding">Finding F-1 (Gap-1 in the code): Quantitative acceptance criteria for AI components undefined; the standards defer values to context.</p></template><template id="panel-G2"><p class="node-text">The specification is sufficient for all applicable assurance domains: AI-specific completeness (ISO/PAS 8800), ODD and triggering condition completeness (ISO 21448), and cybersecurity requirement completeness (ISO/SAE 21434).</p><p class="origin">The authors kept this goal from ISO/PAS 8800 Annex B.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#E65100">ISO 21448</span><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Cl.5 (AI specification)</li><li>ISO 21448 Table A.8 (17 specification items)</li><li>ISO/SAE 21434 [RQ-06-01] (cybersecurity specification)</li></ul><p class="crosswalk">Decision point DP-3 (I-3 in the code): AI error terminology differs across standards.</p><h3>Evidence the argument calls for</h3><div class="evidence-list"><div class="evidence"><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h4>AI specification review report (ISO/PAS 8800 Cl.5)</h4><p class="kind">Evidence kind: document review</p><p>Review of AI specification against 8800 requirements.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#E65100">ISO 21448</span></p><h4>Triggering condition catalogue (ISO 21448 Cl.7)</h4><p class="kind">Evidence kind: analysis report</p><p>Catalogue of triggering conditions for the perception component.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h4>Cybersecurity requirements specification (ISO/SAE 21434 [RQ-06-01])</h4><p class="kind">Evidence kind: specification</p><p>Cybersecurity requirements for the perception component.</p></div></div></template><template id="panel-G3"><p class="node-text">Training and test data are sufficient in quantity, distribution coverage, annotation quality, and domain representativeness.</p><p class="origin">The authors kept this goal from ISO/PAS 8800 Annex B.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Cl.8.4 (data quality)</li><li>ISO/IEC TR 5469 Cl.9.3.2 (data linked to HARA, informative)</li></ul><p class="note">ISO/PAS 8800 is the only standard making normative claims at this goal, and G3 is the only retained goal (G2 to G6) with a single contributing standard. No other applicable standard addresses data quality for AI.</p><p class="crosswalk">Decision point DP-7 (I-7 in the code): Data sufficiency threshold undefined.</p><p class="finding">Finding F-5 (Gap-5 in the code): Data acceptance criteria for AI components undefined; the standards prescribe frameworks but defer thresholds to context.</p><h3>Evidence the argument calls for</h3><div class="evidence-list"><div class="evidence"><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h4>Data quality report (ISO/PAS 8800 Cl.8.4)</h4><p class="kind">Evidence kind: quality report</p><p>Training data quality assessment: quantity, distribution, annotation quality, domain representativeness.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h4>Distribution coverage analysis</h4><p class="kind">Evidence kind: statistical analysis</p><p>Analysis of training data distribution vs. operational domain.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h4>Annotation quality metrics</h4><p class="kind">Evidence kind: quality metrics</p><p>Inter-annotator agreement, labelling error rates.</p></div></div></template><template id="panel-G4"><p class="node-text">The AI design satisfies safety and cybersecurity requirements. Architecture decisions reconcile AI model design with SOTIF mitigation strategies and cybersecurity controls.</p><p class="origin">The authors kept this goal from ISO/PAS 8800 Annex B.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#E65100">ISO 21448</span><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Cl.7 (AI design principles)</li><li>ISO 21448 Table A.9 (SOTIF design measures)</li><li>ISO/SAE 21434 Cl.10 (cybersecurity control design)</li></ul><h3>Evidence the argument calls for</h3><div class="evidence-list"><div class="evidence"><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h4>AI design review (ISO/PAS 8800 Cl.7)</h4><p class="kind">Evidence kind: design review</p><p>Review of SECOND architecture and deep ensemble design.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#E65100">ISO 21448</span></p><h4>SOTIF design measures report (ISO 21448 Table A.9)</h4><p class="kind">Evidence kind: design measures</p><p>Avoidance, reduction, and mitigation measures for SOTIF.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h4>Cybersecurity control design (ISO/SAE 21434 Cl.10)</h4><p class="kind">Evidence kind: security controls</p><p>Design of cybersecurity controls against identified threats.</p></div></div></template><template id="panel-G5"><p class="node-text">Verification and validation evidence is sufficient across all assurance domains. Four evidence types converge: (a) MC/DC structural coverage (ISO 26262), (b) scenario-based testing with triggering condition coverage (ISO 21448), (c) AI-specific metrics and uncertainty evaluation (ISO/PAS 8800), (d) vulnerability analysis and penetration testing (ISO/SAE 21434).</p><p class="origin">The authors kept this goal from ISO/PAS 8800 Annex B.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#E65100">ISO 21448</span><span class="chip" style="--c:#2E7D32">ISO 26262</span><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Cl.8-9 (AI V&amp;V)</li><li>ISO 26262-6 Cl.9 (MC/DC at ASIL D)</li><li>ISO 21448 Cl.9-11 (scenario testing, triggering conditions)</li><li>ISO/SAE 21434 Cl.10 (vulnerability analysis, pen testing)</li></ul><p class="note">The only node where all four applicable standards contribute claims at once. The four evidence types measure on scales that do not combine.</p><p class="crosswalk">Decision point DP-2 (I-2 in the code): Evidence type asymmetry at V&amp;V.</p><p class="crosswalk">Decision point DP-4 (I-4 in the code): &#x27;Validation&#x27; defined differently across standards.</p><p class="finding">Finding F-4 (Gap-4 in the code): No cross-domain release decision criteria: no standard defines how the per-domain residual risks combine into one release decision.</p><h3>Four kinds of evidence, four scales that do not combine</h3><div class="evidence-grid"><div class="evidence"><p class="chips"><span class="chip" style="--c:#2E7D32">ISO 26262</span></p><h4>(a) MC/DC structural coverage of non-AI wrapper code (ISO 26262-6 Cl.9)</h4><p class="status status-missing">Case study: not produced</p><p class="kind">Evidence kind: deterministic coverage</p><p>Modified condition/decision coverage at ASIL D. Deterministic pass/fail metric. Applies to non-AI code only.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#E65100">ISO 21448</span></p><h4>(b) Scenario-based testing with triggering condition coverage (ISO 21448 Cl.9-11)</h4><p class="status status-missing">Case study: not produced</p><p class="kind">Evidence kind: scenario coverage</p><p>Scenario count with demonstrated triggering condition coverage, under parametrically controlled conditions such as rain and fog.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h4>(c) Deep ensemble uncertainty quantification (ISO/PAS 8800 Cl.8-9)</h4><p class="status status-provided">Case study: provided (simulated)</p><p class="kind">Evidence kind: statistical metric</p><p>Geometric disagreement among ensemble members as the uncertainty indicator; AUROC measures the separation of correct from incorrect detections. A statistical distribution, not a binary pass/fail. Reported on simulated ensemble outputs calibrated to published LiDAR uncertainty distributions; validation with trained ensemble inference is future work.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h4>(d) Adversarial penetration testing results (ISO/SAE 21434 Cl.10)</h4><p class="status status-missing">Case study: not produced</p><p class="kind">Evidence kind: attack success rate</p><p>Attack success rates against LiDAR spoofing and point cloud perturbation under defined threat models.</p></div></div></template><template id="panel-G6"><p class="node-text">Operational monitoring covers AI (out-of-distribution detection, distributional drift), SOTIF (safety of the intended functionality: field performance, new triggering conditions), and cybersecurity (vulnerabilities, incidents).</p><p class="origin">The authors kept this goal from ISO/PAS 8800 Annex B.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#E65100">ISO 21448</span><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Cl.14 (AI monitoring)</li><li>ISO 21448 Tables A.13-A.14 (field monitoring)</li><li>ISO/SAE 21434 Cl.8 (continuous cybersecurity monitoring)</li></ul><p class="crosswalk">Decision point DP-6 (I-6 in the code): Monitoring scope overlap — three regimes on one component.</p><h3>Evidence the argument calls for</h3><div class="evidence-list"><div class="evidence"><p class="chips"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h4>Out-of-distribution (OOD) detection and drift monitoring (ISO/PAS 8800 Cl.14)</h4><p class="kind">Evidence kind: runtime monitor</p><p>Runtime ensemble disagreement as an out-of-distribution indicator.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#E65100">ISO 21448</span></p><h4>SOTIF field monitoring (ISO 21448 Tables A.13-A.14)</h4><p class="kind">Evidence kind: field monitoring</p><p>Field performance tracking and new triggering condition discovery.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h4>Continuous cybersecurity monitoring (ISO/SAE 21434 Cl.8)</h4><p class="kind">Evidence kind: security monitoring</p><p>Vulnerability scanning, incident detection and threat intelligence feeds.</p></div></div></template><template id="panel-G7"><p class="node-text">Residual risk from functional insufficiencies meets the acceptance criteria defined per ISO 21448 Clause 6.5. Area 3 (unknown potentially hazardous) is reduced to an acceptable level.</p><p class="origin">The authors added this goal; ISO/PAS 8800 Annex B has no equivalent.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#E65100">ISO 21448</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO 21448 Cl.6.5 (acceptance criteria)</li><li>ISO 21448 Table A.10 (acceptance criteria evidence)</li><li>ISO 21448 Annex A.1 (GSN, Example 2)</li></ul><p class="note">Separate goal (not sub-goal of G5) because it represents an acceptability judgement about residual risk, not a verification activity.</p><p class="crosswalk">Decision point DP-3 (I-3 in the code): AI error terminology differs across standards.</p><p class="crosswalk">Decision point DP-5 (I-5 in the code): Cybersecurity-SOTIF boundary undefined for adversarial inputs.</p><p class="finding">Finding F-3 (Gap-3 in the code): Adversarial-SOTIF boundary unowned: adversarial inputs that exploit functional insufficiencies fall between G7 and G8.</p><h3>Evidence the argument calls for</h3><div class="evidence-list"><div class="evidence"><p class="chips"><span class="chip" style="--c:#E65100">ISO 21448</span></p><h4>Four-area model evaluation (ISO 21448 Cl.5)</h4><p class="kind">Evidence kind: risk evaluation</p><p>Evaluation of Area 3 reduction to acceptable level.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#E65100">ISO 21448</span></p><h4>Acceptance criteria assessment (ISO 21448 Cl.6.5, Table A.10)</h4><p class="kind">Evidence kind: acceptance decision</p><p>Comparison of residual risk to defined acceptance criteria.</p></div></div></template><template id="panel-G8"><p class="node-text">Cybersecurity risks identified through TARA are treated to an acceptable level. The safety impact of each threat scenario is assessed using ISO 26262-3 severity classes ([RQ-15-06]).</p><p class="origin">The authors added this goal; ISO/PAS 8800 Annex B has no equivalent.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/SAE 21434 Cl.3.1.11 (cybersecurity case)</li><li>ISO/SAE 21434 Cl.15 (TARA)</li><li>ISO/SAE 21434 [RQ-15-06] (safety bridge)</li></ul><p class="note">Separate goal for same reason as G7: cybersecurity risk treatment is an acceptability judgement, not a verification activity.</p><p class="crosswalk">Decision point DP-5 (I-5 in the code): Cybersecurity-SOTIF boundary undefined for adversarial inputs.</p><p class="finding">Finding F-3 (Gap-3 in the code): Adversarial-SOTIF boundary unowned: adversarial inputs that exploit functional insufficiencies fall between G7 and G8.</p><h3>Evidence the argument calls for</h3><div class="evidence-list"><div class="evidence"><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h4>TARA report (ISO/SAE 21434 Cl.15)</h4><p class="kind">Evidence kind: threat analysis</p><p>Complete threat analysis and risk assessment.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h4>Risk treatment plan (ISO/SAE 21434 Cl.15)</h4><p class="kind">Evidence kind: treatment plan</p><p>Cybersecurity risk treatment decisions and residual risk.</p></div><div class="evidence"><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#2E7D32">ISO 26262</span></p><h4>Safety-cybersecurity impact assessment (ISO/SAE 21434 [RQ-15-06])</h4><p class="kind">Evidence kind: impact assessment</p><p>Assessment of safety impact of each threat scenario using ISO 26262-3 severity classes. ISO 26262 enters here as a normative bridge, not as a source of claims at G8.</p></div></div></template><template id="panel-G9"><p class="node-text">AI model modifications (OTA updates, retraining) are controlled with re-assurance criteria. [UNDEVELOPED — no single standard prescribes the complete re-assurance workflow.]</p><p class="undeveloped-banner">This goal is undeveloped. The paper records it as finding F-2 (Gap-2 in the code).</p><p class="note">Undeveloped because no standard prescribes a complete workflow for re-assuring an AI component after modification. For a retrained neural network, the entire weight space changes.</p><p class="finding">Finding F-2 (Gap-2 in the code): No complete over-the-air (OTA) re-assurance workflow for AI.</p><h3>What existing standards cover, and where they stop</h3><ul class='clauses'><li>ISO 26262-8 Cl.8 (change management, assumes conventional software)</li><li>ISO/PAS 8800 Cl.14.8.3 (partial re-approval, incomplete)</li><li>ISO 24089 (software update engineering; specifies the update process, not re-assurance of a modified AI model&#x27;s argument)</li><li>ISO/IEC TR 5469 Table A.8 (change protocols, informative only)</li></ul></template><template id="panel-S1"><p class="node-text">Argue over four assurance domains: (a) AI-specific insufficiencies are controlled (ISO/PAS 8800), (b) functional insufficiencies produce acceptable residual risk (ISO 21448), (c) cybersecurity risks are managed to an acceptable level (ISO/SAE 21434), (d) hardware random faults and systematic faults in non-AI elements are controlled (ISO 26262, via A1.4).</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="chip" style="--c:#E65100">ISO 21448</span><span class="chip" style="--c:#2E7D32">ISO 26262</span><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Annex B S1 (extended)</li></ul></template><template id="panel-C1"><p class="node-text">ASIL D assigned from HARA. At SAE Level 4+, controllability is C3 (no human driver). High severity and exposure yield ASIL D.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#2E7D32">ISO 26262</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO 26262-3 Cl.6</li><li>ISO 26262-3 Cl.6.4.3</li></ul></template><template id="panel-C2"><p class="node-text">TARA results: threat scenarios identified for the LiDAR perception component — LiDAR spoofing, adversarial point cloud perturbation, model poisoning — with associated risk values (1-5).</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/SAE 21434 Cl.15</li></ul></template><template id="panel-A1.4"><p class="node-text">Hardware random faults and systematic faults in non-AI elements are controlled by established ISO 26262 processes.</p><h3>Contributing standards</h3><p class="chips"><span class="chip" style="--c:#2E7D32">ISO 26262</span><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span></p><h3>Clause references</h3><ul class='clauses'><li>ISO/PAS 8800 Annex B A1.4</li><li>ISO 26262 Part 5</li></ul></template>
+<footer>
+<p>Generated file; do not edit by hand. Structure and button text come from <code>gsn/integrated_pattern.gsn.yaml</code>; panel text, clause references and evidence detail from <code>src/gsn/integrated_pattern.py</code>; findings and decision points from <code>src/analysis/gaps.py</code> and <code>src/analysis/decision_points.py</code>; colours from <code>src/visualization/standard_colors.py</code>. <code>tests/test_gsn_yaml_builder_consistency.py</code> fails if the structure sources disagree. Rebuild: <code>python -m src.visualization.interactive_view</code></p>
+</footer>
+<script>
+(function () {
+  var sheet = document.getElementById('sheet');
+  var backdrop = document.getElementById('backdrop');
+  var title = document.getElementById('sheet-title');
+  var body = document.getElementById('sheet-body');
+  var close = document.getElementById('sheet-close');
+  var opener = null;
+
+  function hide() {
+    sheet.hidden = true;
+    backdrop.hidden = true;
+    if (opener) { opener.focus(); opener = null; }
+  }
+  function show(id, label) {
+    var tpl = document.getElementById('panel-' + id);
+    if (!tpl) { return; }
+    body.replaceChildren(tpl.content.cloneNode(true));
+    title.textContent = label;
+    sheet.hidden = false;
+    backdrop.hidden = false;
+    close.focus();
+  }
+  document.querySelectorAll('[data-node]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      opener = btn;
+      show(btn.dataset.node, btn.querySelector('.node-id').textContent + ': ' +
+        btn.querySelector('.node-kind').textContent);
+    });
+  });
+  close.addEventListener('click', hide);
+  backdrop.addEventListener('click', hide);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { hide(); }
+  });
+})();
+</script>
+</body>
+</html>

@@ -23,6 +23,7 @@ from typing import Optional
 
 import numpy as np
 
+from src.seeds import DEFAULT_SEED
 from src.evaluation.weather_conditions import (
     WeatherCondition,
     generate_weather_grid,
@@ -190,7 +191,7 @@ class FullEvaluationResult:
 
 def generate_synthetic_illustration(
     num_scenes_per_weather: int = 10,
-    seed: int = 42,
+    seed: int = DEFAULT_SEED,
 ) -> FullEvaluationResult:
     """Generate a synthetic illustration of the evaluation output.
 

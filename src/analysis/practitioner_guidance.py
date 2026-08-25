@@ -34,7 +34,10 @@ def build_practitioner_guidance() -> list[GapResolutionGuidance]:
     return [
         GapResolutionGuidance(
             gap_id="Gap-1",
-            description="No AI-specific quantitative reliability target",
+            description=(
+                "Quantitative acceptance criteria for AI components "
+                "undefined; the standards defer values to context"
+            ),
             immediate_actions=[
                 "Define project-specific AI reliability targets based on "
                 "ASIL D hardware metrics as reference (SPFM >= 99%, "

@@ -23,10 +23,11 @@ evaluation section of `summary_report_seed42.txt` are illustrative. They show wh
 the evaluation pipeline produces and how its output is organised. They are not
 measurements of a trained detector and must not be cited as empirical results.
 
-For real empirical evidence supporting the case study claims at G5 (V&V
-sufficiency) and G6 (runtime monitoring), see `data/empirical_results/`. That
-directory contains measured AUROC and MDR/MFAR results from a trained PointPillars
-deep ensemble on KITTI and nuScenes, together with a provenance README.
+For measured results of the kind the G5 and G6 goals call for, see
+`data/empirical_results/`: AUROC and MDR/MFAR results from a trained
+PointPillars deep ensemble on KITTI and nuScenes. Those measurements support a
+paper in preparation and are claimed by neither paper in this repository; their
+provenance README states this in its first line.
 
 ## Files
 

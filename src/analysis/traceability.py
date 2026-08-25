@@ -62,7 +62,7 @@ class TraceabilityMatrix:
         goal_gaps: dict[str, list[str]] = {}
         goal_int_gaps: dict[str, list[str]] = {}
         gap_goal_mapping = {
-            "Gap-1": ["G1"],   # No AI-specific quantitative reliability target
+            "Gap-1": ["G1"],   # Quantitative acceptance criteria undefined
             "Gap-2": ["G9"],   # No complete OTA re-assurance workflow
             "Gap-3": ["G7", "G8"],  # Adversarial-SOTIF boundary
             "Gap-4": ["G5"],   # No cross-domain release decision criteria

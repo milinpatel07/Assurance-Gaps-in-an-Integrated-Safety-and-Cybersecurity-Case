@@ -10,6 +10,9 @@
 #   make figures      — Generate figures only
 #   make latex        — Generate LaTeX tables only
 #   make traceability — Regenerate the traceability index
+#   make gsn-view     — Regenerate the interactive GSN view
+#   make pages        — Regenerate every reader-facing generated page
+#   make reproduce    — Generate everything, then verify against references
 #   make clean        — Remove generated output
 #   make all          — Install, test, and generate results
 #
@@ -24,7 +27,8 @@ SCENES   ?= 50
 OUTDIR   ?= output
 GSN2X    ?= gsn/gsn2x
 
-.PHONY: all install test results figures latex gsn gsn-install traceability clean help
+.PHONY: all install test results figures latex gsn gsn-install traceability \
+        gsn-view landing seam notebook pages reproduce verify-refs clean help
 
 all: install test results
 
@@ -38,6 +42,10 @@ help:
 	@echo "  figures      — Generate visualization figures only"
 	@echo "  latex        — Generate LaTeX tables only"
 	@echo "  traceability — Regenerate TRACEABILITY.md"
+	@echo "  gsn-view     — Regenerate docs/gsn_view.html (interactive GSN)"
+	@echo "  landing      — Regenerate docs/index.html (GitHub Pages landing page)"
+	@echo "  pages        — Regenerate every reader-facing generated page"
+	@echo "  reproduce    — Generate everything, then verify against committed references"
 	@echo "  clean        — Remove generated output directory"
 	@echo "  all          — install + test + results"
 	@echo ""
@@ -55,6 +63,47 @@ test:
 # Regenerate the traceability index. Use --check in CI to fail on a stale copy.
 traceability:
 	$(PYTHON) -m src.results.traceability_index
+
+# Regenerate the interactive GSN view. Use --check in CI to fail on a stale copy.
+gsn-view:
+	$(PYTHON) -m src.visualization.interactive_view
+
+# Regenerate the GitHub Pages landing page (the poster's QR target).
+landing:
+	$(PYTHON) -m src.visualization.landing_page
+
+# Regenerate the seam page and its figure.
+seam:
+	$(PYTHON) -m src.visualization.seam_page
+
+# Regenerate the anomaly-walk notebook.
+notebook:
+	$(PYTHON) -m src.visualization.anomaly_notebook
+
+# Every reader-facing generated page.
+pages: gsn-view landing seam notebook
+
+# ── Reproducibility (Gate 3) ─────────────────────────────────────
+# One command from clone to every artefact both papers use, then prove the
+# committed references match what the code generates today. A non-empty diff
+# means a source changed without its references: fix the cause; never edit a
+# reference by hand. data/empirical_results/ is excluded by declaration: its
+# inputs belong to a paper in preparation (see that directory's README).
+reproduce: results verify-refs
+
+verify-refs:
+	$(PYTHON) -m src.results.generate_all --seed $(SEED) --scenes $(SCENES) \
+		--output $(OUTDIR)/_refcheck > /dev/null
+	diff $(OUTDIR)/_refcheck/csv/gaps.csv data/synthetic_illustrations/gaps.csv
+	diff $(OUTDIR)/_refcheck/csv/decision_points.csv data/synthetic_illustrations/decision_points.csv
+	diff $(OUTDIR)/_refcheck/csv/weather_evaluation.csv data/synthetic_illustrations/weather_evaluation_seed42.csv
+	diff $(OUTDIR)/_refcheck/summary_report.txt data/synthetic_illustrations/summary_report_seed42.txt
+	$(PYTHON) -m src.results.traceability_index --check
+	$(PYTHON) -m src.visualization.interactive_view --check
+	$(PYTHON) -m src.visualization.landing_page --check
+	$(PYTHON) -m src.visualization.seam_page --check
+	$(PYTHON) -m src.visualization.anomaly_notebook --check
+	@echo "All committed references match regeneration."
 
 results: $(OUTDIR)/analysis_results.json
 

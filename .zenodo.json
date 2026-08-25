@@ -1,0 +1,36 @@
+{
+  "title": "Assurance Gaps in an Integrated Safety and Cybersecurity Case for an AI-Based Perception Component in Highly Automated Driving",
+  "description": "<p>Supplementary material for two SAFECOMP 2026 papers. Builds the single GSN argument that ISO 26262, ISO 21448, ISO/SAE 21434 and ISO/PAS 8800 jointly imply for an AI-based perception component in highly automated driving, and reports the decision points and findings the combination exposes.</p><p>Includes the argument as machine-readable YAML, the five-step integration code, a generated traceability index from every claim to its clause or paper passage, an interactive argument view, and a notebook that follows one runtime anomaly clause by clause until no clause assigns it to a concern.</p>",
+  "upload_type": "software",
+  "license": "MIT",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Patel, Milin",
+      "affiliation": "Kempten University of Applied Sciences",
+      "orcid": "0000-0002-8357-6018"
+    },
+    {
+      "name": "Jung, Rolf",
+      "affiliation": "Kempten University of Applied Sciences"
+    }
+  ],
+  "keywords": [
+    "safety assurance",
+    "goal structuring notation",
+    "highly automated driving",
+    "cybersecurity",
+    "ISO/PAS 8800",
+    "ISO 21448",
+    "ISO/SAE 21434",
+    "ISO 26262",
+    "AI perception"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ]
+}

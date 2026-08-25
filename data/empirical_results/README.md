@@ -1,18 +1,27 @@
 # Empirical Results
 
+These measurements support a paper in preparation (P5, a runtime-monitoring
+study by the same author) and are claimed by neither paper in this repository.
+The VEHITS 2026 companion study the WAISE paper cites at G5 reports a
+simulated ensemble result, not these files.
+
 Provenance: measured. These are real measurements from trained models, in
 contrast to the deterministic seeded outputs in `data/synthetic_illustrations/`.
+They are kept here because they are the kind of evidence the argument's G5 and
+G6 goals call for, and because a reader who wants to know whether the ensemble
+uncertainty signal actually works on real data should be able to see the
+answer, including where it is weak. Once P5 is published, this README gains its
+citation.
 
-Neither paper cites these files, and no claim in either paper rests on them. They
-were produced by a separate runtime-monitoring project (referred to below as paper
-P5, in preparation). They are kept here because they are the kind of evidence the
-argument's G5 and G6 goals call for, and because a reader who wants to know
-whether the ensemble uncertainty signal actually works on real data should be able
-to see the answer, including where it is weak.
+## Reproducibility exception
 
-For the evidence the WAISE paper does cite at G5, see its evidence type (c): a
-simulated ensemble result reported in the VEHITS 2026 companion study, not the
-measurements here.
+This directory is the one part of the repository that clone-to-artefact
+reproduction cannot cover. The training and evaluation scripts that produced
+these CSVs and figures belong to paper P5 and are not in this repository, and
+the trained ensemble weights are not published. `make reproduce` regenerates
+every artefact both papers use; it does not and cannot regenerate anything
+under this directory. Treat these files as fixed inputs with the provenance
+stated below, not as outputs of this repository's pipeline.
 
 ## 1. Provenance
 

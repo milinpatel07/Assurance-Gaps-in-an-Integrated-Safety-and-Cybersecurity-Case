@@ -51,19 +51,19 @@ G2:
     Specification sufficient for all
     applicable assurance domains
     [8800 + 21448 + 21434]
-  supportedBy: [Sn1, Sn2, Sn3]
+  supportedBy: [Sn-G2-spec-review, Sn-G2-trig-catalogue, Sn-G2-cyber-spec]
 
-Sn1:
+Sn-G2-spec-review:
   text: |
     AI specification review
     (ISO/PAS 8800 Cl.5)
 
-Sn2:
+Sn-G2-trig-catalogue:
   text: |
     Triggering condition catalogue
     (ISO 21448 Cl.7, Table A.8)
 
-Sn3:
+Sn-G2-cyber-spec:
   text: |
     Cybersecurity requirements
     (ISO/SAE 21434 [RQ-06-01])
@@ -72,18 +72,18 @@ G3:
   text: |
     Training and test data sufficient
     [8800 only]
-  supportedBy: [Sn4, Sn5, Sn6]
+  supportedBy: [Sn-G3-data-quality, Sn-G3-distribution, Sn-G3-annotation]
 
-Sn4:
+Sn-G3-data-quality:
   text: |
     Data quality report
     (ISO/PAS 8800 Cl.8.4)
 
-Sn5:
+Sn-G3-distribution:
   text: |
     Distribution coverage analysis
 
-Sn6:
+Sn-G3-annotation:
   text: |
     Annotation quality metrics
 
@@ -92,19 +92,19 @@ G4:
     AI design satisfies safety and
     cybersecurity requirements
     [8800 + 21448 + 21434]
-  supportedBy: [Sn7, Sn8, Sn9]
+  supportedBy: [Sn-G4-ai-design, Sn-G4-sotif-measures, Sn-G4-cyber-controls]
 
-Sn7:
+Sn-G4-ai-design:
   text: |
     AI design review
     (ISO/PAS 8800 Cl.7)
 
-Sn8:
+Sn-G4-sotif-measures:
   text: |
     SOTIF design measures
     (ISO 21448 Table A.9)
 
-Sn9:
+Sn-G4-cyber-controls:
   text: |
     Cybersecurity control design
     (ISO/SAE 21434 Cl.10)
@@ -114,27 +114,27 @@ G5:
     V&V evidence sufficient across
     all assurance domains
     [All four standards]
-  supportedBy: [Sn10, Sn11, Sn12, Sn13]
+  supportedBy: [Sn-G5-mcdc, Sn-G5-scenario, Sn-G5-ensemble-uncertainty, Sn-G5-pentest]
 
-Sn10:
+Sn-G5-mcdc:
   text: |
     MC/DC structural coverage
     of non-AI wrapper code
     (ISO 26262-6 Cl.9)
 
-Sn11:
+Sn-G5-scenario:
   text: |
     Scenario-based testing with
     triggering condition coverage
     (ISO 21448 Cl.9-11)
 
-Sn12:
+Sn-G5-ensemble-uncertainty:
   text: |
     Deep ensemble uncertainty
     quantification
     (ISO/PAS 8800 Cl.8-9)
 
-Sn13:
+Sn-G5-pentest:
   text: |
     Adversarial penetration testing
     (ISO/SAE 21434 Cl.10)
@@ -144,19 +144,19 @@ G6:
     Operational monitoring covers
     AI, SOTIF, and cybersecurity
     [8800 + 21448 + 21434]
-  supportedBy: [Sn14, Sn15, Sn16]
+  supportedBy: [Sn-G6-ood, Sn-G6-sotif-field, Sn-G6-cyber-monitor]
 
-Sn14:
+Sn-G6-ood:
   text: |
     OOD detection and drift monitoring
     (ISO/PAS 8800 Cl.14)
 
-Sn15:
+Sn-G6-sotif-field:
   text: |
     SOTIF field monitoring
     (ISO 21448 Tables A.13-A.14)
 
-Sn16:
+Sn-G6-cyber-monitor:
   text: |
     Cybersecurity monitoring
     (ISO/SAE 21434 Cl.8)
@@ -166,14 +166,14 @@ G7:
     Residual risk from functional
     insufficiencies meets acceptance
     criteria (ISO 21448 Cl.6.5)
-  supportedBy: [Sn17, Sn18]
+  supportedBy: [Sn-G7-area-eval, Sn-G7-acceptance]
 
-Sn17:
+Sn-G7-area-eval:
   text: |
     Four-area model evaluation
     (ISO 21448 Cl.5)
 
-Sn18:
+Sn-G7-acceptance:
   text: |
     Acceptance criteria assessment
     (ISO 21448 Cl.6.5, Table A.10)
@@ -183,19 +183,19 @@ G8:
     Cybersecurity risks treated to
     acceptable level
     (ISO/SAE 21434 Cl.3.1.11)
-  supportedBy: [Sn19, Sn20, Sn21]
+  supportedBy: [Sn-G8-tara, Sn-G8-treatment, Sn-G8-bridge]
 
-Sn19:
+Sn-G8-tara:
   text: |
     TARA report
     (ISO/SAE 21434 Cl.15)
 
-Sn20:
+Sn-G8-treatment:
   text: |
     Risk treatment plan
     (ISO/SAE 21434 Cl.15)
 
-Sn21:
+Sn-G8-bridge:
   text: |
     Safety-cybersecurity bridge
     (ISO/SAE 21434 [RQ-15-06])
@@ -204,5 +204,5 @@ G9:
   text: |
     AI model modifications controlled
     with re-assurance criteria
-    [UNDEVELOPED - Gap-2]
+    [UNDEVELOPED - F-2]
   undeveloped: true

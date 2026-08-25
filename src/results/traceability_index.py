@@ -34,8 +34,8 @@ from src.standards.registry import StandardsRegistry
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUTPUT_PATH = os.path.join(REPO_ROOT, "TRACEABILITY.md")
 
-WAISE = "paper/waise2026/CR_Submission_WAISE_SafeCompAssuranceGaps_SafetySecurityCase_AI_Perception_HAD.tex"
-POSITION = "paper/safecomp2026-position/CR_position_paper.tex"
+WAISE = "paper/waise2026/camera-ready.tex"
+POSITION = "paper/safecomp2026-position/camera-ready.tex"
 
 GENERATE_ALL = "python -m src.results.generate_all --seed 42 --scenes 50 --output output"
 
@@ -125,8 +125,7 @@ def _crosswalk_section(catalogue: DecisionPointCatalogue, gaps: GapClassificatio
         'The paper calls DP-N "decision points" and F-N "integration-induced',
         'findings and open methodological problems". The code calls them',
         "inconsistencies (`I-N`) and gaps (`Gap-N`). The numbers correspond exactly;",
-        "only the prefixes differ. `gsn/integrated_pattern.gsn.yaml` still tags G9",
-        'with the older "Gap-2" spelling.',
+        "only the prefixes differ.",
         "",
     ]
     return lines
@@ -277,7 +276,7 @@ def _artefacts_section() -> list[str]:
         "| `data/synthetic_illustrations/*` | seeded, seed 42 | COMMAND: as above. Not measurements. See that directory's README |",
         "| `data/empirical_results/*` | measured | Trained PointPillars ensemble, external to this repository. Cited by neither paper. See that directory's README |",
         "| `data/carla_configs/*.yaml` | hand-written | Documentation only. Checked against `src/` by `tests/test_config_documentation.py` |",
-        "| `configs/*.yaml` | hand-written | Documentation only. No code loads them |",
+        "| `docs/standards-reference/*.yaml` | hand-written | Documentation only. No code loads them |",
         "| `gsn/*.gsn.yaml` | hand-written | Source for the rendered GSN diagrams |",
         "| `gsn/*.svg` | generated | COMMAND: `make gsn`, or `gsn2x gsn/<file>.gsn.yaml` |",
         "",

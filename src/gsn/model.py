@@ -97,10 +97,18 @@ class Assumption(GSNElement):
 
 @dataclass
 class Solution(GSNElement):
-    """A reference to evidence supporting a goal."""
+    """A reference to evidence supporting a goal.
+
+    Attributes:
+        instantiation: Whether the paper's case study produced this evidence.
+            The WAISE paper's Figure 2(b) marks the G5 evidence legs: one
+            "provided (simulated)", three "not produced". Empty string means
+            the paper states no status for this solution.
+    """
 
     evidence_type: str = ""
     evidence_description: str = ""
+    instantiation: str = ""
 
     def __post_init__(self):
         self.element_type = GSNElementType.SOLUTION

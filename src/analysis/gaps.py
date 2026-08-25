@@ -17,7 +17,7 @@ from src.standards.base import AssuranceGap, GapType, LifecyclePhase
 # Where each finding sits in the argument. Single source: counterfactual.py and
 # traceability.py both read this rather than keeping their own copies, because a
 # fact written down twice with nothing holding the copies together is how G2 came
-# to contradict a published claim (REPO_AUDIT.md section 5b.2).
+# to contradict a published claim (see tests/test_representation_consistency.py).
 GAP_GOAL_MAP: dict[str, list[str]] = {
     "Gap-1": ["G1"],
     "Gap-2": ["G9"],
@@ -41,14 +41,22 @@ class GapClassification:
         return [
             AssuranceGap(
                 gap_id="Gap-1",
-                description="No AI-specific quantitative reliability target",
+                # Camera-ready title (tab:gaps): "Quantitative acceptance
+                # criteria for AI components". The paper's claim is a deferral
+                # plus a research gap, not a flat absence: the standards
+                # establish frameworks but defer values to context, and no
+                # published method derives application-specific targets.
+                description=(
+                    "Quantitative acceptance criteria for AI components "
+                    "undefined; the standards defer values to context"
+                ),
                 gap_type=GapType.MISSING_EVIDENCE,
                 lifecycle_phase=LifecyclePhase.VERIFICATION,
                 # The camera-ready findings table (tab:gaps) gives "Concept, Verification".
                 additional_lifecycle_phases=[LifecyclePhase.CONCEPT],
                 partial_coverage=[
                     "ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, "
-                    "PMHF < 10^-8 h^-1 — hardware only)",
+                    "PMHF < 10^-8 h^-1, hardware only)",
                     "ISO 21448 Cl.6.5 (establishes the acceptance-criteria framework, "
                     "including risk tolerability principles, but defers "
                     "quantitative values to context)",
@@ -58,22 +66,27 @@ class GapClassification:
             ),
             AssuranceGap(
                 gap_id="Gap-2",
-                description="No complete OTA re-assurance workflow for AI",
+                description=(
+                    "No complete over-the-air (OTA) re-assurance workflow "
+                    "for AI"
+                ),
                 gap_type=GapType.MISSING_CLAIM,
                 lifecycle_phase=LifecyclePhase.MODIFICATION,
                 partial_coverage=[
-                    "ISO 26262-8 Cl.8 (change management — assumes conventional SW)",
-                    "ISO/PAS 8800 Cl.14.8.3 (partial re-approval — incomplete)",
+                    "ISO 26262-8 Cl.8 (change management, assumes conventional "
+                    "software)",
+                    "ISO/PAS 8800 Cl.14.8.3 (partial re-approval, incomplete)",
                     "ISO 24089 (software update engineering; specifies the update "
                     "process, not re-assurance of a modified AI model's argument)",
-                    "ISO/IEC TR 5469 Table A.8 (change protocols — informative only)",
+                    "ISO/IEC TR 5469 Table A.8 (change protocols, informative "
+                    "only)",
                 ],
                 integration_induced=False,
             ),
             AssuranceGap(
                 gap_id="Gap-3",
                 description=(
-                    "Adversarial-SOTIF boundary unowned — adversarial inputs that "
+                    "Adversarial-SOTIF boundary unowned: adversarial inputs that "
                     "exploit functional insufficiencies fall between G7 and G8"
                 ),
                 gap_type=GapType.UNRESOLVED_INCONSISTENCY,
@@ -89,8 +102,9 @@ class GapClassification:
             AssuranceGap(
                 gap_id="Gap-4",
                 description=(
-                    "No cross-domain release decision criteria — four separate "
-                    "evidence sets with no combined evaluation"
+                    "No cross-domain release decision criteria: no standard "
+                    "defines how the per-domain residual risks combine into "
+                    "one release decision"
                 ),
                 gap_type=GapType.MISSING_CLAIM,
                 lifecycle_phase=LifecyclePhase.INTEGRATION,
@@ -105,9 +119,14 @@ class GapClassification:
             ),
             AssuranceGap(
                 gap_id="Gap-5",
+                # Camera-ready title (tab:gaps): "Data acceptance criteria for
+                # AI components". As with Gap-1, the paper's claim is a
+                # deferral: ISO/PAS 8800 Cl.8.4 and TR 5469 Cl.9.3.3 prescribe
+                # frameworks and criteria but defer thresholds to context.
                 description=(
-                    "Data acceptance threshold undefined — no standard prescribes "
-                    "when training data are sufficient"
+                    "Data acceptance criteria for AI components undefined; the "
+                    "standards prescribe frameworks but defer thresholds to "
+                    "context"
                 ),
                 gap_type=GapType.MISSING_EVIDENCE,
                 lifecycle_phase=LifecyclePhase.DESIGN,
@@ -253,6 +272,10 @@ class GapClassification:
             overall = sum(dims) / len(dims) if dims else 0
             result.append({
                 **s,
+                # The classification above is the single source for the
+                # description; the copies in the scores dict had already
+                # drifted from it once.
+                "description": gap.description,
                 "integration_induced": gap.integration_induced,
                 "overall_severity": round(overall, 1),
                 "priority": "CRITICAL" if overall >= 4.0 else "HIGH" if overall >= 3.0 else "MEDIUM",

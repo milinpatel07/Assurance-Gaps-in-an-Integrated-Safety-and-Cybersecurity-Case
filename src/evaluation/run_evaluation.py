@@ -10,6 +10,7 @@ import argparse
 import os
 
 from src.evaluation.carla_evaluator import generate_synthetic_illustration
+from src.seeds import DEFAULT_SEED
 from src.evaluation.weather_conditions import (
     generate_weather_grid,
     compute_triggering_coverage,
@@ -42,7 +43,7 @@ def main():
     parser.add_argument(
         "--seed",
         type=int,
-        default=42,
+        default=DEFAULT_SEED,
         help="Random seed for synthetic evaluation",
     )
     args = parser.parse_args()

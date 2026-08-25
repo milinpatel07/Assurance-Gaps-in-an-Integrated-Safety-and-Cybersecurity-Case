@@ -56,9 +56,12 @@ values (Gap-1), ISO/PAS 8800 Clause 14.8.3 gives partial re-approval only
 a new field rather than remove it, so it has not been added. These three remain
 declared judgments traceable to the clauses named in ``gaps.py``.
 
-An earlier derivation attempt and why it failed is recorded in ``REPO_AUDIT.md``.
-It is kept as evidence about the limits of deriving these claims, not deleted as
-a failed experiment.
+An earlier derivation attempt produced {Gap-2, Gap-3} against the published
+{Gap-3, Gap-4}; diagnosing why the rule rather than the paper was wrong exposed
+the representation drift that ``tests/test_representation_consistency.py`` now
+guards against (commit ``f9a7902``). The attempt is kept in the git history as
+evidence about the limits of deriving these claims, not deleted as a failed
+experiment.
 """
 
 from __future__ import annotations
@@ -109,7 +112,10 @@ class CounterfactualAnalysis:
                     "Data quality for training",
                     "Runtime monitoring for ML",
                 ],
-                visible_gaps=["Gap-1 (no AI reliability target)", "Gap-2 (no OTA re-assurance)"],
+                visible_gaps=[
+                    "Gap-1 (no quantitative acceptance criteria)",
+                    "Gap-2 (no OTA re-assurance)",
+                ],
                 invisible_gaps=[
                     "Gap-3 (adversarial-SOTIF boundary — not aware SOTIF excludes cyber)",
                     "Gap-4 (cross-domain release — only sees safety assessment)",

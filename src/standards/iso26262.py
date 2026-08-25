@@ -210,7 +210,7 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         # scope rather than mis-placed. While it sat at G2 it made G2 appear to
         # draw on all four standards under compute_goal_density(), which would
         # have contradicted the paper's claim that G5 is the only such node.
-        # Recorded in REPO_AUDIT.md.
+        # The decision is pinned by tests/test_representation_consistency.py.
         Claim(
             claim_id="CLM-26262-TSC-01",
             text=(

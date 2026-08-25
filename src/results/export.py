@@ -11,9 +11,10 @@ from __future__ import annotations
 import csv
 import json
 import os
-from datetime import datetime
 
 import numpy as np
+
+from src.seeds import DEFAULT_SEED
 
 from src.standards.base import LifecyclePhase, InconsistencyType, GapType
 from src.standards.registry import StandardsRegistry
@@ -60,11 +61,12 @@ def export_json(
             "authors": ["Milin Patel", "Rolf Jung"],
             "affiliation": "Kempten University of Applied Sciences",
             "venue": "SafeComp 2026 WAISE Workshop",
-            "generated": datetime.now().isoformat(),
+            # No timestamp: outputs are byte-identical across runs, and the
+            # run manifest records when and from what a run was made.
             "methodology": "Five-step constructive integration",
             "base_pattern": "ISO/PAS 8800:2024 Annex B",
             "case_study": "LiDAR-based 3D object detection (SECOND + deep ensemble)",
-            "random_seed": 42,
+            "random_seed": DEFAULT_SEED,
         },
         "standards": {
             std.standard_id: {
@@ -334,8 +336,7 @@ def export_summary_report(
     lines.append("Assurance Gaps in an Integrated Safety and Cybersecurity Case")
     lines.append("for an AI-Based Perception Component in Highly Automated Driving")
     lines.append("=" * 80)
-    lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    lines.append(f"Random seed: 42")
+    lines.append(f"Random seed: {DEFAULT_SEED}")
     lines.append("")
 
     # Standards summary
