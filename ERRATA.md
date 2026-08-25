@@ -4,7 +4,7 @@ Discrepancies between the camera-ready papers and this repository, and one
 internal inconsistency inside the WAISE camera-ready itself. Each entry states
 what the paper says, what the repository holds, how the difference was found,
 and how it was resolved. Line numbers refer to
-`paper/waise2026/CR_Submission_WAISE_SafeCompAssuranceGaps_SafetySecurityCase_AI_Perception_HAD.tex`.
+`paper/waise2026/camera-ready.tex`.
 
 The repository's rule for these cases: never change a paper source, and never
 silently absorb a difference. Where the paper is internally inconsistent, the

@@ -22,8 +22,8 @@ python -m src.results.traceability_index
 
 The two papers:
 
-- WAISE 2026, GSN integration: `paper/waise2026/CR_Submission_WAISE_SafeCompAssuranceGaps_SafetySecurityCase_AI_Perception_HAD.tex`
-- SAFECOMP 2026 position: `paper/safecomp2026-position/CR_position_paper.tex`
+- WAISE 2026, GSN integration: `paper/waise2026/camera-ready.tex`
+- SAFECOMP 2026 position: `paper/safecomp2026-position/camera-ready.tex`
 
 ## 1. Standards and editions
 
@@ -195,7 +195,7 @@ left undeclared.
 | `data/synthetic_illustrations/*` | seeded, seed 42 | COMMAND: as above. Not measurements. See that directory's README |
 | `data/empirical_results/*` | measured | Trained PointPillars ensemble, external to this repository. Cited by neither paper. See that directory's README |
 | `data/carla_configs/*.yaml` | hand-written | Documentation only. Checked against `src/` by `tests/test_config_documentation.py` |
-| `configs/*.yaml` | hand-written | Documentation only. No code loads them |
+| `docs/standards-reference/*.yaml` | hand-written | Documentation only. No code loads them |
 | `gsn/*.gsn.yaml` | hand-written | Source for the rendered GSN diagrams |
 | `gsn/*.svg` | generated | COMMAND: `make gsn`, or `gsn2x gsn/<file>.gsn.yaml` |
 

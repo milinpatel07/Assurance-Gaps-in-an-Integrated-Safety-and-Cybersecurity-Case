@@ -1,0 +1,63 @@
+cff-version: 1.2.0
+message: >-
+  Cite the two papers rather than this repository. Both are listed under
+  preferred-citation and references below.
+title: >-
+  Assurance Gaps in an Integrated Safety and Cybersecurity Case for an
+  AI-Based Perception Component in Highly Automated Driving
+abstract: >-
+  Supplementary material for two SAFECOMP 2026 papers. Builds the single GSN
+  argument that ISO 26262, ISO 21448, ISO/SAE 21434 and ISO/PAS 8800 jointly
+  imply for an AI-based perception component, and reports the decision points
+  and findings the combination exposes.
+type: software
+license: MIT
+authors:
+  - family-names: Patel
+    given-names: Milin
+    orcid: https://orcid.org/0000-0002-8357-6018
+    affiliation: Kempten University of Applied Sciences
+  - family-names: Jung
+    given-names: Rolf
+    affiliation: Kempten University of Applied Sciences
+keywords:
+  - safety assurance
+  - goal structuring notation
+  - highly automated driving
+  - cybersecurity
+  - ISO/PAS 8800
+  - AI perception
+preferred-citation:
+  type: conference-paper
+  title: >-
+    Integrating Cybersecurity into the AI Safety Assurance Argument: A GSN
+    Pattern for AI-Based Perception Components in Highly Automated Driving
+  authors:
+    - family-names: Patel
+      given-names: Milin
+      orcid: https://orcid.org/0000-0002-8357-6018
+      affiliation: Kempten University of Applied Sciences
+    - family-names: Jung
+      given-names: Rolf
+      affiliation: Kempten University of Applied Sciences
+  collection-title: WAISE 2026 Workshop at SAFECOMP 2026
+  collection-type: proceedings
+  publisher:
+    name: Springer
+  year: 2026
+references:
+  - type: conference-paper
+    title: >-
+      Operational Safety and Cybersecurity Assurance for AI-Based Perception
+      in Highly Automated Driving
+    authors:
+      - family-names: Patel
+        given-names: Milin
+        orcid: https://orcid.org/0000-0002-8357-6018
+        affiliation: Kempten University of Applied Sciences
+      - family-names: Jung
+        given-names: Rolf
+        affiliation: Kempten University of Applied Sciences
+    collection-title: SAFECOMP 2026
+    collection-type: proceedings
+    year: 2026

@@ -40,6 +40,9 @@ help:
 	@echo "  latex        — Generate LaTeX tables only"
 	@echo "  traceability — Regenerate TRACEABILITY.md"
 	@echo "  gsn-view     — Regenerate docs/gsn_view.html (interactive GSN)"
+	@echo "  landing      — Regenerate docs/index.html (GitHub Pages landing page)"
+	@echo "  pages        — Regenerate every reader-facing generated page"
+	@echo "  reproduce    — Generate everything, then verify against committed references"
 	@echo "  clean        — Remove generated output directory"
 	@echo "  all          — install + test + results"
 	@echo ""
@@ -62,6 +65,13 @@ traceability:
 gsn-view:
 	$(PYTHON) -m src.visualization.interactive_view
 
+# Regenerate the GitHub Pages landing page (the poster's QR target).
+landing:
+	$(PYTHON) -m src.visualization.landing_page
+
+# Every reader-facing generated page.
+pages: gsn-view landing
+
 # ── Reproducibility (Gate 3) ─────────────────────────────────────
 # One command from clone to every artefact both papers use, then prove the
 # committed references match what the code generates today. A non-empty diff
@@ -79,6 +89,7 @@ verify-refs:
 	diff $(OUTDIR)/_refcheck/summary_report.txt data/synthetic_illustrations/summary_report_seed42.txt
 	$(PYTHON) -m src.results.traceability_index --check
 	$(PYTHON) -m src.visualization.interactive_view --check
+	$(PYTHON) -m src.visualization.landing_page --check
 	@echo "All committed references match regeneration."
 
 results: $(OUTDIR)/analysis_results.json

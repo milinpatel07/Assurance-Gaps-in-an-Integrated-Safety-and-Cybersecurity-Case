@@ -40,9 +40,10 @@ Run it with:
 pytest tests/test_config_documentation.py -v
 ```
 
-`configs/case_study.yaml` and `configs/standards.yaml` at the repository root
-are documentation in the same sense. The case-study file is covered by the same
-test; `configs/standards.yaml` is prose about clauses and is not.
+`docs/standards-reference/case_study.yaml` and
+`docs/standards-reference/standards.yaml` are documentation in the same sense.
+The case-study file is covered by the same test; `standards.yaml` is prose
+about clauses and is not.
 
 ## The detector named here
 
