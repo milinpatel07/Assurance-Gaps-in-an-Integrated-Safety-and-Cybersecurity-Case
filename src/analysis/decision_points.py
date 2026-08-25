@@ -91,7 +91,7 @@ class DecisionPointCatalogue:
                 inconsistency_type=InconsistencyType.TERMINOLOGICAL,
                 standards_involved=["ISO26262", "ISO21448", "TR5469"],
                 clause_references=[
-                    "ISO 26262-1 Cl.1 (malfunction/fault scope — AI errors outside scope)",
+                    "ISO 26262-1 Cl.1 (malfunction/fault scope, AI errors outside scope)",
                     "ISO 21448 Cl.3 (functional insufficiency)",
                     "ISO/IEC TR 5469 Cl.6.1 (systematic failure)",
                 ],

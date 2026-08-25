@@ -53,8 +53,8 @@ def build_integrated_gsn() -> GSNArgument:
         element_type=None,
         text=(
             "TARA results: threat scenarios identified for the LiDAR perception "
-            "component — LiDAR spoofing, adversarial point cloud perturbation, "
-            "model poisoning — with associated risk values (1-5)."
+            "component (LiDAR spoofing, adversarial point cloud perturbation, "
+            "model poisoning), with associated risk values (1-5)."
         ),
         source_standards=["ISO21434"],
         clause_references=["ISO/SAE 21434 Cl.15"],
@@ -293,7 +293,7 @@ def build_integrated_gsn() -> GSNArgument:
         element_type=None,
         text=(
             "AI model modifications (OTA updates, retraining) are controlled "
-            "with re-assurance criteria. [UNDEVELOPED — no single standard "
+            "with re-assurance criteria. [UNDEVELOPED: no single standard "
             "prescribes the complete re-assurance workflow.]"
         ),
         source_standards=[],

@@ -15,7 +15,7 @@ standards:
     title: "Road vehicles — Safety of the intended functionality"
     year: 2022
     type: "normative"
-    scope: "SOTIF — intended function producing hazardous behaviour"
+    scope: "SOTIF: intended function producing hazardous behaviour"
     relevance: "Perception fails under adverse conditions without fault"
     key_clauses: ["Cl.5-7 (Analysis)", "Cl.9-11 (V&V)", "Cl.13 (Monitoring)", "Annex A.1 (GSN)"]
 
