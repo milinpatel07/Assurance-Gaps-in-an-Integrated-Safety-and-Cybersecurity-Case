@@ -12,6 +12,21 @@ abstract: >-
   and findings the combination exposes.
 type: software
 license: MIT
+version: 1.0.0
+date-released: "2026-08-25"
+# The concept DOI: it always resolves to the latest archived version.
+doi: 10.5281/zenodo.22091825
+repository-code: >-
+  https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case
+url: >-
+  https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22091825
+    description: Concept DOI, resolving to the latest archived version
+  - type: doi
+    value: 10.5281/zenodo.22091826
+    description: Version DOI for release v1.0.0
 authors:
   - family-names: Patel
     given-names: Milin

@@ -3,6 +3,8 @@
 Milin Patel and Rolf Jung, Kempten University of Applied Sciences.
 Supplementary material for two SAFECOMP 2026 papers, both accepted.
 
+[![DOI](https://zenodo.org/badge/1178669234.svg)](https://doi.org/10.5281/zenodo.22091825)
+
 Four standards apply at once to an AI perception component in a driverless
 vehicle, and each one prescribes its own evidence. This repository builds
 one argument the four jointly imply, in Goal Structuring Notation, and reports
@@ -101,7 +103,7 @@ paper/waise2026/            Camera-ready source of the GSN pattern paper
 paper/safecomp2026-position/  Camera-ready source of the position paper
 src/                        The five-step method: claims, GSN, decision points, findings
 gsn/                        The argument in YAML, rendered by gsn2x
-tests/                      372 tests, including the paper's own claims
+tests/                      383 tests, including the paper's own claims
 data/                       Seeded illustrations and measured results, each with a README
 docs/                       The interactive argument view, figures, reference tables
 notebooks/                  The anomaly walk, and the method as a walkthrough
@@ -145,10 +147,15 @@ and the papers themselves.
 
 ## Archive
 
-Release `v1.0.0` is the camera-ready snapshot. `.zenodo.json` holds the archive
-metadata, so publishing a GitHub release with the Zenodo integration enabled
-mints a DOI without further editing. We add the DOI here once Zenodo mints it.
-Until then this repository claims none.
+Release `v1.0.0` is the camera-ready snapshot, archived on Zenodo.
+
+| DOI | Resolves to |
+|---|---|
+| [10.5281/zenodo.22091825](https://doi.org/10.5281/zenodo.22091825) | The repository, always the latest version. Cite this one unless you need a specific release |
+| [10.5281/zenodo.22091826](https://doi.org/10.5281/zenodo.22091826) | Release `v1.0.0` specifically |
+
+The archived snapshot is the tagged commit, so it predates any change made after
+the tag. `.zenodo.json` holds the archive metadata.
 
 ## License
 

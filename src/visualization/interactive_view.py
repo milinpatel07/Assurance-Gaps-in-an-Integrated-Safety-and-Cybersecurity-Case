@@ -549,6 +549,10 @@ def build_html() -> str:
         "<code>tests/test_gsn_yaml_builder_consistency.py</code> fails if the "
         "structure sources disagree. "
         f"Rebuild: <code>{REBUILD_COMMAND}</code></p>\n"
+        # Without these a reader arriving from the poster reaches this page and
+        # has nowhere to go but the browser's back button.
+        '<p><a href="index.html">Back to the start</a> · '
+        '<a href="seam.html">One problem at two lifecycle points</a></p>\n'
         "</footer>\n"
         f"<script>{JS}</script>\n"
         "</body>\n</html>\n"

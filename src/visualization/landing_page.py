@@ -43,6 +43,10 @@ REPO_URL = (
 )
 BLOB = f"{REPO_URL}/blob/main"
 
+# The concept DOI, which always resolves to the latest archived version. The
+# version DOI for a specific release lives in CITATION.cff.
+CONCEPT_DOI = "10.5281/zenodo.22091825"
+
 # Legend order follows the paper's Figure 2(a).
 LEGEND_ORDER = ["ISOPAS8800", "ISO21448", "ISO21434", "ISO26262"]
 
@@ -230,6 +234,7 @@ def build_html() -> str:
         "about the camera-ready papers.</p>\n"
         f'<p>Source: <a href="{REPO_URL}">github.com/milinpatel07</a>. '
         f'Cite the papers: <a href="{BLOB}/CITATION.cff">CITATION.cff</a>. '
+        f'Archived: <a href="https://doi.org/{CONCEPT_DOI}">{CONCEPT_DOI}</a>. '
         "MIT licence.</p>\n"
         f"<p>Generated page; do not edit by hand. Rebuild: "
         f"<code>{REBUILD_COMMAND}</code></p>\n"

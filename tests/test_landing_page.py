@@ -50,11 +50,15 @@ class TestSelfContained:
         assert "@import" not in html
         assert "url(" not in html
 
-    def test_the_only_outbound_links_are_the_repository(self, html):
+    def test_outbound_links_go_only_to_the_repository_or_the_doi(self, html):
+        """Two destinations are legitimate: the repository, and the DOI
+        resolver for the archived release. Anything else on a page a
+        conference visitor opens would be a surprise."""
+        allowed = ("https://github.com/milinpatel07/", "https://doi.org/10.5281/")
         urls = re.findall(r'href="(https?://[^"]+)"', html)
         assert urls, "the page should link out to the repository"
         for url in urls:
-            assert url.startswith("https://github.com/milinpatel07/"), url
+            assert url.startswith(allowed), url
 
     def test_size_fits_the_conference_wifi_budget(self, html):
         assert len(html.encode("utf-8")) < 30_000
@@ -119,3 +123,56 @@ class TestProvenance:
         assert "make reproduce" in html
         assert "/REPRODUCING.md" in html
         assert "/ERRATA.md" in html
+
+
+class TestSiteNavigation:
+    """GitHub Pages serves this site from a subpath, so a link starting with a
+    slash resolves above the site root and breaks. Every page must also offer a
+    way onward: a reader arriving from the poster should never have to reach for
+    the browser's back button."""
+
+    PAGES = ["index.html", "gsn_view.html", "seam.html"]
+
+    def _page(self, name: str) -> str:
+        path = os.path.join(os.path.dirname(OUTPUT_PATH), name)
+        with open(path, encoding="utf-8") as handle:
+            return handle.read()
+
+    @pytest.mark.parametrize("name", PAGES)
+    def test_no_root_relative_links(self, name):
+        links = re.findall(r'href="([^"]+)"', self._page(name))
+        offenders = [link for link in links if link.startswith("/")]
+        assert not offenders, (
+            f"{name} has root-relative links {offenders}, which resolve above "
+            "the Pages subpath and 404."
+        )
+
+    @pytest.mark.parametrize("name", PAGES)
+    def test_every_relative_link_resolves(self, name):
+        directory = os.path.dirname(OUTPUT_PATH)
+        links = [
+            link for link in re.findall(r'href="([^"]+)"', self._page(name))
+            if not link.startswith(("http", "#"))
+        ]
+        for link in links:
+            assert os.path.exists(os.path.join(directory, link)), (
+                f"{name} links to {link}, which is not in docs/"
+            )
+
+    @pytest.mark.parametrize("name", PAGES)
+    def test_no_page_is_a_dead_end(self, name):
+        links = [
+            link for link in re.findall(r'href="([^"]+)"', self._page(name))
+            if not link.startswith(("http", "#"))
+        ]
+        assert links, f"{name} offers no way onward"
+
+
+class TestArchive:
+    def test_the_concept_doi_is_published_on_the_page(self, html):
+        assert "10.5281/zenodo.22091825" in html
+
+    def test_the_page_uses_the_concept_doi_not_a_version_doi(self, html):
+        """The concept DOI tracks the latest version; a version DOI on a page
+        that is rebuilt every release would go stale."""
+        assert "10.5281/zenodo.22091826" not in html
