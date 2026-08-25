@@ -131,7 +131,7 @@ class TestSiteNavigation:
     way onward: a reader arriving from the poster should never have to reach for
     the browser's back button."""
 
-    PAGES = ["index.html", "gsn_view.html", "seam.html"]
+    PAGES = ["index.html", "gsn_view.html", "seam.html", "g5_playground.html"]
 
     def _page(self, name: str) -> str:
         path = os.path.join(os.path.dirname(OUTPUT_PATH), name)

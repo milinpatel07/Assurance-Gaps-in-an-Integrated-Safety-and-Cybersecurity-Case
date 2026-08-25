@@ -106,7 +106,7 @@ paper/waise2026/            Camera-ready source of the GSN pattern paper
 paper/safecomp2026-position/  Camera-ready source of the position paper
 src/                        The five-step method: claims, GSN, decision points, findings
 gsn/                        The argument in YAML, rendered by gsn2x
-tests/                      429 tests, including the paper's own claims
+tests/                      449 tests, including the paper's own claims
 data/                       Seeded illustrations and measured results, each with a README
 docs/                       The interactive argument view, figures, reference tables
 notebooks/                  The anomaly walk, and the method as a walkthrough

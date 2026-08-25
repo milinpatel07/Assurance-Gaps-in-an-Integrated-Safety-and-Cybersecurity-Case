@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try to combine the four scales at G5</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #fff; color: #111;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px; line-height: 1.5;
+}
+header, main, footer { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 22px; }
+h1 { font-size: 1.4rem; line-height: 1.25; margin: 0 0 10px; }
+.intro { margin: 0 0 8px; }
+.muted { color: #555; font-size: 0.85rem; }
+.verdict {
+  position: sticky; top: 0; z-index: 1; background: #fff;
+  border: 2px solid #111; border-radius: 10px; padding: 12px 14px;
+  margin: 14px 0; text-align: center;
+}
+.verdict .word { font-size: 1.6rem; font-weight: 800; letter-spacing: 0.02em; }
+.verdict.release { border-color: #2E7D32; }
+.verdict.release .word { color: #2E7D32; }
+.verdict.hold { border-color: #C62828; }
+.verdict.hold .word { color: #C62828; }
+.verdict .why { font-size: 0.9rem; color: #333; margin: 4px 0 0; }
+.leg { border: 2px solid #222; border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+.leg-head { display: flex; align-items: center; gap: 8px; }
+.chip {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  border: 2px solid var(--c); color: #111; font-size: 0.85rem;
+  background: #fff; white-space: nowrap;
+}
+.chip::before {
+  content: ""; display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--c); margin-right: 6px;
+}
+.verdict-leg {
+  margin-left: auto; font-weight: 700; font-size: 0.85rem;
+  border: 1px solid #999; border-radius: 4px; padding: 1px 8px;
+}
+.verdict-leg.pass { color: #2E7D32; border-color: #2E7D32; }
+.verdict-leg.fail { color: #C62828; border-color: #C62828; }
+.leg-name { margin: 8px 0 6px; }
+.dial { display: block; font-size: 0.9rem; }
+.dial output { font-weight: 700; }
+input[type=range] { width: 100%; margin: 8px 0 0; accent-color: var(--c); }
+.controls { margin: 14px 0; }
+.controls button {
+  font: inherit; border: 2px solid #333; background: #fff; color: #111;
+  border-radius: 6px; padding: 6px 12px; cursor: pointer;
+}
+.note {
+  background: #f5f5f5; border-left: 4px solid #757575;
+  padding: 8px 12px; margin: 14px 0; font-size: 0.95rem;
+}
+code {
+  background: #f2f2f2; border: 1px solid #ddd; border-radius: 4px;
+  padding: 1px 5px; font-size: 0.85rem;
+}
+footer {
+  border-top: 1px solid #ccc; margin-top: 22px; padding-top: 12px;
+  padding-bottom: 28px; font-size: 0.85rem; color: #333;
+}
+a { color: #111; }
+</style>
+</head>
+<body>
+<header>
+<h1>Try to combine the four scales</h1>
+<p class="intro">At G5, the goal that verification and validation are sufficient, four standards each require their own kind of evidence on a scale that does not convert into the others. Every prescribed activity is complete. You decide: is the evidence together enough to release?</p>
+<p class="intro">To decide, draw an acceptance line for each scale below and read the verdict. Only leg (c) was produced in the case study, on simulated outputs; the four values are illustrative, so move the lines and watch what happens.</p>
+</header>
+<main>
+<div class="verdict release" id="verdict" role="status" aria-live="polite"><div class="word" id="verdict-word">RELEASE</div><p class="why" id="verdict-why"></p></div>
+<div class="leg" data-standard="ISO26262"><div class="leg-head"><span class="chip" style="--c:#2E7D32">ISO 26262</span><span class="verdict-leg" data-role="leg-verdict">&mdash;</span></div><p class="leg-name">(a) deterministic coverage <span class="muted">(evidence value 0.97, illustrative)</span></p><label class="dial">Your acceptance line: pass if the value is at least <output data-role="line-out">0.95</output><input type="range" data-role="line" min="0.0" max="1.0" step="0.01" value="0.95" style="--c:#2E7D32" aria-label="acceptance line for ISO 26262"></label></div><div class="leg" data-standard="ISO21448"><div class="leg-head"><span class="chip" style="--c:#E65100">ISO 21448</span><span class="verdict-leg" data-role="leg-verdict">&mdash;</span></div><p class="leg-name">(b) scenario coverage <span class="muted">(evidence value 1200 scenarios, illustrative)</span></p><label class="dial">Your acceptance line: pass if the value is at least <output data-role="line-out">1000</output><input type="range" data-role="line" min="0" max="3000" step="50" value="1000" style="--c:#E65100" aria-label="acceptance line for ISO 21448"></label></div><div class="leg" data-standard="ISOPAS8800"><div class="leg-head"><span class="chip" style="--c:#1565C0">ISO/PAS 8800</span><span class="verdict-leg" data-role="leg-verdict">&mdash;</span></div><p class="leg-name">(c) statistical metric <span class="muted">(evidence value 0.95 AUROC, illustrative)</span></p><label class="dial">Your acceptance line: pass if the value is at least <output data-role="line-out">0.9</output><input type="range" data-role="line" min="0.5" max="1.0" step="0.01" value="0.9" style="--c:#1565C0" aria-label="acceptance line for ISO/PAS 8800"></label></div><div class="leg" data-standard="ISO21434"><div class="leg-head"><span class="chip" style="--c:#C62828">ISO/SAE 21434</span><span class="verdict-leg" data-role="leg-verdict">&mdash;</span></div><p class="leg-name">(d) attack success rate <span class="muted">(evidence value 0.15, illustrative)</span></p><label class="dial">Your acceptance line: pass if the value is at most <output data-role="line-out">0.2</output><input type="range" data-role="line" min="0.0" max="1.0" step="0.01" value="0.2" style="--c:#C62828" aria-label="acceptance line for ISO/SAE 21434"></label></div><div class="controls"><button id="reset" type="button">Reset the lines</button></div>
+<p class="note">Whatever verdict you reach, you reached it by choosing four lines no clause draws, on four scales that share no common unit. That is the point: the release decision at G5 is underdetermined by the standards, and whoever combines the evidence supplies a rule no clause authorises. The design-time paper records this as decision point DP-2 and finding F-4; the position paper reports the same shape in service. This page draws the four scales from <code>src/analysis/g5_evidence.py</code>; it defines no combination rule, because none exists to define.</p>
+</main>
+<footer>
+<p>Generated page; do not edit by hand. The four legs, their standards and scales come from the built argument via <code>src/analysis/g5_evidence.py</code>; the values and ranges are illustrative. Rebuild: <code>python -m src.visualization.playground_page</code></p>
+<p>Trace the four legs in <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/TRACEABILITY.md">TRACEABILITY.md</a>, and see what this work found about the papers in <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/ERRATA.md">ERRATA.md</a>.</p>
+<p><a href="index.html">Back to the start</a> · <a href="seam.html">One problem at two lifecycle points</a> · <a href="gsn_view.html">The argument, one node at a time</a></p>
+</footer>
+<script>
+(function () {
+  var legs = [{"letter": "(a)", "standard": "ISO26262", "label": "ISO 26262", "colour": "#2E7D32", "scale": "deterministic coverage", "better": "higher", "instantiation": "not produced", "value": 0.97, "min": 0.0, "max": 1.0, "step": 0.01, "line": 0.95, "unit": ""}, {"letter": "(b)", "standard": "ISO21448", "label": "ISO 21448", "colour": "#E65100", "scale": "scenario coverage", "better": "higher", "instantiation": "not produced", "value": 1200, "min": 0, "max": 3000, "step": 50, "line": 1000, "unit": " scenarios"}, {"letter": "(c)", "standard": "ISOPAS8800", "label": "ISO/PAS 8800", "colour": "#1565C0", "scale": "statistical metric", "better": "higher", "instantiation": "provided (simulated)", "value": 0.95, "min": 0.5, "max": 1.0, "step": 0.01, "line": 0.9, "unit": " AUROC"}, {"letter": "(d)", "standard": "ISO21434", "label": "ISO/SAE 21434", "colour": "#C62828", "scale": "attack success rate", "better": "lower", "instantiation": "not produced", "value": 0.15, "min": 0.0, "max": 1.0, "step": 0.01, "line": 0.2, "unit": ""}];
+  var byStandard = {};
+  legs.forEach(function (leg) { byStandard[leg.standard] = leg; });
+
+  var rows = document.querySelectorAll(".leg");
+  var verdict = document.getElementById("verdict");
+  var word = document.getElementById("verdict-word");
+  var why = document.getElementById("verdict-why");
+
+  function evaluate() {
+    var allPass = true;
+    rows.forEach(function (row) {
+      var leg = byStandard[row.dataset.standard];
+      var input = row.querySelector('[data-role="line"]');
+      var out = row.querySelector('[data-role="line-out"]');
+      var flag = row.querySelector('[data-role="leg-verdict"]');
+      var line = parseFloat(input.value);
+      out.textContent = line;
+      var passed = leg.better === "higher" ? leg.value >= line : leg.value <= line;
+      flag.textContent = passed ? "PASS" : "FAIL";
+      flag.className = "verdict-leg " + (passed ? "pass" : "fail");
+      if (!passed) { allPass = false; }
+    });
+    if (allPass) {
+      verdict.className = "verdict release";
+      word.textContent = "RELEASE";
+    } else {
+      verdict.className = "verdict hold";
+      word.textContent = "HOLD";
+    }
+    why.textContent = "You reached this by drawing four acceptance lines. "
+      + "No clause draws any of them; move one and the verdict changes. "
+      + "That no standard sets these lines is finding F-4.";
+  }
+
+  rows.forEach(function (row) {
+    row.querySelector('[data-role="line"]').addEventListener("input", evaluate);
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    rows.forEach(function (row) {
+      var leg = byStandard[row.dataset.standard];
+      row.querySelector('[data-role="line"]').value = leg.line;
+    });
+    evaluate();
+  });
+  evaluate();
+})();
+</script>
+</body>
+</html>

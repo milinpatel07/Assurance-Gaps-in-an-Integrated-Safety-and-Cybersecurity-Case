@@ -567,7 +567,8 @@ def build_html() -> str:
         # Without these a reader arriving from the poster reaches this page and
         # has nowhere to go but the browser's back button.
         '<p><a href="index.html">Back to the start</a> · '
-        '<a href="seam.html">One problem at two lifecycle points</a></p>\n'
+        '<a href="seam.html">One problem at two lifecycle points</a> · '
+        '<a href="g5_playground.html">Try to combine the four scales</a></p>\n'
         "</footer>\n"
         f"<script>{JS}</script>\n"
         "</body>\n</html>\n"

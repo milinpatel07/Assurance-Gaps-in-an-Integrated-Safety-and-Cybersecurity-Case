@@ -28,7 +28,8 @@ OUTDIR   ?= output
 GSN2X    ?= gsn/gsn2x
 
 .PHONY: all install test results figures latex gsn gsn-install traceability \
-        gsn-view landing seam notebook pages reproduce verify-refs clean help
+        gsn-view landing seam notebook playground pages reproduce verify-refs \
+        clean help
 
 all: install test results
 
@@ -44,6 +45,7 @@ help:
 	@echo "  traceability — Regenerate TRACEABILITY.md"
 	@echo "  gsn-view     — Regenerate docs/gsn_view.html (interactive GSN)"
 	@echo "  landing      — Regenerate docs/index.html (GitHub Pages landing page)"
+	@echo "  playground   — Regenerate docs/g5_playground.html (interactive G5 page)"
 	@echo "  pages        — Regenerate every reader-facing generated page"
 	@echo "  reproduce    — Generate everything, then verify against committed references"
 	@echo "  clean        — Remove generated output directory"
@@ -78,13 +80,17 @@ landing:
 seam:
 	$(PYTHON) -m src.visualization.seam_page
 
+# Regenerate the interactive G5 playground.
+playground:
+	$(PYTHON) -m src.visualization.playground_page
+
 # Regenerate the notebooks.
 notebook:
 	$(PYTHON) -m src.visualization.anomaly_notebook
 	$(PYTHON) -m src.visualization.g5_notebook
 
 # Every reader-facing generated page.
-pages: gsn-view landing seam notebook
+pages: gsn-view landing seam playground notebook
 
 # ── Reproducibility (Gate 3) ─────────────────────────────────────
 # One command from clone to every artefact both papers use, then prove the
@@ -106,6 +112,7 @@ verify-refs:
 	$(PYTHON) -m src.visualization.interactive_view --check
 	$(PYTHON) -m src.visualization.landing_page --check
 	$(PYTHON) -m src.visualization.seam_page --check
+	$(PYTHON) -m src.visualization.playground_page --check
 	$(PYTHON) -m src.visualization.anomaly_notebook --check
 	$(PYTHON) -m src.visualization.g5_notebook --check
 	@echo "All committed references match regeneration."

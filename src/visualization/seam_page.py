@@ -280,7 +280,8 @@ def build_html() -> str:
         "this work found about the papers is in "
         f'<a href="{BLOB_URL}/ERRATA.md">ERRATA.md</a>.</p>\n'
         '<p><a href="index.html">Back to the start</a> · '
-        '<a href="gsn_view.html">The argument, one node at a time</a></p>\n'
+        '<a href="gsn_view.html">The argument, one node at a time</a> · '
+        '<a href="g5_playground.html">Try to combine the four scales</a></p>\n'
         "</footer>\n</body>\n</html>\n"
     )
 

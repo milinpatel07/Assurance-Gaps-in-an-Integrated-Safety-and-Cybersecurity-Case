@@ -227,6 +227,9 @@ def build_html() -> str:
         + "</header>\n"
         + _panels(counts)
         + "<footer>\n"
+        '<p>Play with it: <a href="g5_playground.html">drag the four V&amp;V '
+        "scales and watch the release decision flip</a>, and see that no "
+        "standard sets the lines.</p>\n"
         "<p>Reproduce every artefact both papers use, and fail if anything "
         f"drifted: <code>make reproduce</code>. See <a href=\"{BLOB}/"
         'REPRODUCING.md">REPRODUCING.md</a>, and '

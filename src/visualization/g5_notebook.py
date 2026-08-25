@@ -233,6 +233,7 @@ def _cells() -> list[dict]:
             "that operation-time end, and the seam page sets the two side by side as",
             "a synthesis this repository draws, not a claim either paper makes.",
             "",
+            f"- [The same question in the browser, no install]({PAGES_URL}g5_playground.html)",
             f"- [One problem at two lifecycle points]({PAGES_URL}seam.html)",
             f"- [The argument, one node at a time]({PAGES_URL}gsn_view.html)",
             f"- [Where every claim comes from]({BLOB_URL}/TRACEABILITY.md)",
