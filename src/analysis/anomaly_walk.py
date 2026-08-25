@@ -1,0 +1,251 @@
+"""Follow a runtime anomaly clause by clause until no clause assigns it.
+
+This is the position paper's argument, made executable. A monitor output goes
+abnormal in service. Before any concern can act on it, the anomaly has to belong
+to a concern. This module asks each applicable standard, at clause level,
+whether it owns the anomaly, and records the answer with the clause that gives
+it.
+
+Every standard answers the same way: it owns the anomaly if the cause is of its
+kind. The cause is the one thing a runtime observation does not carry. So the
+walk ends with no assignment, which is the position paper's missing step 1.
+
+WHAT THIS ASSERTS, AND ON WHOSE AUTHORITY
+
+Each verdict below restates a clause-level fact the position paper argues, and
+each names the clause it rests on:
+
+  * ISO 21448 Clause 1 (with Table 1) excludes cybersecurity threats and refers
+    the attack case to ISO/SAE 21434.
+  * ISO/SAE 21434 does not address performance insufficiency.
+  * Random hardware faults lie outside the ambiguity, because ISO 26262
+    requires diagnostic mechanisms that identify them.
+  * ISO/PAS 8800 Clause 14 requires operational monitoring of the AI component,
+    and prescribes no rule that assigns an anomaly to a concern.
+
+The module adds no clause and no exclusion of its own. Where a standard is
+silent, the verdict says silent rather than inventing a reason.
+
+The walk is deterministic: the same observation always produces the same
+verdicts in the same order.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from enum import Enum
+
+from src.standards.registry import StandardsRegistry
+
+
+class Verdict(Enum):
+    """What a standard's clauses say about owning this anomaly."""
+
+    OWNS = "owns it"
+    CONDITIONAL = "owns it only if the cause is of its kind"
+    EXCLUDES = "excludes it and refers it elsewhere"
+    SILENT = "prescribes no rule that assigns it"
+
+
+class Cause(Enum):
+    """The ground truth a runtime observation does not carry."""
+
+    PERFORMANCE_INSUFFICIENCY = "performance insufficiency"
+    ATTACK = "cybersecurity attack"
+    HARDWARE_FAULT = "random hardware fault"
+    UNKNOWN = "not observable in service"
+
+
+@dataclass(frozen=True)
+class AnomalyObservation:
+    """What a monitor can actually see when the alarm fires.
+
+    Every field is something an in-service monitor reports. There is
+    deliberately no field for the cause: that is the point of the walk.
+    """
+
+    description: str
+    detections_dropped: bool = True
+    ensemble_disagreement_high: bool = True
+    hardware_diagnostic_passed: bool = True
+    security_event_reported: bool = False
+    adverse_weather_reported: bool = False
+
+    def observable_summary(self) -> list[str]:
+        return [
+            f"Detections dropped: {self.detections_dropped}",
+            f"Ensemble disagreement high: {self.ensemble_disagreement_high}",
+            f"Hardware diagnostic passed: {self.hardware_diagnostic_passed}",
+            f"Security event reported: {self.security_event_reported}",
+            f"Adverse weather reported: {self.adverse_weather_reported}",
+        ]
+
+
+@dataclass(frozen=True)
+class ClauseVerdict:
+    """One standard's answer, and the clause that gives it."""
+
+    standard_id: str
+    standard_name: str
+    clause: str
+    clause_title: str
+    verdict: Verdict
+    reason: str
+
+    def assigns(self) -> bool:
+        return self.verdict is Verdict.OWNS
+
+
+def _clause(registry: StandardsRegistry, standard_id: str, reference: str):
+    standard = registry.get_standard(standard_id)
+    for clause in standard.clauses:
+        if clause.reference == reference:
+            return standard, clause
+    raise KeyError(f"{standard_id} has no clause {reference}")
+
+
+def walk(observation: AnomalyObservation) -> list[ClauseVerdict]:
+    """Ask each standard, in turn, whether it owns this anomaly."""
+    registry = StandardsRegistry()
+    verdicts: list[ClauseVerdict] = []
+
+    # ISO 26262. Random hardware faults are outside the ambiguity because the
+    # diagnostics identify them. A passing diagnostic removes this concern.
+    std, clause = _clause(registry, "ISO26262", "Part 5, Cl.9")
+    if observation.hardware_diagnostic_passed:
+        verdicts.append(
+            ClauseVerdict(
+                std.standard_id, std.full_name, clause.reference, clause.title,
+                Verdict.SILENT,
+                "The hardware diagnostic passed, so no random hardware fault is "
+                "indicated. ISO 26262 identifies its own faults through "
+                "diagnostic mechanisms and says nothing about an anomaly with "
+                "no fault indication.",
+            )
+        )
+    else:
+        verdicts.append(
+            ClauseVerdict(
+                std.standard_id, std.full_name, clause.reference, clause.title,
+                Verdict.OWNS,
+                "The hardware diagnostic failed, so a random hardware fault is "
+                "indicated and ISO 26262 owns the anomaly. This is the one "
+                "case the position paper puts outside the ambiguity.",
+            )
+        )
+
+    # ISO 21448. Owns performance insufficiency; Clause 1 excludes attacks.
+    std, clause = _clause(registry, "ISO21448", "Cl.7")
+    verdicts.append(
+        ClauseVerdict(
+            std.standard_id, std.full_name, clause.reference, clause.title,
+            Verdict.CONDITIONAL,
+            "Triggering conditions and performance insufficiencies are in "
+            "scope, so ISO 21448 owns the anomaly if the cause is a "
+            "performance insufficiency. Nothing in the observation says "
+            "whether it is.",
+        )
+    )
+    std, clause = _clause(registry, "ISO21448", "Cl.1")
+    verdicts.append(
+        ClauseVerdict(
+            std.standard_id, std.full_name, clause.reference, clause.title,
+            Verdict.EXCLUDES,
+            "Clause 1, with Table 1, excludes cybersecurity threats and refers "
+            "the attack case to ISO/SAE 21434. So ISO 21448 cannot take the "
+            "anomaly until something rules the attack case out.",
+        )
+    )
+
+    # ISO/SAE 21434. Owns attacks; does not address performance insufficiency.
+    std, clause = _clause(registry, "ISO21434", "Cl.15")
+    verdicts.append(
+        ClauseVerdict(
+            std.standard_id, std.full_name, clause.reference, clause.title,
+            Verdict.CONDITIONAL,
+            "Threat analysis covers adversarial scenarios, so ISO/SAE 21434 "
+            "owns the anomaly if the cause is an attack. It does not address "
+            "performance insufficiency, and the observation does not say which "
+            "this is.",
+        )
+    )
+
+    # ISO/PAS 8800. Requires the monitoring that produced the anomaly, and
+    # prescribes no assignment rule.
+    std, clause = _clause(registry, "ISOPAS8800", "Cl.14")
+    verdicts.append(
+        ClauseVerdict(
+            std.standard_id, std.full_name, clause.reference, clause.title,
+            Verdict.SILENT,
+            "Operational monitoring of the AI component is required, and this "
+            "anomaly is its output. The clause prescribes the monitoring, not "
+            "a rule that assigns what the monitoring finds to a concern.",
+        )
+    )
+
+    return verdicts
+
+
+def assignment(verdicts: list[ClauseVerdict]) -> str | None:
+    """The concern the walk assigns the anomaly to, or None."""
+    owners = [v for v in verdicts if v.assigns()]
+    if len(owners) == 1:
+        return owners[0].standard_id
+    return None
+
+
+def walk_result(observation: AnomalyObservation) -> dict:
+    """The walk and its outcome, as one object."""
+    verdicts = walk(observation)
+    assigned = assignment(verdicts)
+    return {
+        "observation": observation,
+        "verdicts": verdicts,
+        "assigned_to": assigned,
+        "unassigned": assigned is None,
+        "conditional_on_cause": [
+            v for v in verdicts if v.verdict is Verdict.CONDITIONAL
+        ],
+    }
+
+
+def resolve_with_cause(observation: AnomalyObservation, cause: Cause) -> str | None:
+    """What the assignment would be if the cause were known.
+
+    Operation cannot observe the cause; this function exists to show that the
+    cause is the only missing input. Supplying it settles the assignment at
+    once, which is why the position paper calls assignment a missing step
+    rather than a hard problem.
+    """
+    if cause is Cause.HARDWARE_FAULT:
+        return "ISO26262"
+    if cause is Cause.PERFORMANCE_INSUFFICIENCY:
+        return "ISO21448"
+    if cause is Cause.ATTACK:
+        return "ISO21434"
+    return None
+
+
+# The anomaly the position paper opens with, plus variants a reader can try.
+SCENARIOS: dict[str, AnomalyObservation] = {
+    "detections_drop": AnomalyObservation(
+        "Detections drop in one scene region while the vehicle is in service",
+    ),
+    "drop_with_rain_reported": AnomalyObservation(
+        "The same drop, with adverse weather reported at the same time",
+        adverse_weather_reported=True,
+    ),
+    "drop_with_security_event": AnomalyObservation(
+        "The same drop, with a cybersecurity event reported at the same time",
+        security_event_reported=True,
+    ),
+    "drop_with_both_reported": AnomalyObservation(
+        "The same drop, with both adverse weather and a security event reported",
+        adverse_weather_reported=True,
+        security_event_reported=True,
+    ),
+    "hardware_fault": AnomalyObservation(
+        "The same drop, with a failing hardware diagnostic",
+        hardware_diagnostic_passed=False,
+    ),
+}

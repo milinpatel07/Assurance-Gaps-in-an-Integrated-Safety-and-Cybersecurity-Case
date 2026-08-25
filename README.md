@@ -11,6 +11,8 @@ use, and reports what the combination exposes.
 **Start here:** [the argument, one node at a time](docs/gsn_view.html) (works on
 a phone) · [what it found](#what-it-found) · [reproduce it](#reproduce-it)
 
+[![Open the anomaly walk in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/notebooks/anomaly_walk.ipynb)
+
 ## What it found
 
 One node carries all four standards at once: the goal claiming that verification
@@ -45,6 +47,15 @@ The four standards are ISO 26262 (functional safety), ISO 21448 (hazards that
 arise while the function works as designed), ISO/SAE 21434 (cybersecurity) and
 ISO/PAS 8800 (safety of AI). The case study is a LiDAR 3D object detector for
 cars, pedestrians and cyclists in a vehicle with no driver to fall back on.
+
+**Follow one anomaly yourself.** `notebooks/anomaly_walk.ipynb` takes a single
+runtime alarm and asks each standard, clause by clause, whether it owns it. The
+walk ends without an answer. That is the position paper's argument, executable.
+
+**One problem, two lifecycle points.** Each paper reports the same junction:
+evidence on scales that do not convert into one another, and no clause saying
+how to combine it. [`docs/seam.html`](docs/seam.html) sets the two side by side.
+That connection is a synthesis drawn here, not a claim either paper makes.
 
 ## Reproduce it
 

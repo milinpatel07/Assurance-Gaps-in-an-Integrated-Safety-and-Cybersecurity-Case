@@ -28,7 +28,7 @@ OUTDIR   ?= output
 GSN2X    ?= gsn/gsn2x
 
 .PHONY: all install test results figures latex gsn gsn-install traceability \
-        gsn-view landing seam pages reproduce verify-refs clean help
+        gsn-view landing seam notebook pages reproduce verify-refs clean help
 
 all: install test results
 
@@ -76,8 +76,12 @@ landing:
 seam:
 	$(PYTHON) -m src.visualization.seam_page
 
+# Regenerate the anomaly-walk notebook.
+notebook:
+	$(PYTHON) -m src.visualization.anomaly_notebook
+
 # Every reader-facing generated page.
-pages: gsn-view landing seam
+pages: gsn-view landing seam notebook
 
 # ── Reproducibility (Gate 3) ─────────────────────────────────────
 # One command from clone to every artefact both papers use, then prove the
@@ -98,6 +102,7 @@ verify-refs:
 	$(PYTHON) -m src.visualization.interactive_view --check
 	$(PYTHON) -m src.visualization.landing_page --check
 	$(PYTHON) -m src.visualization.seam_page --check
+	$(PYTHON) -m src.visualization.anomaly_notebook --check
 	@echo "All committed references match regeneration."
 
 results: $(OUTDIR)/analysis_results.json

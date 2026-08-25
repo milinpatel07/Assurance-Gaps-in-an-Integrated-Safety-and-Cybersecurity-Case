@@ -53,6 +53,11 @@ perception = [
 carla = [
     "carla>=0.9.14",
 ]
+notebooks = [
+    "nbclient>=0.8",
+    "nbformat>=5.9",
+    "ipykernel>=6.25",
+]
 dev = [
     "pytest>=7.3",
     "pytest-cov>=4.1",

@@ -21,10 +21,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.lock
-          pip install -e . --no-deps
+          pip install -e ".[notebooks]" --no-deps
+          pip install nbclient nbformat ipykernel
 
       - name: Test
         run: python -m pytest tests/ -q --tb=short
 
       - name: Verify committed references against regeneration
         run: make verify-refs
+
+      - name: Verify the notebooks are current
+        run: python -m src.visualization.anomaly_notebook --check
