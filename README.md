@@ -130,6 +130,21 @@ Cite the papers, not this repository:
 
 [CITATION.cff](CITATION.cff) carries the same details in machine-readable form.
 
+## This page
+
+The poster's QR code resolves to
+<https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/>,
+which GitHub Pages serves from [`docs/`](docs/). It carries four panels: the
+interactive argument, the seam between the two papers, the traceability index,
+and the papers themselves.
+
+## Archive
+
+Release `v1.0.0` is the camera-ready snapshot. `.zenodo.json` holds the archive
+metadata, so publishing a GitHub release with the Zenodo integration enabled
+mints a DOI without further editing. The DOI is added here once minted; no DOI
+is claimed before it exists.
+
 ## License
 
 MIT.
