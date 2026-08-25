@@ -21,12 +21,12 @@ DP-5 as structural (line 372), and the statement that the evidence asymmetry at
 G5 "is a structural property of the applicable standards" (line 469). The last
 two are camera-ready additions.
 
-Found by the standards-practitioner review in iteration 1, comparing the
-paper's Table 3 against `src/analysis/decision_points.py`. Resolved by the
-authors in favour of the prose: DP-2 is structural. The code types `I-2`
-structural, the paper's 3/2/2 type split holds, and the reasoning is recorded
-at the definition of `I-2`. The Table 3 cell stands uncorrected in the
-published paper; this entry is its erratum.
+Found by comparing the paper's Table 3 against
+`src/analysis/decision_points.py`. Resolved by the authors in favour of the
+prose: DP-2 is structural. The code types `I-2` structural, the paper's 3/2/2
+type split holds, and the reasoning is recorded at the definition of `I-2`. The
+Table 3 cell stands uncorrected in the published paper; this entry is its
+erratum.
 
 ## 2. Findings table classifications the code had not absorbed
 
@@ -39,10 +39,10 @@ repository's data:
 - F-2's related-clauses cell includes ISO 24089. The code's partial-coverage
   list did not.
 
-Found by the standards-practitioner review in iteration 1, confirmed
-independently by the support reviewer. Absorbed in commit `21a9ecb`: F-1 and
-F-3 gained `additional_lifecycle_phases`, leaving the primary phase and every
-existing caller unchanged, and F-2's partial coverage gained ISO 24089.
+Found by comparing the paper's Table 4 against `src/analysis/gaps.py`, and
+confirmed independently in a second review. Absorbed in commit `21a9ecb`: F-1
+and F-3 gained `additional_lifecycle_phases`, leaving the primary phase and
+every existing caller unchanged, and F-2's partial coverage gained ISO 24089.
 
 ## 3. F-1 and F-5 titles the code had not absorbed
 
@@ -57,10 +57,10 @@ Cl.9.3.3 prescribe frameworks and criteria but defer thresholds to context
 reliability target" and F-5 as "no standard prescribes when training data are
 sufficient", which the paper's own line 439 contradicts.
 
-Found by the scope-fidelity and standards-practitioner reviews of the
-interactive GSN view, 2026-08-24. Absorbed in commit `6bc81ca`: both
-descriptions in `src/analysis/gaps.py` now carry the camera-ready titles and
-the deferral framing.
+Found while building the interactive GSN view on 2026-08-24, by checking each
+displayed finding against the camera-ready wording. Absorbed in commit
+`6bc81ca`: both descriptions in `src/analysis/gaps.py` now carry the
+camera-ready titles and the deferral framing.
 
 ## 4. The paper reports 193 tests; the suite holds 192 at that baseline
 
@@ -81,9 +81,9 @@ triggering conditions in Cl.7; Cl.9 belongs to the verification clauses. The
 paper's own Table 2 and the repository (`src/standards/iso21448.py`, Cl.7)
 use Cl.7 for identification.
 
-Found by the standards-practitioner review of the interactive GSN view,
-2026-08-24. The repository is correct and unchanged; the table cell is the
-erratum.
+Found while building the interactive GSN view on 2026-08-24, by checking each
+displayed clause against the standard and the paper. The repository is correct
+and unchanged; the table cell is the erratum.
 
 ## 6. Table 2 lists ISO 26262-4 Cl.8 at G5; the repository does not
 
@@ -94,9 +94,10 @@ paper's Figure 2(b) (line 307) and the DP-2 row of Table 3 (line 410). So the
 paper cites two different ISO 26262 clauses for G5 in different places, and
 the repository follows the figure and Table 3 rather than Table 2.
 
-Found by the standards-practitioner review of the interactive GSN view,
-2026-08-24. Unresolved: whether ISO 26262-4 Cl.8 (integration and testing)
-should join G5's clause references is a decision for the authors.
+Found while building the interactive GSN view on 2026-08-24, by checking each
+displayed clause against the standard and the paper. Unresolved: whether ISO
+26262-4 Cl.8 (integration and testing) should join G5's clause references is a
+decision for the authors.
 
 ## 7. The paper cites ISO/PAS 8800 Cl.6.2 at G2; the repository uses Cl.5
 
@@ -106,6 +107,7 @@ which resolves in `src/standards/iso8800.py` and is used consistently in
 `TRACEABILITY.md`. Table 2's source cell for G2 says only "8800 Annex B", so
 neither reading contradicts the table.
 
-Found by the standards-practitioner review of the interactive GSN view,
-2026-08-24. Unresolved: a divergence, not a contradiction, and the authors
-decide which clause the repository should cite.
+Found while building the interactive GSN view on 2026-08-24, by checking each
+displayed clause against the standard and the paper. Unresolved: a divergence,
+not a contradiction, and the authors decide which clause the repository should
+cite.
