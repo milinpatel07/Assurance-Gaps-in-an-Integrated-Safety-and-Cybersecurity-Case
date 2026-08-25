@@ -60,14 +60,24 @@ class TestSelfContained:
         assert len(html.encode("utf-8")) < 30_000
 
 
-class TestThreePanels:
-    def test_exactly_three_panels(self, html):
-        assert html.count('class="panel ') == 3
+class TestPanels:
+    def test_exactly_four_panels(self, html):
+        assert html.count('class="panel ') == 4
 
-    def test_the_three_destinations_are_present(self, html):
+    def test_the_four_destinations_are_present(self, html):
         assert 'href="gsn_view.html"' in html
+        assert 'href="seam.html"' in html
         assert "/TRACEABILITY.md" in html
         assert "/paper" in html
+
+    def test_each_panel_carries_a_different_standard_colour(self, html):
+        """One panel per standard colour, so no two panels read as a pair."""
+        accents = re.findall(r'class="panel accent-([a-z-]+)"', html)
+        assert len(accents) == len(set(accents)) == 4
+
+    def test_the_seam_panel_says_it_is_a_synthesis(self, html):
+        """The QR visitor must not read the seam as a paper claim."""
+        assert "not a claim either paper makes" in html
 
     def test_the_gsn_view_link_is_relative_so_pages_serves_it(self, html):
         """Pages serves from /docs; the view sits beside this file."""

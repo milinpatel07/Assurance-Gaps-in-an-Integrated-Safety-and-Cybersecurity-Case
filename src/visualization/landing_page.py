@@ -2,8 +2,9 @@
 
 Writes ``docs/index.html``, the root of the GitHub Pages site. A visitor
 arriving from the poster has a phone, daylight, and under a minute, so the page
-carries three panels and nothing else: the interactive argument, the
-traceability index, and the two papers.
+carries four panels and nothing else: the interactive argument, the seam
+between the two papers, the traceability index, and the papers themselves. One
+panel per standard colour, in the paper's legend order.
 
 Generated, never edited by hand. ``tests/test_landing_page.py`` rebuilds it and
 fails if the committed copy differs. Every count on the page comes from the code
@@ -85,6 +86,19 @@ def _panels(counts: dict[str, int]) -> str:
             "accent": "four",
         },
         {
+            "href": "seam.html",
+            "kicker": "Connect",
+            "title": "One problem at two lifecycle points",
+            "body": (
+                "Each paper reports the same junction: evidence on scales that "
+                "do not convert, and no clause combining them. One before "
+                "release, one in service. A synthesis drawn here, not a claim "
+                "either paper makes."
+            ),
+            "cta": "See the connection",
+            "accent": "seam",
+        },
+        {
             "href": f"{BLOB}/TRACEABILITY.md",
             "kicker": "Check",
             "title": "Where every claim comes from",
@@ -94,7 +108,7 @@ def _panels(counts: dict[str, int]) -> str:
                 "that regenerates it."
             ),
             "cta": "Open the index",
-            "accent": "single",
+            "accent": "trace",
         },
         {
             "href": f"{BLOB}/paper",
@@ -107,7 +121,7 @@ def _panels(counts: dict[str, int]) -> str:
                 "owns an alarm once the vehicle is in service."
             ),
             "cta": "Open the camera-ready sources",
-            "accent": "single-alt",
+            "accent": "papers",
         },
     ]
     out = []
@@ -160,8 +174,9 @@ h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 8px; }
 }
 .panel:focus-visible { outline: 3px solid #111; outline-offset: 3px; }
 .accent-four { border-top-color: var(--c8800); }
-.accent-single { border-top-color: var(--c21448); }
-.accent-single-alt { border-top-color: var(--c21434); }
+.accent-seam { border-top-color: var(--c21448); }
+.accent-trace { border-top-color: var(--c21434); }
+.accent-papers { border-top-color: var(--c26262); }
 .kicker {
   font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
   color: #444; font-weight: 700;

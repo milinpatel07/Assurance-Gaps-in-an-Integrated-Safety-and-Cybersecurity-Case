@@ -11,6 +11,8 @@
 #   make latex        — Generate LaTeX tables only
 #   make traceability — Regenerate the traceability index
 #   make gsn-view     — Regenerate the interactive GSN view
+#   make pages        — Regenerate every reader-facing generated page
+#   make reproduce    — Generate everything, then verify against references
 #   make clean        — Remove generated output
 #   make all          — Install, test, and generate results
 #
@@ -25,7 +27,8 @@ SCENES   ?= 50
 OUTDIR   ?= output
 GSN2X    ?= gsn/gsn2x
 
-.PHONY: all install test results figures latex gsn gsn-install traceability clean help
+.PHONY: all install test results figures latex gsn gsn-install traceability \
+        gsn-view landing seam pages reproduce verify-refs clean help
 
 all: install test results
 
@@ -69,8 +72,12 @@ gsn-view:
 landing:
 	$(PYTHON) -m src.visualization.landing_page
 
+# Regenerate the seam page and its figure.
+seam:
+	$(PYTHON) -m src.visualization.seam_page
+
 # Every reader-facing generated page.
-pages: gsn-view landing
+pages: gsn-view landing seam
 
 # ── Reproducibility (Gate 3) ─────────────────────────────────────
 # One command from clone to every artefact both papers use, then prove the
@@ -90,6 +97,7 @@ verify-refs:
 	$(PYTHON) -m src.results.traceability_index --check
 	$(PYTHON) -m src.visualization.interactive_view --check
 	$(PYTHON) -m src.visualization.landing_page --check
+	$(PYTHON) -m src.visualization.seam_page --check
 	@echo "All committed references match regeneration."
 
 results: $(OUTDIR)/analysis_results.json

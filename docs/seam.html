@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One problem at two lifecycle points</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #fff; color: #111;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px; line-height: 1.5;
+}
+header, main, footer { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 22px; }
+h1 { font-size: 1.4rem; line-height: 1.25; margin: 0 0 10px; }
+h2 { font-size: 1.1rem; margin: 0 0 6px; }
+h3 { font-size: 1rem; margin: 18px 0 6px; }
+.synthesis {
+  border: 2px solid #111; border-radius: 8px; padding: 10px 12px;
+  margin: 12px 0; background: #fafafa;
+}
+figure { margin: 18px 0; }
+figcaption { font-size: 0.85rem; color: #444; margin-top: 6px; }
+.point {
+  border: 2px solid #222; border-radius: 8px; padding: 12px 14px; margin: 14px 0;
+}
+.question { font-style: italic; margin: 0 0 10px; }
+ul.scales { list-style: none; margin: 0 0 10px; padding: 0; }
+ul.scales li { margin-bottom: 8px; }
+ul.plain { margin: 4px 0 10px; padding-left: 20px; }
+.dot {
+  display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+  background: var(--c); border: 1px solid #111; margin-right: 6px;
+  vertical-align: -1px;
+}
+.kind { font-size: 0.85rem; color: #555; }
+.missing {
+  border: 2px dashed #757575; background: #f5f5f5;
+  padding: 8px 10px; font-weight: 600; margin: 10px 0;
+}
+.src { font-size: 0.85rem; color: #444; margin: 8px 0 0; }
+code {
+  background: #f2f2f2; border: 1px solid #ddd; border-radius: 4px;
+  padding: 1px 5px; font-size: 0.85rem;
+}
+footer {
+  border-top: 1px solid #ccc; margin-top: 22px; padding-top: 12px;
+  padding-bottom: 28px; font-size: 0.85rem; color: #333;
+}
+a { color: #111; }
+</style>
+</head>
+<body>
+<header>
+<h1>One problem at two lifecycle points</h1>
+<div class="synthesis"><p><strong>What this page is.</strong> Each paper reports, separately, that evidence from several concerns has to support one claim on scales that do not convert into one another, and that no clause says how to combine it. One paper reports it before release, the other during service. Putting the two together is a synthesis drawn in this repository. Neither paper states it, and this page is not evidence for it beyond what each paper already says.</p></div>
+</header>
+<main>
+<figure><svg viewBox="0 0 380 442" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The same missing combination rule at two lifecycle points: the design-time release decision and the operation-time re-evaluation."><style>.t-lifecycle{font:700 15px system-ui,sans-serif;fill:#111}.t-where{font:12px system-ui,sans-serif;fill:#444}.t-scale{font:12px system-ui,sans-serif;fill:#111}.t-kind{font:10px system-ui,sans-serif;fill:#555}.t-gap{font:700 12px system-ui,sans-serif;fill:#333}.t-link{font:italic 12px system-ui,sans-serif;fill:#333}</style><text x="14" y="24" class="t-lifecycle">Design time</text><text x="14" y="41" class="t-where">G5, the release decision</text><rect x="14" y="54" width="12" height="12" rx="2" fill="#2E7D32" stroke="#111" stroke-width="1"/><text x="33" y="64" class="t-scale">MC/DC structural coverage of non-AI wrapper code</text><text x="33" y="75" class="t-kind">scale: deterministic coverage</text><rect x="14" y="90" width="12" height="12" rx="2" fill="#E65100" stroke="#111" stroke-width="1"/><text x="33" y="100" class="t-scale">Scenario-based testing with triggering condition coverage</text><text x="33" y="111" class="t-kind">scale: scenario coverage</text><rect x="14" y="126" width="12" height="12" rx="2" fill="#1565C0" stroke="#111" stroke-width="1"/><text x="33" y="136" class="t-scale">Deep ensemble uncertainty quantification</text><text x="33" y="147" class="t-kind">scale: statistical metric</text><rect x="14" y="162" width="12" height="12" rx="2" fill="#C62828" stroke="#111" stroke-width="1"/><text x="33" y="172" class="t-scale">Adversarial penetration testing results</text><text x="33" y="183" class="t-kind">scale: attack success rate</text><rect x="14" y="156" width="352" height="30" rx="4" fill="#f5f5f5" stroke="#757575" stroke-width="2" stroke-dasharray="6 4"/><text x="190" y="175" class="t-gap" text-anchor="middle">No clause combines them</text><line x1="190" y1="190" x2="190" y2="220" stroke="#111" stroke-width="2" stroke-dasharray="3 3"/><text x="190" y="238" class="t-link" text-anchor="middle">Same structure, different lifecycle point</text><text x="14" y="266" class="t-lifecycle">Operation time</text><text x="14" y="283" class="t-where">In-service re-evaluation, after an anomaly</text><rect x="14" y="296" width="12" height="12" rx="2" fill="#9E9E9E" stroke="#111" stroke-width="1"/><text x="33" y="306" class="t-scale">Calibrated probability</text><text x="33" y="317" class="t-kind">scale: probability</text><rect x="14" y="332" width="12" height="12" rx="2" fill="#1565C0" stroke="#111" stroke-width="1"/><text x="33" y="342" class="t-scale">Ensemble disagreement value</text><text x="33" y="353" class="t-kind">scale: statistical metric</text><rect x="14" y="368" width="12" height="12" rx="2" fill="#C62828" stroke="#111" stroke-width="1"/><text x="33" y="378" class="t-scale">Binary event indicator</text><text x="33" y="389" class="t-kind">scale: binary indicator</text><rect x="14" y="404" width="12" height="12" rx="2" fill="#C62828" stroke="#111" stroke-width="1"/><text x="33" y="414" class="t-scale">Risk rating</text><text x="33" y="425" class="t-kind">scale: risk rating</text><rect x="14" y="398" width="352" height="30" rx="4" fill="#f5f5f5" stroke="#757575" stroke-width="2" stroke-dasharray="6 4"/><text x="190" y="417" class="t-gap" text-anchor="middle">No clause combines them</text></svg><figcaption>The same junction at two points in the lifecycle. The dashed bar marks the missing rule, following the papers' own convention for an absence. Nothing is drawn through it, because drawing an arrow there would assert the rule both papers report as missing. Generated from <code>src/analysis/seam.py</code>.</figcaption></figure>
+<section class="point"><h2>Design time: G5, the release decision</h2><p class="question">Every prescribed verification activity is complete. Is the evidence together enough to release?</p><ul class="scales"><li><span class="dot" style="--c:#2E7D32"></span><strong>MC/DC structural coverage of non-AI wrapper code</strong><br><span class="kind">Scale: deterministic coverage. Source: ISO 26262.</span></li><li><span class="dot" style="--c:#E65100"></span><strong>Scenario-based testing with triggering condition coverage</strong><br><span class="kind">Scale: scenario coverage. Source: ISO 21448.</span></li><li><span class="dot" style="--c:#1565C0"></span><strong>Deep ensemble uncertainty quantification</strong><br><span class="kind">Scale: statistical metric. Source: ISO/PAS 8800.</span></li><li><span class="dot" style="--c:#C62828"></span><strong>Adversarial penetration testing results</strong><br><span class="kind">Scale: attack success rate. Source: ISO/SAE 21434.</span></li></ul><p class="missing">No cross-domain release decision criteria: no standard defines how the per-domain residual risks combine into one release decision.</p><p class="src">WAISE paper, decision point DP-2 (Evidence type asymmetry at V&amp;V) and finding F-4. The code calls them I-2 and Gap-4. Source file: <code>paper/waise2026/camera-ready.tex</code></p></section><section class="point"><h2>Operation time: In-service re-evaluation, after an anomaly</h2><p class="question">A monitor output is abnormal and each concern has re-evaluated. Does the assurance argument still hold?</p><ul class="scales"><li><span class="dot" style="--c:#9E9E9E"></span><strong>Calibrated probability</strong><br><span class="kind">Scale: probability. Source: no single standard named.</span></li><li><span class="dot" style="--c:#1565C0"></span><strong>Ensemble disagreement value</strong><br><span class="kind">Scale: statistical metric. Source: ISO/PAS 8800.</span></li><li><span class="dot" style="--c:#C62828"></span><strong>Binary event indicator</strong><br><span class="kind">Scale: binary indicator. Source: ISO/SAE 21434.</span></li><li><span class="dot" style="--c:#C62828"></span><strong>Risk rating</strong><br><span class="kind">Scale: risk rating. Source: ISO/SAE 21434.</span></li></ul><p class="missing">Concern-specific results must meet the top claim on different measurement scales, and no rule combines them.</p><p>Operation also adds:</p><ul class='plain'><li>Evidence arrives asynchronously</li><li>The component changes under updates</li><li>The reporting duty requires a current judgment on demand</li></ul><p class="src">Position paper, missing step 2 of two. Its figure labels this step resolution into one judgment, with no clause. Source file: <code>paper/safecomp2026-position/camera-ready.tex</code></p></section><h3>What is the same at both points</h3><ul><li>Several concerns each complete their own activity within their own scope</li><li>Their results land on measurement scales that do not convert into one another</li><li>The results have to support a single claim at one junction</li><li>No clause in any of the standards says how to combine them</li><li>So the engineer can finish every prescribed activity and still not answer the question</li></ul><h3>What is not the same</h3><ul><li>The design-time junction is reached once, before release; the operation-time one recurs whenever a monitor output is abnormal</li><li>At design time the evidence is assembled deliberately; in operation it arrives asynchronously and the component may have changed under an update</li><li>Operation carries a reporting duty that requires a current judgment on demand</li><li>Operation needs an assignment step first, which design time does not: the anomaly carries no concern label</li></ul><h3>The same boundary, one step earlier</h3><p>Before the combination question can arise, the anomaly has to belong to a concern. That step is unowned too, and both papers report it at their own lifecycle point.</p><p><strong>F-3, design time.</strong> Adversarial-SOTIF boundary unowned: adversarial inputs that exploit functional insufficiencies fall between G7 and G8.</p><p><strong>Missing step 1, assignment, operation time.</strong> An anomaly in operational evidence carries no concern label and does not show whether the cause falls under SOTIF, AI safety or cybersecurity, and no clause performs the assignment.</p><p>The same boundary, before the combination question arises. The WAISE paper finds it between G7 and G8 at design time; the position paper finds it at the monitor output in service.</p></main>
+<footer>
+<p>Generated page; do not edit by hand. The design-time side is read from the analysis catalogues and the built argument; the operation-time side is transcribed from the position paper, which no code backs by design. Sources: <code>paper/waise2026/camera-ready.tex</code> and <code>paper/safecomp2026-position/camera-ready.tex</code>. Rebuild: <code>python -m src.visualization.seam_page</code></p>
+<p><a href="index.html">Back to the start</a> · <a href="gsn_view.html">The argument, one node at a time</a></p>
+</footer>
+</body>
+</html>
