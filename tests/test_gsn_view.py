@@ -63,10 +63,16 @@ class TestSelfContained:
         assert "<link" not in html
         assert "@import" not in html
         assert "url(" not in html
+        assert "<img" not in html
 
-    def test_no_network_urls(self, html):
-        assert "http://" not in html
-        assert "https://" not in html
+    def test_only_navigational_links_reach_the_network(self, html):
+        """Offline rendering: nothing is fetched to display the page. Footer
+        hyperlinks (to the traceability index and errata) are navigation, not
+        fetched resources, so they are allowed. Strip href values, then no
+        network reference may remain."""
+        stripped = re.sub(r'href="[^"]*"', "", html)
+        assert "http://" not in stripped
+        assert "https://" not in stripped
 
     def test_size_fits_the_conference_wifi_budget(self, html):
         assert len(html.encode("utf-8")) < 100_000

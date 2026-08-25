@@ -91,7 +91,10 @@ interchangeable:
 [TRACEABILITY.md](TRACEABILITY.md) is the index: every number, table and figure
 traces to a passage in a paper, a clause in a named standard edition, or a
 command that regenerates it. It also carries the identifier crosswalk, since the
-papers write DP-2 and F-3 where the code writes `I-2` and `Gap-3`.
+papers write DP-2 and F-3 where the code writes `I-2` and `Gap-3`. The
+clause-to-node rows are also exported for loading as
+[`docs/traceability.json`](docs/traceability.json) and
+[`docs/traceability.csv`](docs/traceability.csv).
 
 [ERRATA.md](ERRATA.md) records what this work found about the camera-ready
 papers, including places where the papers' own tables and prose disagree.
@@ -103,7 +106,7 @@ paper/waise2026/            Camera-ready source of the GSN pattern paper
 paper/safecomp2026-position/  Camera-ready source of the position paper
 src/                        The five-step method: claims, GSN, decision points, findings
 gsn/                        The argument in YAML, rendered by gsn2x
-tests/                      383 tests, including the paper's own claims
+tests/                      429 tests, including the paper's own claims
 data/                       Seeded illustrations and measured results, each with a README
 docs/                       The interactive argument view, figures, reference tables
 notebooks/                  The anomaly walk, and the method as a walkthrough

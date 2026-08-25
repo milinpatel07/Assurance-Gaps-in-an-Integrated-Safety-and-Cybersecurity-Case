@@ -70,6 +70,14 @@ OUTPUT_PATH = os.path.join(REPO_ROOT, "docs", "gsn_view.html")
 
 REBUILD_COMMAND = "python -m src.visualization.interactive_view"
 
+# The traceability index and errata live at the repository root, outside the
+# docs/ tree GitHub Pages serves, so they are reachable only by absolute URL.
+# These are navigation links, not fetched resources; the page renders offline.
+BLOB_URL = (
+    "https://github.com/milinpatel07/"
+    "Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main"
+)
+
 NORMATIVE = set(STANDARD_COLORS)
 
 GAPS = GapClassification()
@@ -549,6 +557,13 @@ def build_html() -> str:
         "<code>tests/test_gsn_yaml_builder_consistency.py</code> fails if the "
         "structure sources disagree. "
         f"Rebuild: <code>{REBUILD_COMMAND}</code></p>\n"
+        # A reader tapping a node meets identifiers like DP-2 and clause
+        # references; these give the path to where they are traced and to the
+        # recorded caveats, without which the reader has nowhere to check them.
+        "<p>Trace any node's clauses and identifiers in "
+        f'<a href="{BLOB_URL}/TRACEABILITY.md">TRACEABILITY.md</a>. '
+        "Where the paper cites a clause this view does not, see "
+        f'<a href="{BLOB_URL}/ERRATA.md">ERRATA.md</a>.</p>\n'
         # Without these a reader arriving from the poster reaches this page and
         # has nowhere to go but the browser's back button.
         '<p><a href="index.html">Back to the start</a> · '

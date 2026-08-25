@@ -148,11 +148,16 @@ class TestSelfContained:
     def test_no_external_resource(self, html):
         assert "<script" not in html
         assert "<link" not in html
-        # The SVG namespace URI is an identifier, never fetched. Nothing else
-        # on the page may reach the network.
-        without_ns = html.replace('xmlns="http://www.w3.org/2000/svg"', "")
-        assert "http://" not in without_ns
-        assert "https://" not in without_ns
+        assert "<img" not in html
+        assert "url(" not in html
+        # Footer hyperlinks (to the traceability index and errata) are
+        # navigation, not fetched to render. Strip them and the SVG namespace
+        # identifier, then nothing else may reach the network, so the page
+        # still renders fully offline.
+        stripped = re.sub(r'href="[^"]*"', "", html)
+        stripped = stripped.replace('xmlns="http://www.w3.org/2000/svg"', "")
+        assert "http://" not in stripped
+        assert "https://" not in stripped
 
     def test_figure_is_inline_and_scales_to_the_viewport(self, html):
         assert re.search(r'<svg viewBox="0 0 380 \d+" width="100%"', html)

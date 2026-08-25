@@ -27,7 +27,7 @@ A poster is also in scope on this branch (`restructure/two-papers-plus-poster`).
 
 ```bash
 pip install -e ".[dev]"          # install (make install)
-pytest tests/ -v --tb=short      # run all 203 tests (make test)
+pytest tests/ -v --tb=short      # run the full test suite (make test)
 pytest tests/test_paper_claims.py -v                       # one file
 pytest tests/test_paper_claims.py::TestGapClaims -v        # one class
 pytest "tests/test_paper_claims.py::TestGapClaims::test_exactly_five_gaps" -v  # one test

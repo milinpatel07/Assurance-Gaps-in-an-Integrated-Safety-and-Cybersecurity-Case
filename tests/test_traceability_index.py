@@ -86,6 +86,42 @@ class TestIndexCoversWhatItPromises:
         for marker in ("DP-2", "193 tests", "PointPillars", "G8 and G9"):
             assert marker in generated, f"missing known inconsistency: {marker}"
 
+
+ERRATA_PATH = os.path.join(os.path.dirname(OUTPUT_PATH), "ERRATA.md")
+
+
+@pytest.fixture(scope="module")
+def errata() -> str:
+    if not os.path.exists(ERRATA_PATH):
+        pytest.fail("ERRATA.md is missing")
+    with open(ERRATA_PATH, encoding="utf-8") as handle:
+        return handle.read()
+
+
+class TestErrataIsNotDuplicated:
+    """Section 9 points to ERRATA.md for the paper divergences rather than
+    restating them, so the two files cannot drift. The pointer must resolve, and
+    the detail must live in exactly one place."""
+
+    def test_section_9_points_at_errata(self, generated):
+        section = generated[generated.index("## 9. Known inconsistencies"):]
+        assert "ERRATA.md" in section
+
+    def test_errata_carries_the_entries_the_pointer_names(self, errata):
+        for number in range(1, 8):
+            assert f"## {number}." in errata, f"ERRATA.md entry {number} missing"
+
+    def test_the_dp2_detail_lives_only_in_errata(self, generated, errata):
+        """The 'S, M' typing detail is the duplication that was removed; it must
+        now appear in ERRATA.md and not in the generated index."""
+        assert '"S, M"' in errata
+        assert '"S, M"' not in generated
+
+    def test_the_test_count_detail_lives_only_in_errata(self, generated, errata):
+        """The '192' baseline detail belongs to ERRATA; the index only points."""
+        assert "192" in errata
+        assert "192" not in generated
+
     def test_regeneration_command_is_stated(self, generated):
         assert "python -m src.results.traceability_index" in generated
 

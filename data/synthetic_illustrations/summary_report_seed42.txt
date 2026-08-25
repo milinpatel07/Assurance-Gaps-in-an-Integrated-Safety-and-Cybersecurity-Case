@@ -40,7 +40,7 @@ REQUIREMENT INCONSISTENCIES
   I-3: AI error terminology differs across standards
   I-4: 'Validation' defined differently across standards
   I-5: Cybersecurity-SOTIF boundary undefined for adversarial inputs
-  I-6: Monitoring scope overlap — three regimes on one component
+  I-6: Monitoring scope overlap: three regimes on one component
   I-7: Data sufficiency threshold undefined
 
 ------------------------------------------------------------

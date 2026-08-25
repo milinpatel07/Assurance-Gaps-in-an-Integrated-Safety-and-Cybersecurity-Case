@@ -55,12 +55,5 @@ gsn/gsn2x.exe
 gsn/*.svg
 evidence.md
 
-# Local tool session state (never committed)
-.claude/
-.headroom/
-
-# Local agent configuration (not part of the research record)
-CLAUDE.md
-
 # Process and working material (kept locally, not part of the research record)
 working/

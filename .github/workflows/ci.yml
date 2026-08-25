@@ -31,4 +31,6 @@ jobs:
         run: make verify-refs
 
       - name: Verify the notebooks are current
-        run: python -m src.visualization.anomaly_notebook --check
+        run: |
+          python -m src.visualization.anomaly_notebook --check
+          python -m src.visualization.g5_notebook --check

@@ -141,7 +141,7 @@ class DecisionPointCatalogue:
             ),
             Inconsistency(
                 inconsistency_id="I-6",
-                description="Monitoring scope overlap — three regimes on one component",
+                description="Monitoring scope overlap: three regimes on one component",
                 inconsistency_type=InconsistencyType.METHODOLOGICAL,
                 standards_involved=["ISO21448", "ISO21434", "ISOPAS8800"],
                 clause_references=[

@@ -1,0 +1,41 @@
+standard,edition_as_cited,year,clause,claim_id,node,lifecycle_phase,out_of_scope
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,Cl.10,CLM-21434-CTRL-01,G4,Design / Training,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,Cl.10,CLM-21434-VER-01,G5,Verification & Validation,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,Cl.15,CLM-21434-TARA-01,G1,Concept / Requirements,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,Cl.15,CLM-21434-TREAT-01,G8,Design / Training,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,Cl.15.8,CLM-21434-RISK-01,G8,Concept / Requirements,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,Cl.3.1.11,CLM-21434-CASE-01,G8,Verification & Validation,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,Cl.8,CLM-21434-MON-01,G6,Operation / Monitoring,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,[RQ-06-01],CLM-21434-SPEC-01,G2,Concept / Requirements,False
+ISO21434,ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering,2021,[RQ-15-06],CLM-21434-BRIDGE-01,G8,Concept / Requirements,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.10,CLM-21448-UNK-01,G5,Verification & Validation,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.11,CLM-21448-VSTRAT-01,G5,Verification & Validation,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.12,CLM-21448-REL-01,G7,Integration / Deployment,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.13,CLM-21448-MON-01,G6,Operation / Monitoring,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.5,CLM-21448-AREA-01,G7,Concept / Requirements,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.6.5,CLM-21448-ACC-01,G7,Concept / Requirements,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.7,CLM-21448-TRIG-01,G2,Concept / Requirements,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Cl.9,CLM-21448-VER-01,G5,Verification & Validation,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Table A.10,CLM-21448-RISK-01,G7,Verification & Validation,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Table A.8,CLM-21448-SPEC-01,G2,Concept / Requirements,False
+ISO21448,ISO 21448:2022 — Road vehicles — Safety of the intended functionality,2022,Table A.9,CLM-21448-DES-01,G4,Design / Training,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 2, Cl.6.4",CLM-26262-CASE-01,G1,Verification & Validation,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 3, Cl.6",CLM-26262-HARA-01,G1,Concept / Requirements,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 3, Cl.6.4.3",CLM-26262-CTRL-01,G1,Concept / Requirements,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 4, Cl.6.4.3",CLM-26262-TSC-01,(out of scope),Design / Training,True
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 4, Cl.7",CLM-26262-INTG-01,G5,Integration / Deployment,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 4, Cl.8",CLM-26262-SVAL-01,G5,Verification & Validation,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 5, Cl.9",CLM-26262-HWMET-01,G5,Verification & Validation,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 6, Cl.9",CLM-26262-MCDC-01,G5,Verification & Validation,False
+ISO26262,ISO 26262:2018 — Road vehicles — Functional safety,2018,"Part 8, Cl.8",CLM-26262-CHG-01,G9,Modification / Re-assurance,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Annex B,CLM-8800-G1,G1,Verification & Validation,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Annex B,CLM-8800-S1,S1,Verification & Validation,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Cl.14,CLM-8800-G6,G6,Operation / Monitoring,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Cl.14.8.3,CLM-8800-MOD-01,G9,Modification / Re-assurance,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Cl.5,CLM-8800-G2,G2,Concept / Requirements,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Cl.7,CLM-8800-G4,G4,Design / Training,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Cl.8.4,CLM-8800-G3,G3,Design / Training,False
+ISOPAS8800,ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence,2024,Cl.9,CLM-8800-G5,G5,Verification & Validation,False
+TR5469,ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems,2024,Cl.9.3.2,CLM-TR5469-DATA-01,G3,Design / Training,False
+TR5469,ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems,2024,Cl.9.3.3,CLM-TR5469-DATA-02,G3,Design / Training,False
+TR5469,ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems,2024,Table A.8,CLM-TR5469-MOD-01,G9,Modification / Re-assurance,False

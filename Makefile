@@ -60,9 +60,11 @@ install:
 test:
 	$(PYTHON) -m pytest tests/ -v --tb=short
 
-# Regenerate the traceability index. Use --check in CI to fail on a stale copy.
+# Regenerate the traceability index and its machine-readable export. Use
+# --check in CI to fail on a stale copy.
 traceability:
 	$(PYTHON) -m src.results.traceability_index
+	$(PYTHON) -m src.results.traceability_export
 
 # Regenerate the interactive GSN view. Use --check in CI to fail on a stale copy.
 gsn-view:
@@ -76,9 +78,10 @@ landing:
 seam:
 	$(PYTHON) -m src.visualization.seam_page
 
-# Regenerate the anomaly-walk notebook.
+# Regenerate the notebooks.
 notebook:
 	$(PYTHON) -m src.visualization.anomaly_notebook
+	$(PYTHON) -m src.visualization.g5_notebook
 
 # Every reader-facing generated page.
 pages: gsn-view landing seam notebook
@@ -99,10 +102,12 @@ verify-refs:
 	diff $(OUTDIR)/_refcheck/csv/weather_evaluation.csv data/synthetic_illustrations/weather_evaluation_seed42.csv
 	diff $(OUTDIR)/_refcheck/summary_report.txt data/synthetic_illustrations/summary_report_seed42.txt
 	$(PYTHON) -m src.results.traceability_index --check
+	$(PYTHON) -m src.results.traceability_export --check
 	$(PYTHON) -m src.visualization.interactive_view --check
 	$(PYTHON) -m src.visualization.landing_page --check
 	$(PYTHON) -m src.visualization.seam_page --check
 	$(PYTHON) -m src.visualization.anomaly_notebook --check
+	$(PYTHON) -m src.visualization.g5_notebook --check
 	@echo "All committed references match regeneration."
 
 results: $(OUTDIR)/analysis_results.json

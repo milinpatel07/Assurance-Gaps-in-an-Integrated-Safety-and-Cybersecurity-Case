@@ -8,6 +8,14 @@ base-pattern-independent because they arise from the standards' scope
 boundaries and evidence requirements, not from the organising principle
 of the argument structure. The specific goal numbering and decomposition
 would differ, but the same junction-point conflicts would surface.
+
+The comparison in this module is qualitative: the ``would_detect_*`` flags are
+hand-set judgments about four published frameworks. For the two
+integration-induced findings (Gap-3, Gap-4) against the one alternative the
+WAISE paper names, the Warg & Skoglund concern hierarchy, the answer is instead
+*derived* from the standards' scope structure in
+``src/analysis/topology_sensitivity.py``, so "not an artefact of the tree" is a
+computed result there rather than an assertion here.
 """
 
 from __future__ import annotations

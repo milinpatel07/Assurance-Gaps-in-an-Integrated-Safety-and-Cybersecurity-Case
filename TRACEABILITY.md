@@ -53,7 +53,7 @@ the paper and reading the code needs this table.
 | DP-3 | `I-3` | AI error terminology differs across standards | `src/analysis/decision_points.py` |
 | DP-4 | `I-4` | 'Validation' defined differently across standards | `src/analysis/decision_points.py` |
 | DP-5 | `I-5` | Cybersecurity-SOTIF boundary undefined for adversarial inputs | `src/analysis/decision_points.py` |
-| DP-6 | `I-6` | Monitoring scope overlap — three regimes on one component | `src/analysis/decision_points.py` |
+| DP-6 | `I-6` | Monitoring scope overlap: three regimes on one component | `src/analysis/decision_points.py` |
 | DP-7 | `I-7` | Data sufficiency threshold undefined | `src/analysis/decision_points.py` |
 | F-1 | `Gap-1` | Quantitative acceptance criteria for AI components undefined; the standards defer values to context | `src/analysis/gaps.py` |
 | F-2 | `Gap-2` | No complete over-the-air (OTA) re-assurance workflow for AI | `src/analysis/gaps.py` |
@@ -87,11 +87,38 @@ paper's central structural claim, and it is checked from both of the
 repository's representations by
 `tests/test_representation_consistency.py`.
 
+### Base pattern and the six-to-nine extension
+
+The pattern extends the 6-goal ISO/PAS 8800 Annex B base (G1, G2, G3, G4, G5, G6) to 9 goals. The three added goals and the
+standards each draws on:
+
+| Added goal | Standards |
+|---|---|
+| G7 | ISO21448 |
+| G8 | ISO21434, ISO26262 |
+| G9 | (undeveloped, no source) |
+
+Retained goals gain claims beyond the ISO/PAS 8800 base:
+
+- G1: ISO21434, ISO26262
+- G2: ISO21434, ISO21448
+- G3: unchanged
+- G4: ISO21434, ISO21448
+- G5: ISO21434, ISO21448, ISO26262
+- G6: ISO21434, ISO21448
+
+G1 gains its two standards through its contexts (ASIL, TARA) and the
+reformulated top claim rather than through added evidence legs. Computed
+by `src/gsn/annex_b_base.py` from the base and integrated builders, and
+checked by `tests/test_base_pattern.py`.
+
 ## 4. Clause to node index
 
 Every extracted claim, the clause it comes from, and the node it supports.
 This is the machine-readable traceability the WAISE paper refers to in
-Section 4.
+Section 4. The same rows are exported for loading as
+`docs/traceability.json` and `docs/traceability.csv`, by
+`python -m src.results.traceability_export`.
 
 | Standard | Clause | Claim | Node | Phase |
 |---|---|---|---|---|
@@ -223,23 +250,18 @@ repository. Its claims trace to CLAUSE and to PAPER, never to COMMAND.
 
 ## 9. Known inconsistencies
 
-Recorded here so a reader meets them rather than discovering them alone.
+Recorded so a reader meets them rather than discovering them alone. The
+divergences between the camera-ready papers and this repository are held in
+one place, `ERRATA.md`, and not restated here. This section points to them
+and adds the two repository-internal notes that are not errata about the
+papers.
 
-**DP-2 is typed differently in the paper's own table and prose.** The
-decision-point table (`tab:inconsistencies`)
-tags DP-2 "S, M". The prose calls it structural in three places: the
-structural list "(DP-1, DP-2, DP-5)", the subsection heading "DP-2:
-Evidence type asymmetry at V&V (structural decision point)", and the
-discussion, "the evidence asymmetry at G5 (DP-2) is a structural property".
-The last two are camera-ready additions. The authors resolved this in favour
-of the prose, so the code types I-2 structural. This is an inconsistency
-inside the camera-ready, not a defect in this repository.
-
-**Test count.** The WAISE paper reports 193 tests. The suite has held at
-192 since the findings were revised from six to five, which removed one
-test (commit `4d782b0`), and has grown since with tests added after
-publication. The paper was correct when written. No test was added or
-removed here to make the numbers agree.
+**Divergences from the papers.** `ERRATA.md` records each, with what the
+paper says, what the repository holds, and how it was resolved: the DP-2
+typing inside the WAISE camera-ready (entry 1), the findings-table
+classifications the code absorbed (entry 2), the F-1 and F-5 title changes
+(entry 3), the paper's 193 tests against the suite's count at that baseline
+(entry 4), and the clause questions at DP-5, G5 and G2 (entries 5 to 7).
 
 **Two representations of goal sources.** `source_standards` on each goal and
 the claim-to-goal mapping are maintained separately. They agree everywhere

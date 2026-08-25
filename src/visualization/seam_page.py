@@ -36,6 +36,14 @@ REPO_ROOT = os.path.dirname(
 OUTPUT_PATH = os.path.join(REPO_ROOT, "docs", "seam.html")
 REBUILD_COMMAND = "python -m src.visualization.seam_page"
 
+# The traceability index and errata live at the repository root, outside the
+# docs/ tree GitHub Pages serves, so they are reachable only by absolute URL.
+# These are navigation links, not fetched resources; the page renders offline.
+BLOB_URL = (
+    "https://github.com/milinpatel07/"
+    "Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main"
+)
+
 
 def _esc(text: str) -> str:
     return html.escape(text, quote=True)
@@ -239,8 +247,10 @@ def build_html() -> str:
         "following the papers' own convention for an absence. This figure "
         "draws nothing through that bar, because an arrow there would assert "
         "the rule both papers report as missing. MC/DC is modified "
-        "condition/decision coverage. Generated from "
-        "<code>src/analysis/seam.py</code>.</figcaption></figure>\n"
+        "condition/decision coverage. The figure's data comes from "
+        "<code>src/analysis/seam.py</code>; the page is built by "
+        "<code>src.visualization.seam_page</code>, the rebuild command in the "
+        "footer.</figcaption></figure>\n"
         + _point_section(data["points"][0])
         + _point_section(data["points"][1])
         + f"<h3>What is the same at both points</h3><ul>{shared}</ul>"
@@ -265,6 +275,10 @@ def build_html() -> str:
         f"<code>{_esc(PAPER_WAISE)}</code> and "
         f"<code>{_esc(PAPER_POSITION)}</code>. "
         f"Rebuild: <code>{REBUILD_COMMAND}</code></p>\n"
+        "<p>Every design-time identifier here is traced in "
+        f'<a href="{BLOB_URL}/TRACEABILITY.md">TRACEABILITY.md</a>, and what '
+        "this work found about the papers is in "
+        f'<a href="{BLOB_URL}/ERRATA.md">ERRATA.md</a>.</p>\n'
         '<p><a href="index.html">Back to the start</a> · '
         '<a href="gsn_view.html">The argument, one node at a time</a></p>\n'
         "</footer>\n</body>\n</html>\n"

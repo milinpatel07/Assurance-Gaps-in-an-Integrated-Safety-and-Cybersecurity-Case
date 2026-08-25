@@ -28,6 +28,7 @@ import sys
 
 from src.analysis.decision_points import DecisionPointCatalogue
 from src.analysis.gaps import GapClassification
+from src.gsn.annex_b_base import compute_extension_delta
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.standards.registry import StandardsRegistry
 
@@ -160,6 +161,44 @@ def _goals_section(registry: StandardsRegistry) -> list[str]:
         "`tests/test_representation_consistency.py`.",
         "",
     ]
+    lines += _extension_delta_lines()
+    return lines
+
+
+def _extension_delta_lines() -> list[str]:
+    """The 6-to-9 extension, computed from the base and integrated builders."""
+    delta = compute_extension_delta()
+    lines = [
+        "### Base pattern and the six-to-nine extension",
+        "",
+        f"The pattern extends the {delta['base_goal_count']}-goal "
+        f"{delta['base_pattern']} base "
+        f"({', '.join(delta['base_goal_ids'])}) to "
+        f"{delta['integrated_goal_count']} goals. The three added goals and the",
+        "standards each draws on:",
+        "",
+        "| Added goal | Standards |",
+        "|---|---|",
+    ]
+    for gid in delta["goals_added"]:
+        stds = delta["added_goal_standards"][gid]
+        lines.append(f"| {gid} | {', '.join(stds) if stds else '(undeveloped, no source)'} |")
+    lines += [
+        "",
+        "Retained goals gain claims beyond the ISO/PAS 8800 base:",
+        "",
+    ]
+    for gid, stds in delta["augmentation_of_retained_goals"].items():
+        note = ", ".join(stds) if stds else "unchanged"
+        lines.append(f"- {gid}: {note}")
+    lines += [
+        "",
+        "G1 gains its two standards through its contexts (ASIL, TARA) and the",
+        "reformulated top claim rather than through added evidence legs. Computed",
+        "by `src/gsn/annex_b_base.py` from the base and integrated builders, and",
+        "checked by `tests/test_base_pattern.py`.",
+        "",
+    ]
     return lines
 
 
@@ -169,7 +208,9 @@ def _clause_section(registry: StandardsRegistry) -> list[str]:
         "",
         "Every extracted claim, the clause it comes from, and the node it supports.",
         "This is the machine-readable traceability the WAISE paper refers to in",
-        "Section 4.",
+        "Section 4. The same rows are exported for loading as",
+        "`docs/traceability.json` and `docs/traceability.csv`, by",
+        "`python -m src.results.traceability_export`.",
         "",
         "| Standard | Clause | Claim | Node | Phase |",
         "|---|---|---|---|---|",
@@ -324,23 +365,18 @@ def _known_inconsistencies_section() -> list[str]:
     return [
         "## 9. Known inconsistencies",
         "",
-        "Recorded here so a reader meets them rather than discovering them alone.",
+        "Recorded so a reader meets them rather than discovering them alone. The",
+        "divergences between the camera-ready papers and this repository are held in",
+        "one place, `ERRATA.md`, and not restated here. This section points to them",
+        "and adds the two repository-internal notes that are not errata about the",
+        "papers.",
         "",
-        "**DP-2 is typed differently in the paper's own table and prose.** The",
-        "decision-point table (`tab:inconsistencies`)",
-        'tags DP-2 "S, M". The prose calls it structural in three places: the',
-        'structural list "(DP-1, DP-2, DP-5)", the subsection heading "DP-2:',
-        'Evidence type asymmetry at V&V (structural decision point)", and the',
-        'discussion, "the evidence asymmetry at G5 (DP-2) is a structural property".',
-        "The last two are camera-ready additions. The authors resolved this in favour",
-        "of the prose, so the code types I-2 structural. This is an inconsistency",
-        "inside the camera-ready, not a defect in this repository.",
-        "",
-        "**Test count.** The WAISE paper reports 193 tests. The suite has held at",
-        "192 since the findings were revised from six to five, which removed one",
-        "test (commit `4d782b0`), and has grown since with tests added after",
-        "publication. The paper was correct when written. No test was added or",
-        "removed here to make the numbers agree.",
+        "**Divergences from the papers.** `ERRATA.md` records each, with what the",
+        "paper says, what the repository holds, and how it was resolved: the DP-2",
+        "typing inside the WAISE camera-ready (entry 1), the findings-table",
+        "classifications the code absorbed (entry 2), the F-1 and F-5 title changes",
+        "(entry 3), the paper's 193 tests against the suite's count at that baseline",
+        "(entry 4), and the clause questions at DP-5, G5 and G2 (entries 5 to 7).",
         "",
         "**Two representations of goal sources.** `source_standards` on each goal and",
         "the claim-to-goal mapping are maintained separately. They agree everywhere",
