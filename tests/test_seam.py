@@ -107,6 +107,42 @@ class TestTheFigureAssertsNoRule:
         for scale in operation_time_point().scales:
             assert scale.label in html
 
+    def test_no_scale_is_painted_over_by_the_absence_bar(self, html):
+        """SVG paints in document order and the bar is opaque, so a bar that
+        overlaps a chip erases it. This hid the cybersecurity evidence at both
+        junctions once already."""
+        svg = html[html.index("<svg"): html.index("</svg>")]
+        chips = [
+            int(m.group(1))
+            for m in re.finditer(r'<rect x="14" y="(\d+)" width="12"', svg)
+        ]
+        bars = [
+            (int(m.group(1)), int(m.group(1)) + 30)
+            for m in re.finditer(r'<rect x="14" y="(\d+)" width="352"', svg)
+        ]
+        assert len(chips) == 8, "expected four scales at each of two junctions"
+        for top, bottom in bars:
+            covered = [y for y in chips if top - 25 <= y <= bottom]
+            assert not covered, (
+                f"absence bar {top}-{bottom} covers chips at {covered}"
+            )
+
+    def test_every_scale_label_sits_above_its_junction_bar(self, html):
+        """The four labels must be readable, not just present in the source."""
+        svg = html[html.index("<svg"): html.index("</svg>")]
+        labels = [
+            int(m.group(1))
+            for m in re.finditer(r'<text x="33" y="(\d+)" class="t-kind"', svg)
+        ]
+        bars = [
+            int(m.group(1))
+            for m in re.finditer(r'<rect x="14" y="(\d+)" width="352"', svg)
+        ]
+        assert len(labels) == 8
+        for bar_top in bars:
+            in_bar = [y for y in labels if bar_top <= y <= bar_top + 30]
+            assert not in_bar, f"scale text at {in_bar} falls inside the bar"
+
 
 class TestSelfContained:
     def test_no_external_resource(self, html):

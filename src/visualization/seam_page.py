@@ -57,9 +57,16 @@ def _junction_svg(point, top: int) -> list[str]:
         f'<text x="14" y="{top}" class="t-lifecycle">{_esc(point.lifecycle)}</text>',
         f'<text x="14" y="{top + 17}" class="t-where">{_esc(point.where)}</text>',
     ]
+    # One chip is a 12px swatch, a label line and a scale line: 36px of pitch.
+    # The absence bar below has to clear the last of them, so the pitch is
+    # written once here and reused to place the bar. An earlier version
+    # advanced the chips by 36 and placed the bar as though the pitch were 24,
+    # which painted the bar over the fourth chip at both junctions and hid the
+    # cybersecurity evidence in a figure about four scales meeting.
+    chip_pitch = 36
     chip_top = top + 30
     for index, scale in enumerate(point.scales):
-        y = chip_top + index * 24
+        y = chip_top + index * chip_pitch
         colour = _colour(scale.standard)
         parts.append(
             f'<rect x="14" y="{y}" width="12" height="12" rx="2" fill="{colour}" '
@@ -71,8 +78,8 @@ def _junction_svg(point, top: int) -> list[str]:
         parts.append(
             f'<text x="33" y="{y + 21}" class="t-kind">scale: {_esc(scale.kind)}</text>'
         )
-        chip_top += 12
-    bar_y = chip_top + len(point.scales) * 12 + 6
+    last_chip_bottom = chip_top + (len(point.scales) - 1) * chip_pitch + 25
+    bar_y = last_chip_bottom + 10
     parts.append(
         f'<rect x="14" y="{bar_y}" width="352" height="30" rx="4" fill="#f5f5f5" '
         'stroke="#757575" stroke-width="2" stroke-dasharray="6 4"/>'
@@ -226,20 +233,25 @@ def build_html() -> str:
         "</header>\n<main>\n"
         "<figure>"
         + _figure_svg()
-        + "<figcaption>The same junction at two points in the lifecycle. The "
-        "dashed bar marks the missing rule, following the papers' own "
-        "convention for an absence. Nothing is drawn through it, because "
-        "drawing an arrow there would assert the rule both papers report as "
-        "missing. Generated from <code>src/analysis/seam.py</code>."
-        "</figcaption></figure>\n"
+        + "<figcaption>The same junction at two points in the lifecycle, set "
+        "side by side by this repository rather than by either paper. Each "
+        "paper reports its own end. The dashed bar marks the missing rule, "
+        "following the papers' own convention for an absence. This figure "
+        "draws nothing through that bar, because an arrow there would assert "
+        "the rule both papers report as missing. MC/DC is modified "
+        "condition/decision coverage. Generated from "
+        "<code>src/analysis/seam.py</code>.</figcaption></figure>\n"
         + _point_section(data["points"][0])
         + _point_section(data["points"][1])
         + f"<h3>What is the same at both points</h3><ul>{shared}</ul>"
         + f"<h3>What is not the same</h3><ul>{differs}</ul>"
         + "<h3>The same boundary, one step earlier</h3>"
         + "<p>Before the combination question can arise, the anomaly has to "
-        "belong to a concern. That step is unowned too, and both papers report "
-        "it at their own lifecycle point.</p>"
+        "belong to a concern. Each paper reports a case that falls between "
+        "concerns at that earlier step. Reading the two as one boundary is a "
+        "second synthesis drawn here, and a looser one than the first: the "
+        "two cases differ, as the note below says. SOTIF is safety of the "
+        "intended functionality.</p>"
         + f"<p><strong>{_esc(assignment['design_time_identifier'])}, design "
         f"time.</strong> {_esc(assignment['design_time'])}.</p>"
         + f"<p><strong>{_esc(assignment['operation_time_identifier'])}, "

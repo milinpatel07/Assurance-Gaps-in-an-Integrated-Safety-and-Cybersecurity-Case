@@ -6,25 +6,43 @@ to a concern. This module asks each applicable standard, at clause level,
 whether it owns the anomaly, and records the answer with the clause that gives
 it.
 
-Every standard answers the same way: it owns the anomaly if the cause is of its
-kind. The cause is the one thing a runtime observation does not carry. So the
-walk ends with no assignment, which is the position paper's missing step 1.
+Three of the four standards answer the same way: each owns the anomaly if the
+cause is of its kind. The cause is the one thing a runtime observation does not
+carry. So the walk ends with no assignment, which is the position paper's
+missing step 1.
 
 WHAT THIS ASSERTS, AND ON WHOSE AUTHORITY
 
-Each verdict below restates a clause-level fact the position paper argues, and
-each names the clause it rests on:
+Each verdict restates a fact one of the papers argues, and names what it rests
+on:
 
   * ISO 21448 Clause 1 (with Table 1) excludes cybersecurity threats and refers
-    the attack case to ISO/SAE 21434.
-  * ISO/SAE 21434 does not address performance insufficiency.
+    the attack case to ISO/SAE 21434. Position paper, and WAISE finding F-3.
+  * ISO/SAE 21434 does not address performance insufficiency. Position paper.
   * Random hardware faults lie outside the ambiguity, because ISO 26262
-    requires diagnostic mechanisms that identify them.
+    requires diagnostic mechanisms that identify them. The position paper makes
+    this statement at the level of the standard and cites no clause, so neither
+    does this module. An earlier version cited ISO 26262-5 Cl.9, which is the
+    architectural-metrics evaluation and does not require diagnostics.
+  * ISO/PAS 8800 owns the anomaly if the cause lies in the AI component itself.
+    The position paper's figure puts AI-safety re-evaluation alongside the SOTIF
+    and cybersecurity re-evaluations as one of three concerns.
   * ISO/PAS 8800 Clause 14 requires operational monitoring of the AI component,
     and prescribes no rule that assigns an anomaly to a concern.
 
-The module adds no clause and no exclusion of its own. Where a standard is
-silent, the verdict says silent rather than inventing a reason.
+WHAT THE WALK DOES NOT DO
+
+It consults one observable, the hardware diagnostic. The other fields are
+recorded because a monitor reports them, not because any clause turns them into
+an assignment. A reported security event alongside the anomaly is a
+co-occurrence, and no clause makes a co-occurrence a cause. The walk therefore
+returns the same answer whatever those fields hold, and the notebook says so
+rather than staging it as a discovery.
+
+Knowing the cause does not always settle ownership either. Where a failure mode
+is at once a triggering condition and a threat scenario, the WAISE paper finds
+the boundary unowned (DP-5, finding F-3), so ``resolve_with_cause`` returns None
+for that case rather than inventing an owner.
 
 The walk is deterministic: the same observation always produces the same
 verdicts in the same order.
@@ -36,6 +54,11 @@ from dataclasses import dataclass
 from enum import Enum
 
 from src.standards.registry import StandardsRegistry
+
+
+# Used where a paper states something about a standard without citing a clause.
+# Inventing a clause number to fill the column would be worse than saying so.
+STANDARD_LEVEL = "(no clause cited)"
 
 
 class Verdict(Enum):
@@ -52,7 +75,14 @@ class Cause(Enum):
 
     PERFORMANCE_INSUFFICIENCY = "performance insufficiency"
     ATTACK = "cybersecurity attack"
+    AI_COMPONENT = "the AI component itself, for example distributional drift"
     HARDWARE_FAULT = "random hardware fault"
+    # WAISE DP-5 and finding F-3: an adversarial input that exploits a
+    # functional insufficiency is at once a threat scenario and a triggering
+    # condition, and no standard assigns it to either goal.
+    ATTACK_EXPLOITING_INSUFFICIENCY = (
+        "an attack that exploits a performance insufficiency"
+    )
     UNKNOWN = "not observable in service"
 
 
@@ -71,6 +101,9 @@ class AnomalyObservation:
     security_event_reported: bool = False
     adverse_weather_reported: bool = False
 
+    # Only hardware_diagnostic_passed changes the walk. The other fields are
+    # here because a monitor reports them, and because the position paper's
+    # point is that the observation looks the same whatever caused it.
     def observable_summary(self) -> list[str]:
         return [
             f"Detections dropped: {self.detections_dropped}",
@@ -110,12 +143,14 @@ def walk(observation: AnomalyObservation) -> list[ClauseVerdict]:
     verdicts: list[ClauseVerdict] = []
 
     # ISO 26262. Random hardware faults are outside the ambiguity because the
-    # diagnostics identify them. A passing diagnostic removes this concern.
-    std, clause = _clause(registry, "ISO26262", "Part 5, Cl.9")
+    # diagnostics identify them. The position paper states this at the level of
+    # the standard and cites no clause, so this verdict cites none either.
+    std = registry.get_standard("ISO26262")
     if observation.hardware_diagnostic_passed:
         verdicts.append(
             ClauseVerdict(
-                std.standard_id, std.full_name, clause.reference, clause.title,
+                std.standard_id, std.full_name, STANDARD_LEVEL,
+                "Diagnostic mechanisms for random hardware faults",
                 Verdict.SILENT,
                 "The hardware diagnostic passed, so no random hardware fault is "
                 "indicated. ISO 26262 identifies its own faults through "
@@ -126,7 +161,8 @@ def walk(observation: AnomalyObservation) -> list[ClauseVerdict]:
     else:
         verdicts.append(
             ClauseVerdict(
-                std.standard_id, std.full_name, clause.reference, clause.title,
+                std.standard_id, std.full_name, STANDARD_LEVEL,
+                "Diagnostic mechanisms for random hardware faults",
                 Verdict.OWNS,
                 "The hardware diagnostic failed, so a random hardware fault is "
                 "indicated and ISO 26262 owns the anomaly. This is the one "
@@ -170,16 +206,25 @@ def walk(observation: AnomalyObservation) -> list[ClauseVerdict]:
         )
     )
 
-    # ISO/PAS 8800. Requires the monitoring that produced the anomaly, and
-    # prescribes no assignment rule.
+    # ISO/PAS 8800. One of the position paper's three concerns, and the source
+    # of the monitoring that raised the anomaly in the first place.
     std, clause = _clause(registry, "ISOPAS8800", "Cl.14")
     verdicts.append(
         ClauseVerdict(
             std.standard_id, std.full_name, clause.reference, clause.title,
+            Verdict.CONDITIONAL,
+            "AI safety is one of the three concerns a re-evaluation can belong "
+            "to, so ISO/PAS 8800 owns the anomaly if the cause lies in the AI "
+            "component itself. Nothing in the observation says whether it does.",
+        )
+    )
+    verdicts.append(
+        ClauseVerdict(
+            std.standard_id, std.full_name, clause.reference, clause.title,
             Verdict.SILENT,
-            "Operational monitoring of the AI component is required, and this "
-            "anomaly is its output. The clause prescribes the monitoring, not "
-            "a rule that assigns what the monitoring finds to a concern.",
+            "The same clause requires the operational monitoring that produced "
+            "this anomaly. It prescribes the monitoring, not a rule that "
+            "assigns what the monitoring finds to a concern.",
         )
     )
 
@@ -212,18 +257,23 @@ def walk_result(observation: AnomalyObservation) -> dict:
 def resolve_with_cause(observation: AnomalyObservation, cause: Cause) -> str | None:
     """What the assignment would be if the cause were known.
 
-    Operation cannot observe the cause; this function exists to show that the
-    cause is the only missing input. Supplying it settles the assignment at
+    Operation cannot observe the cause. This function shows what knowing it
+    would and would not settle.
+
+    For a cause that falls inside one concern, it settles the assignment at
     once, which is why the position paper calls assignment a missing step
-    rather than a hard problem.
+    rather than a hard problem. For a failure mode that belongs to two concerns
+    at the same time, it settles nothing: the WAISE paper finds that boundary
+    unowned at design time (DP-5, finding F-3), so this returns None rather
+    than picking a side the standards do not.
     """
-    if cause is Cause.HARDWARE_FAULT:
-        return "ISO26262"
-    if cause is Cause.PERFORMANCE_INSUFFICIENCY:
-        return "ISO21448"
-    if cause is Cause.ATTACK:
-        return "ISO21434"
-    return None
+    single_owner = {
+        Cause.HARDWARE_FAULT: "ISO26262",
+        Cause.PERFORMANCE_INSUFFICIENCY: "ISO21448",
+        Cause.ATTACK: "ISO21434",
+        Cause.AI_COMPONENT: "ISOPAS8800",
+    }
+    return single_owner.get(cause)
 
 
 # The anomaly the position paper opens with, plus variants a reader can try.

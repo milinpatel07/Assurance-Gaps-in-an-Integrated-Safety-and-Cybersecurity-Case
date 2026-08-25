@@ -4,11 +4,12 @@ Milin Patel and Rolf Jung, Kempten University of Applied Sciences.
 Supplementary material for two SAFECOMP 2026 papers, both accepted.
 
 Four standards apply at once to an AI perception component in a driverless
-vehicle, and each one prescribes its own evidence. This repository builds the
-single argument the four jointly imply, in the notation certification engineers
-use, and reports what the combination exposes.
+vehicle, and each one prescribes its own evidence. This repository builds
+one argument the four jointly imply, in Goal Structuring Notation, and reports
+what the combination exposes. The papers choose that structure and give their
+reasons; no standard prescribes it.
 
-**Start here:** [the argument, one node at a time](docs/gsn_view.html) (works on
+**Start here:** [the argument, one node at a time](https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/gsn_view.html) (works on
 a phone) · [what it found](#what-it-found) · [reproduce it](#reproduce-it)
 
 [![Open the anomaly walk in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/notebooks/anomaly_walk.ipynb)
@@ -17,11 +18,11 @@ a phone) · [what it found](#what-it-found) · [reproduce it](#reproduce-it)
 
 One node carries all four standards at once: the goal claiming that verification
 and validation are sufficient. The four standards ask for four kinds of evidence
-there, on four scales that do not convert into one another: a pass/fail coverage
-figure, a count of scenarios, a statistical uncertainty score, and an attack
-success rate. No standard says how to combine them into one judgement. An
-engineer can complete every prescribed activity and still be unable to state
-whether the evidence together is enough.
+there, on four scales that do not convert into one another: structural coverage
+of the non-AI code, scenario coverage against triggering conditions, a
+statistical uncertainty score, and an attack success rate. No standard says how
+to combine them into one judgement. An engineer can complete every prescribed
+activity and still be unable to state whether the evidence together is enough.
 
 ![The integrated argument: nine goals, with the four standards meeting at G5](docs/figures/integrated_gsn.png)
 
@@ -30,18 +31,19 @@ whether the evidence together is enough.
 | Paper | Question | Backed by code? |
 |---|---|---|
 | [`paper/waise2026/`](paper/waise2026/) | What does combining the four standards expose at design time? | Yes, `src/` |
-| [`paper/safecomp2026-position/`](paper/safecomp2026-position/) | An alarm fires in service. Which concern owns it? | No, and none is meant to |
+| [`paper/safecomp2026-position/`](paper/safecomp2026-position/) | An alarm fires in service. Which concern owns it? | No. A notebook demonstrates the argument; no code evidences it |
 
 The WAISE paper builds the nine-goal pattern, extending ISO/PAS 8800 Annex B
-from six goals. It catalogues seven decision points, where the standards hand a
-choice to the project rather than prescribe one, and five findings, two of which
-appear only once the standards are combined. The `src/` code produces all three
-sets and the test suite checks them against the paper.
+from six goals to nine. It catalogues seven decision points, each a place where
+the standards hand a choice to the project rather than prescribe one. It also
+catalogues five findings, two of which appear only once you combine the
+standards. The `src/` code produces all three sets, and the test suite checks
+them against the paper.
 
 The position paper argues at clause level that no standard assigns a runtime
 anomaly to a concern, so a service alarm caused by weather and one caused by an
-attack are indistinguishable in the assurance argument. It is argued from clause
-text, not from code.
+attack are indistinguishable in the assurance argument. The paper argues from
+clause text, not from code.
 
 The four standards are ISO 26262 (functional safety), ISO 21448 (hazards that
 arise while the function works as designed), ISO/SAE 21434 (cybersecurity) and
@@ -50,12 +52,14 @@ cars, pedestrians and cyclists in a vehicle with no driver to fall back on.
 
 **Follow one anomaly yourself.** `notebooks/anomaly_walk.ipynb` takes a single
 runtime alarm and asks each standard, clause by clause, whether it owns it. The
-walk ends without an answer. That is the position paper's argument, executable.
+walk ends without an answer. That demonstrates the position paper's argument
+rather than evidencing it: the argument is the paper's, made from clause text.
 
-**One problem, two lifecycle points.** Each paper reports the same junction:
+**One problem at two lifecycle points.** Each paper reports the same junction:
 evidence on scales that do not convert into one another, and no clause saying
-how to combine it. [`docs/seam.html`](docs/seam.html) sets the two side by side.
-That connection is a synthesis drawn here, not a claim either paper makes.
+how to combine it. [The seam page](https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/seam.html)
+sets the two side by side. That connection is a synthesis drawn here, not a
+claim either paper makes.
 
 ## Reproduce it
 
@@ -77,7 +81,8 @@ interchangeable:
 | Kind | Where | What it means |
 |---|---|---|
 | Argued | `src/`, `gsn/` | The method and the argument, as described in the WAISE paper |
-| Generated | `TRACEABILITY.md`, `docs/gsn_view.html`, `output/` | Rebuilt by a command; a test fails if the committed copy is stale |
+| Generated | `TRACEABILITY.md`, `docs/gsn_view.html`, `docs/index.html`, `docs/seam.html` | Committed, and rebuilt by a command. A test fails if the committed copy is stale |
+| Generated, not committed | `output/` | `make reproduce` builds it, then diffs it against the seeded references |
 | Seeded | `data/synthetic_illustrations/` | Deterministic output at seed 42. Illustrations of the pipeline, not measurements |
 | Measured | `data/empirical_results/` | Real measurements from trained models. They support a paper in preparation, and neither paper here claims them |
 
@@ -87,7 +92,7 @@ command that regenerates it. It also carries the identifier crosswalk, since the
 papers write DP-2 and F-3 where the code writes `I-2` and `Gap-3`.
 
 [ERRATA.md](ERRATA.md) records what this work found about the camera-ready
-papers, including one place where a table and the prose disagree with each other.
+papers, including places where the papers' own tables and prose disagree.
 
 ## Map
 
@@ -96,11 +101,11 @@ paper/waise2026/            Camera-ready source of the GSN pattern paper
 paper/safecomp2026-position/  Camera-ready source of the position paper
 src/                        The five-step method: claims, GSN, decision points, findings
 gsn/                        The argument in YAML, rendered by gsn2x
-tests/                      285 tests, including the paper's own claims
+tests/                      372 tests, including the paper's own claims
 data/                       Seeded illustrations and measured results, each with a README
 docs/                       The interactive argument view, figures, reference tables
-notebooks/                  The analysis as a runnable notebook
-Makefile                    reproduce, test, results, gsn, traceability, gsn-view
+notebooks/                  The anomaly walk, and the method as a walkthrough
+Makefile                    reproduce, test, results, gsn, traceability, pages
 ```
 
 ## Citation
@@ -130,7 +135,7 @@ Cite the papers, not this repository:
 
 [CITATION.cff](CITATION.cff) carries the same details in machine-readable form.
 
-## This page
+## The website the QR code opens
 
 The poster's QR code resolves to
 <https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/>,
@@ -142,8 +147,8 @@ and the papers themselves.
 
 Release `v1.0.0` is the camera-ready snapshot. `.zenodo.json` holds the archive
 metadata, so publishing a GitHub release with the Zenodo integration enabled
-mints a DOI without further editing. The DOI is added here once minted; no DOI
-is claimed before it exists.
+mints a DOI without further editing. We add the DOI here once Zenodo mints it.
+Until then this repository claims none.
 
 ## License
 

@@ -1,4 +1,4 @@
-# Errata and Divergences
+# Errata and divergences
 
 Discrepancies between the camera-ready papers and this repository, and one
 internal inconsistency inside the WAISE camera-ready itself. Each entry states

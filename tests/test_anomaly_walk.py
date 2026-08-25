@@ -22,6 +22,7 @@ from src.analysis.anomaly_walk import (
     AnomalyObservation,
     Cause,
     ClauseVerdict,
+    STANDARD_LEVEL,
     Verdict,
     assignment,
     resolve_with_cause,
@@ -33,14 +34,27 @@ from src.visualization.anomaly_notebook import OUTPUT_PATH, build_notebook
 
 
 class TestEveryVerdictCitesARealClause:
-    def test_each_clause_exists_in_the_registry(self):
+    def test_each_cited_clause_exists_in_the_registry(self):
+        """A verdict either cites a real clause or says it cites none. It may
+        not invent a clause number to fill the column."""
         registry = StandardsRegistry()
         for verdict in walk(SCENARIOS["detections_drop"]):
+            if verdict.clause == STANDARD_LEVEL:
+                continue
             standard = registry.get_standard(verdict.standard_id)
             references = {c.reference for c in standard.clauses}
             assert verdict.clause in references, (
                 f"{verdict.standard_id} has no clause {verdict.clause}"
             )
+
+    def test_the_iso26262_verdict_cites_no_clause(self):
+        """The position paper states this at the level of the standard. An
+        earlier version cited Part 5 Cl.9, which is the architectural-metrics
+        evaluation and does not require diagnostics."""
+        verdicts = walk(SCENARIOS["detections_drop"])
+        iso26262 = [v for v in verdicts if v.standard_id == "ISO26262"]
+        assert len(iso26262) == 1
+        assert iso26262[0].clause == STANDARD_LEVEL
 
     def test_each_verdict_gives_a_reason(self):
         for verdict in walk(SCENARIOS["detections_drop"]):
@@ -49,6 +63,17 @@ class TestEveryVerdictCitesARealClause:
     def test_the_four_normative_standards_all_answer(self):
         ids = {v.standard_id for v in walk(SCENARIOS["detections_drop"])}
         assert ids == {"ISO26262", "ISO21448", "ISO21434", "ISOPAS8800"}
+
+    def test_the_three_concerns_are_all_candidate_owners(self):
+        """The position paper puts SOTIF, AI safety and cybersecurity side by
+        side as the three concerns a re-evaluation can belong to. An earlier
+        version left ISO/PAS 8800 out as a bystander."""
+        conditional = walk_result(SCENARIOS["detections_drop"])[
+            "conditional_on_cause"
+        ]
+        assert {v.standard_id for v in conditional} == {
+            "ISO21448", "ISO21434", "ISOPAS8800",
+        }
 
 
 class TestTheWalkEndsUnassigned:
@@ -65,12 +90,6 @@ class TestTheWalkEndsUnassigned:
         rain = walk_result(SCENARIOS["drop_with_rain_reported"])["assigned_to"]
         attack = walk_result(SCENARIOS["drop_with_security_event"])["assigned_to"]
         assert plain == rain == attack is None
-
-    def test_two_standards_wait_on_the_same_missing_fact(self):
-        conditional = walk_result(SCENARIOS["detections_drop"])[
-            "conditional_on_cause"
-        ]
-        assert {v.standard_id for v in conditional} == {"ISO21448", "ISO21434"}
 
     def test_iso21448_records_its_own_exclusion(self):
         verdicts = walk(SCENARIOS["detections_drop"])
@@ -100,12 +119,23 @@ class TestKnowingTheCauseSettlesIt:
         [
             (Cause.PERFORMANCE_INSUFFICIENCY, "ISO21448"),
             (Cause.ATTACK, "ISO21434"),
+            (Cause.AI_COMPONENT, "ISOPAS8800"),
             (Cause.HARDWARE_FAULT, "ISO26262"),
             (Cause.UNKNOWN, None),
+            # WAISE DP-5 and F-3: unowned even when the cause is known.
+            (Cause.ATTACK_EXPLOITING_INSUFFICIENCY, None),
         ],
     )
     def test_each_cause_maps_to_one_owner(self, cause, owner):
         assert resolve_with_cause(SCENARIOS["detections_drop"], cause) == owner
+
+    def test_knowing_the_cause_does_not_always_settle_ownership(self):
+        """The overlap case the WAISE paper finds unowned must stay unowned.
+        Claiming the standards agree once the cause is known would contradict
+        finding F-3."""
+        assert resolve_with_cause(
+            SCENARIOS["detections_drop"], Cause.ATTACK_EXPLOITING_INSUFFICIENCY
+        ) is None
 
 
 class TestDeterminism:

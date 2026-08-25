@@ -19,23 +19,27 @@ What each paper does state, and what carries the synthesis:
     and "no standard defines how the disjoint evidence types combine to support
     a single sufficiency claim at G5" (DP-2). Finding F-4 records the same
     absence at the release decision.
-  * Position, operation time. Once an anomaly is assigned, "concern-specific
-    results still [must] meet [the] top claim, evidence [on] different
-    measurement scales, such [as] calibrated probability, ensemble disagreement
-    value, binary event indicator, risk rating, no rule combines them."
-  * The position paper marks the relation itself: "Operation adds conditions
-    design-time analysis does not face". That sentence presupposes the
-    design-time counterpart, and the position paper cites the WAISE paper.
+  * Position, operation time: "the concern-specific results still meet at the
+    top claim, where the evidence has different measurement scales, such as a
+    calibrated probability, an ensemble disagreement value, a binary event
+    indicator, or a risk rating, and no rule combines them."
+  * The position paper contrasts the two settings itself: "Operation adds
+    conditions that design-time analysis does not face". That sentence
+    distinguishes operation from design-time analysis in general rather than
+    from the G5 junction in particular, so it supports the synthesis without
+    establishing it. The position paper does cite the WAISE paper.
 
 The design-time identifiers are read from the analysis catalogues rather than
 repeated here, so they cannot drift. The operation-time entries are transcribed
 from the position paper, which no code backs by design; each carries the paper
 as its source.
 
-A second, parallel seam exists and is recorded below: the position paper's
-missing step 1 (assignment) has its design-time counterpart in WAISE finding
-F-3, the unowned adversarial-SOTIF boundary. It is included because leaving it
-out would make the first seam look like the only one.
+A second, looser seam is recorded below, on the assignment step rather than the
+combination: the position paper's missing step 1 sits beside WAISE finding F-3,
+the unowned adversarial-SOTIF boundary. It is looser because the two cases
+differ. F-3 is a boundary reached when the cause is known and belongs to two
+concerns at once; missing step 1 is a boundary reached when the cause is not
+known at all. ``assignment_seam()`` says so, and the page repeats it.
 """
 
 from __future__ import annotations
@@ -56,7 +60,8 @@ class Scale:
 
     label: str
     kind: str
-    standard: str | None  # None where the position paper names no single standard
+    # None where the paper that lists the scale attributes it to no standard.
+    standard: str | None
 
 
 @dataclass(frozen=True)
@@ -93,14 +98,19 @@ def _design_time_scales() -> list[Scale]:
     return scales
 
 
-# Transcribed from the position paper, which no code backs by design. The
-# paper lists these four as the scales that must meet the top claim once an
-# anomaly has been assigned to a concern.
+# Transcribed from the position paper, which no code backs by design. The paper
+# lists these four as the scales that meet at the top claim once an anomaly has
+# been assigned to a concern.
+#
+# The paper attributes none of the four to a standard, so neither does this
+# module. An earlier version assigned three of them by inference, which put a
+# repository guess in the same slot as the paper-backed attributions on the
+# design-time side, where a reader could not tell the two apart.
 _OPERATION_SCALES = [
     Scale("Calibrated probability", "probability", None),
-    Scale("Ensemble disagreement value", "statistical metric", "ISOPAS8800"),
-    Scale("Binary event indicator", "binary indicator", "ISO21434"),
-    Scale("Risk rating", "risk rating", "ISO21434"),
+    Scale("Ensemble disagreement value", "statistical metric", None),
+    Scale("Binary event indicator", "binary indicator", None),
+    Scale("Risk rating", "risk rating", None),
 ]
 
 
@@ -146,12 +156,12 @@ def operation_time_point() -> LifecyclePoint:
         ),
         source_note=(
             "Position paper, missing step 2 of two. Its figure labels this "
-            "step resolution into one judgment, with no clause."
+            "step resolution into one judgement, with no clause."
         ),
         extra_conditions=[
             "Evidence arrives asynchronously",
             "The component changes under updates",
-            "The reporting duty requires a current judgment on demand",
+            "The reporting duty requires a current judgement on demand",
         ],
     )
 
@@ -174,7 +184,7 @@ def what_differs() -> list[str]:
         "operation-time one recurs whenever a monitor output is abnormal",
         "At design time the evidence is assembled deliberately; in operation it "
         "arrives asynchronously and the component may have changed under an update",
-        "Operation carries a reporting duty that requires a current judgment on demand",
+        "Operation carries a reporting duty that requires a current judgement on demand",
         "Operation needs an assignment step first, which design time does not: the "
         "anomaly carries no concern label",
     ]
@@ -193,9 +203,15 @@ def assignment_seam() -> dict[str, str]:
         ),
         "operation_time_identifier": "Missing step 1, assignment",
         "note": (
-            "The same boundary, before the combination question arises. The "
-            "WAISE paper finds it between G7 and G8 at design time; the "
-            "position paper finds it at the monitor output in service."
+            "Setting these two beside each other is a second synthesis drawn "
+            "here, and it is looser than the first. They are not the same "
+            "case. The WAISE paper's F-3 is a boundary between two concerns "
+            "when the cause is known: an adversarial input that exploits a "
+            "functional insufficiency belongs to both, and no standard "
+            "allocates it. The position paper's missing step 1 is a boundary "
+            "when the cause is unknown: the anomaly carries no concern label "
+            "at all. What they share is that a case falls between scopes and "
+            "no clause claims it."
         ),
     }
 
