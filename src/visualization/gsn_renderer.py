@@ -45,10 +45,25 @@ def _goal_color(goal: Goal) -> str:
     return COLORS["goal_base"]
 
 
-def _truncate(text: str, max_len: int = 60) -> str:
-    if len(text) <= max_len:
-        return text
-    return text[:max_len - 3] + "..."
+def _wrap(text: str, width: int = 24) -> str:
+    """Word-wrap into short lines so a node stays narrow.
+
+    Graphviz sizes a node to its widest label line, so one long line makes the
+    whole diagram wide. Wrapping keeps the rendered figure legible at the width
+    a README or a slide gives it.
+    """
+    words = text.split()
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        if current and len(current) + 1 + len(word) > width:
+            lines.append(current)
+            current = word
+        else:
+            current = f"{current} {word}".strip()
+    if current:
+        lines.append(current)
+    return "\\n".join(lines)
 
 
 def render_gsn_to_dot(gsn: GSNArgument) -> str:
@@ -75,35 +90,35 @@ def render_gsn_to_dot(gsn: GSNArgument) -> str:
             color = _goal_color(elem)
             style = "dashed" if elem.status == GoalStatus.UNDEVELOPED else "solid"
             stds = "\\n".join(elem.source_standards[:3]) if elem.source_standards else "Gap"
-            label = f"{elem.element_id}\\n{_truncate(elem.text, 50)}\\n[{stds}]"
+            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}\\n[{stds}]"
             lines.append(
                 f'  {elem.element_id} [shape=box, style="{style},filled", '
                 f'fillcolor="{color}", label="{label}"];'
             )
 
         elif isinstance(elem, Strategy):
-            label = f"{elem.element_id}\\n{_truncate(elem.text, 50)}"
+            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}"
             lines.append(
                 f'  {elem.element_id} [shape=trapezium, style="filled", '
                 f'fillcolor="{COLORS["strategy"]}", label="{label}"];'
             )
 
         elif isinstance(elem, Context):
-            label = f"{elem.element_id}\\n{_truncate(elem.text, 45)}"
+            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}"
             lines.append(
                 f'  {elem.element_id} [shape=box, style="filled,rounded", '
                 f'fillcolor="{COLORS["context"]}", label="{label}"];'
             )
 
         elif isinstance(elem, Assumption):
-            label = f"{elem.element_id}\\n{_truncate(elem.text, 45)}"
+            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}"
             lines.append(
                 f'  {elem.element_id} [shape=ellipse, style="filled", '
                 f'fillcolor="{COLORS["assumption"]}", label="{label}"];'
             )
 
         elif isinstance(elem, Solution):
-            label = f"{elem.element_id}\\n{_truncate(elem.text, 40)}"
+            label = f"{elem.element_id}\\n{_wrap(elem.text, 16)}"
             lines.append(
                 f'  "{elem.element_id}" [shape=circle, style="filled", '
                 f'fillcolor="{COLORS["solution"]}", label="{label}", '
