@@ -55,6 +55,35 @@ class TestGeneratedFileIsCurrent:
         assert build_html() == html
 
 
+class TestNoGeneratorCorruption:
+    """The current-file guard compares the committed copy against a rebuild, so
+    a generator that emits corrupted bytes still passes: the committed copy
+    carries the same corruption. These tests read the bytes themselves.
+
+    An earlier version wrote the two status marks as "\\25CB" and "\\25CF"
+    inside a non-raw Python string. Python read \\25 as the octal escape for
+    byte 0x15, and the phone view showed a control character followed by "CB"
+    or "CF" in place of a circle.
+    """
+
+    def test_no_ascii_control_characters(self, html):
+        allowed = {"\t", "\n", "\r"}
+        stray = sorted(
+            ch for ch in set(html) if (ord(ch) < 0x20 or ord(ch) == 0x7F) and ch not in allowed
+        )
+        assert not stray, (
+            "generated HTML holds control characters "
+            f"{[hex(ord(c)) for c in stray]}; a string escape was likely "
+            "misread (for example \\25 as octal, not a CSS hex escape)"
+        )
+
+    def test_evidence_status_markers_render_as_circles(self, html):
+        """Figure 2(b) marks provided evidence with a filled circle and
+        not-produced evidence with an open one."""
+        assert "○" in html, "open circle (not produced) is missing"
+        assert "●" in html, "filled circle (provided) is missing"
+
+
 class TestSelfContained:
     """Offline, no CDN: the file references nothing outside itself."""
 
