@@ -3,7 +3,10 @@
 Milin Patel and Rolf Jung, Kempten University of Applied Sciences.
 Supplementary material for two SAFECOMP 2026 papers, both accepted.
 
-[![DOI](https://zenodo.org/badge/1178669234.svg)](https://doi.org/10.5281/zenodo.22091825)
+[![CI](https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/actions/workflows/ci.yml/badge.svg)](https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/actions/workflows/ci.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22091825.svg)](https://doi.org/10.5281/zenodo.22091825)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 
 Four standards apply at once to an AI perception component in a driverless
 vehicle, and each one prescribes its own evidence. This repository builds
@@ -13,6 +16,11 @@ reasons; no standard prescribes it.
 
 **Start here:** [the argument, one node at a time](https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/gsn_view.html) (works on
 a phone) · [what it found](#what-it-found) · [reproduce it](#reproduce-it)
+
+[![The interactive GSN argument: tap any node to see the standards it draws on, the evidence it calls for, and where the standards leave a gap](docs/screenshots/interactive_argument.png)](https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/gsn_view.html)
+
+The image is a still. [Open the live page](https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/gsn_view.html)
+to tap each node.
 
 [![Open the anomaly walk in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/notebooks/anomaly_walk.ipynb)
 
@@ -26,7 +34,12 @@ statistical uncertainty score, and an attack success rate. No standard says how
 to combine them into one judgement. An engineer can complete every prescribed
 activity and still be unable to state whether the evidence together is enough.
 
-![The integrated argument: nine goals, with the four standards meeting at G5](docs/figures/integrated_gsn.png)
+[![The G5 acceptance playground: four evidence scales, each with an acceptance line you set, and a release verdict that no clause fixes](docs/screenshots/g5_playground.png)](https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/g5_playground.html)
+
+[Drag the four scales](https://milinpatel07.github.io/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/g5_playground.html)
+and the verdict flips; no clause draws any of the four lines. The whole argument,
+all nine goals with the evidence under each, is one
+diagram: [integrated_gsn.png](docs/figures/integrated_gsn.png).
 
 ## The two papers
 
