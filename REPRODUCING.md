@@ -7,7 +7,9 @@ Milin Patel and Rolf Jung. WAISE 2026 Workshop at SAFECOMP 2026.
 
 ## Prerequisites
 
-- Python >= 3.9
+- Python >= 3.12 to install `requirements.lock` (it was frozen on Python 3.13,
+  matching CI, and pins wheels that need 3.12). The package itself supports
+  Python >= 3.9; on 3.9 to 3.11 use the `[dev]` install in Step 1 instead.
 - pip
 - gsn2x >= 4.2.3 (for GSN diagram rendering; optional)
 - Graphviz (for legacy Graphviz-based GSN rendering; optional)
@@ -26,9 +28,10 @@ pip install -r requirements.lock
 pip install -e . --no-deps
 ```
 
-`requirements.lock` pins the exact versions we verified the results against.
-`pip install -e ".[dev]"` also works and takes the newest compatible versions
-instead. PyTorch is not required: `src/perception/` falls back to numpy, and no
+`requirements.lock` pins the exact versions we verified the results against; it
+was frozen on Python 3.13 and needs Python 3.12 or newer.
+`pip install -e ".[dev]"` also works, takes the newest compatible versions
+instead, and runs on Python 3.9 or newer. PyTorch is not required: `src/perception/` falls back to numpy, and no
 number either paper uses depends on it. Install it with
 `pip install -e ".[perception]"` only if you want the perception module's torch
 paths.
