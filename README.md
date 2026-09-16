@@ -72,8 +72,10 @@ make reproduce
 
 `make reproduce` regenerates every artefact both papers use, then diffs the
 result against the copies committed here. It prints a diff and fails if anything
-drifted. [REPRODUCING.md](REPRODUCING.md) covers the details, including the
-Windows path-length trap and what the lockfile pins. PyTorch is not required.
+drifted. The lockfile needs Python 3.12 or newer (it was frozen on 3.13, the
+version CI runs); [REPRODUCING.md](REPRODUCING.md) covers the details, including
+the path for Python 3.9 to 3.11, the Windows path-length trap, and what the
+lockfile pins. PyTorch is not required.
 
 ## What each file is, and how far to trust it
 
@@ -131,7 +133,7 @@ Cite the papers, not this repository:
 
 @inproceedings{PatelJungPosition2026,
   author    = {Patel, Milin and Jung, Rolf},
-  title     = {Operational Safety and Cybersecurity Assurance for {AI}-Based
+  title     = {Operational Safety and Cybersecurity Assurance of {AI}-Based
                Perception in Highly Automated Driving},
   booktitle = {SAFECOMP 2026},
   year      = {2026}
