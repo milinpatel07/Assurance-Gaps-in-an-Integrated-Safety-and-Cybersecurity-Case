@@ -21,7 +21,9 @@ There are **two papers** (see `paper/`), both by Patel & Jung, Kempten Universit
   concern-assignment gap (assigning a runtime anomaly to SOTIF / AI-safety / cybersecurity).
   It is argued at the clause level and is not backed by the `src/` analysis code.
 
-A poster is also in scope on this branch (`restructure/two-papers-plus-poster`).
+A conference poster is part of the same work. It has no source in this
+repository; its QR code resolves to the site served from `docs/` (see the
+README's website section).
 
 ## Commands
 
