@@ -74,3 +74,37 @@ def test_the_structural_counts_the_readme_states_match_the_code():
 def _word(number: int) -> str:
     words = {5: "five", 7: "seven", 9: "nine"}
     return words.get(number, str(number))
+
+
+def test_the_readme_method_table_matches_the_code():
+    """The README's five-step table states each step's output with its split.
+
+    Those splits are the first thing a reader checks when asking why nine,
+    seven or five, so they are held to the code like the totals above.
+    """
+    from collections import Counter
+
+    from src.standards.registry import StandardsRegistry
+
+    readme = _read("README.md")
+    goals = build_integrated_gsn().get_goals()
+    origin = Counter(goal.origin for goal in goals)
+    dp_types = Counter(
+        dp.inconsistency_type.value for dp in DecisionPointCatalogue().inconsistencies
+    )
+    gaps = GapClassification().gaps
+    induced = sum(gap.integration_induced for gap in gaps)
+
+    assert f"{len(StandardsRegistry().get_all_claims())} claims" in readme
+    assert (
+        f"{origin['retained']} kept, {origin['new']} added (G7, G8), "
+        f"{origin['undeveloped']} left undeveloped (G9)"
+    ) in readme
+    assert (
+        f"{dp_types['structural']} structural, {dp_types['terminological']} "
+        f"terminological, {dp_types['methodological']} methodological"
+    ) in readme
+    assert (
+        f"{induced} integration-induced, {len(gaps) - induced} open "
+        "methodological problems"
+    ) in readme
