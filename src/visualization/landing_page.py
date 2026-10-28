@@ -227,6 +227,11 @@ def build_html() -> str:
         + "</header>\n"
         + _panels(counts)
         + "<footer>\n"
+        f"<p>Why {counts['standards']} standards, {counts['goals']} goals, "
+        f"{counts['decision_points']} decision points and {counts['findings']} "
+        'findings? <a href="numbers.html">Where the numbers come from</a> '
+        "gives the rule behind each count, and says whether it is a choice "
+        "or a result.</p>\n"
         '<p>Play with it: <a href="g5_playground.html">drag the four V&amp;V '
         "scales and watch the release decision flip</a>, and see that no "
         "standard sets the lines.</p>\n"

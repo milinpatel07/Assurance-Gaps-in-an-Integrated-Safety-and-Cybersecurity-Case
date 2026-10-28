@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where the numbers come from</title>
+<meta name="description" content="Each count in the two papers, the rule that produced it, and whether it is a choice or a result.">
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #fff; color: #111;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px; line-height: 1.5;
+}
+header, main, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 22px; }
+h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 8px; }
+.lede { margin: 0 0 8px; }
+nav.jump { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; }
+nav.jump a {
+  border: 2px solid #222; border-radius: 999px; padding: 2px 10px;
+  color: #111; text-decoration: none; font-size: 0.9rem; font-weight: 600;
+}
+main { display: grid; gap: 14px; margin-top: 18px; }
+.card {
+  border: 2px solid #222; border-radius: 10px; padding: 12px 16px 10px;
+  display: grid; grid-template-columns: auto 1fr; column-gap: 14px;
+}
+.card > *:not(.num) { grid-column: 2; }
+.num {
+  grid-row: 1 / span 2; margin: 0; font-size: 2.6rem; font-weight: 800;
+  line-height: 1; min-width: 2.2ch; text-align: center;
+}
+.card h2 { font-size: 1.15rem; margin: 2px 0 6px; }
+.breakdown { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.chip {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  border: 2px solid #444; background: #fff; font-size: 0.85rem;
+}
+.chip.dot { border-color: var(--c); }
+.chip.dot::before {
+  content: ""; display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--c); margin-right: 6px;
+}
+details { margin: 0 0 6px; }
+summary { cursor: pointer; font-weight: 700; }
+details p { margin: 4px 0 6px; }
+.check { font-size: 0.9rem; margin: 4px 0 2px; color: #222; }
+.src { font-weight: 700; }
+a { color: #111; }
+footer {
+  border-top: 1px solid #ccc; margin-top: 20px; padding-top: 14px;
+  padding-bottom: 28px; font-size: 0.9rem; color: #333;
+}
+footer code {
+  background: #f2f2f2; border: 1px solid #ddd; border-radius: 4px;
+  padding: 1px 6px; font-size: 0.85rem;
+}
+@media (max-width: 420px) {
+  .card { grid-template-columns: 1fr; }
+  .card > *:not(.num) { grid-column: 1; }
+  .num { grid-row: auto; text-align: left; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Where the numbers come from</h1>
+<p class="lede">Four standards, nine goals, seven decision points, five findings. None of these was a target. Each is what one step of the method produced, and each card below names that step, shows what the number breaks down into, and says whether it reflects a choice or a result.</p>
+<nav class="jump" aria-label="Jump to"><a href="#standards">Standards</a><a href="#goals">Goals</a><a href="#evidence">G5 evidence</a><a href="#decision-points">Decision points</a><a href="#findings">Findings</a><a href="#missing-steps">In service</a></nav>
+</header>
+<main><section class="card" id="standards"><p class="num">4</p><h2>Standards that apply normatively</h2><p class="breakdown"><span class="chip dot" style="--c:#2E7D32">ISO 26262</span><span class="chip dot" style="--c:#E65100">ISO 21448</span><span class="chip dot" style="--c:#C62828">ISO/SAE 21434</span><span class="chip dot" style="--c:#1565C0">ISO/PAS 8800</span><span class="chip">ISO/IEC TR 5469 (informative, not counted)</span></p><details open><summary>How the method arrives at it</summary><p>An AI-based perception component in a road vehicle draws on four standards: functional safety (ISO 26262), the safety of the intended functionality, or SOTIF (ISO 21448), cybersecurity (ISO/SAE 21434), and safety of AI (ISO/PAS 8800). ISO/IEC TR 5469 is read too, because the WAISE paper cites it, but it is an informative technical report. Any statement about &ldquo;all four standards&rdquo; counts only the normative ones.</p></details><details><summary>Chosen, or found?</summary><p>This is the scope of the papers. The scope is not tuned to produce a result: it is the set the WAISE abstract names as the standards the component requires evidence from. A fifth normative standard, if one applied, would enter as another leg of the argument and could add junctions.</p></details><p class="check"><span class="src">Computed from the code.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/standards/registry.py">registry.py</a> · <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/TRACEABILITY.md">TRACEABILITY.md §1</a></p></section><section class="card" id="claims"><p class="num">40</p><h2>Clause-level claims extracted</h2><p class="breakdown">From five documents: the four standards and the informative report.</p><details open><summary>How the method arrives at it</summary><p>Step 1 of the method reads each standard at clause level. A claim is a normative requirement, a defined work product, or a required lifecycle activity, and each one names the clause it comes from.</p></details><details><summary>Chosen, or found?</summary><p>Found, with a caveat. The count depends on how finely a clause is split into claims, so it describes this encoding, not the standards. None of the findings depends on the total; they depend on which standards meet at which goal.</p></details><p class="check"><span class="src">Computed from the code.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/tree/main/src/standards">src/standards/</a></p></section><section class="card" id="phases"><p class="num">6</p><h2>Lifecycle phases</h2><p class="breakdown"><span class="chip">Concept and requirements</span><span class="chip">Design and training</span><span class="chip">Verification and validation</span><span class="chip">Integration and deployment</span><span class="chip">Operation and monitoring</span><span class="chip">Modification and re-assurance</span></p><details open><summary>How the method arrives at it</summary><p>Step 2 places every claim on one phase of the component's life, from the first requirement to the retrained model in service. The grid shows where the standards cover the same phase and where none does.</p></details><details><summary>Chosen, or found?</summary><p>Chosen. The six phases are a mapping grid the WAISE paper defines in its method. A finer grid would move claims between cells but would not create or remove a junction in the argument.</p></details><p class="check"><span class="src">Computed from the code.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/standards/base.py">base.py, LifecyclePhase</a></p></section><section class="card" id="goals"><p class="num">9</p><h2>Goals in the integrated argument</h2><p class="breakdown"><span class="chip">6 kept from ISO/PAS 8800 Annex B: G1, G2, G3, G4, G5, G6 (G1 reworded)</span><span class="chip">2 added: G7, G8</span><span class="chip dot" style="--c:#757575">1 left open: G9</span></p><details open><summary>How the method arrives at it</summary><p>Step 3 starts from the Annex B pattern, the published argument pattern for AI components in road vehicles, and keeps its goals. A claim from another standard is attached to an existing goal when it serves the same purpose. A new goal is created only when nothing in the base fits. That happened twice: G7 and G8 each claim that a residual risk is acceptable (SOTIF and cybersecurity), which is a judgement, not a verification activity, so neither belongs under G5. G9, re-assurance after an update or retraining, is drawn but left undeveloped, because no standard prescribes the complete workflow.</p></details><details><summary>Chosen, or found?</summary><p>The base pattern is a choice; the nine follows from it. With a different base (AMLAS or SACE, for example) the goals would be numbered and cut differently. What the papers rely on is not the count but where the standards meet, and that is checked separately: see the findings card below.</p></details><p class="check"><span class="src">Computed from the code.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/gsn/integrated_pattern.py">integrated_pattern.py</a> · <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/gsn/annex_b_base.py">annex_b_base.py</a> · <a href="gsn_view.html">the argument, node by node</a></p></section><section class="card" id="evidence"><p class="num">4</p><h2>Kinds of evidence at G5, the V&amp;V goal</h2><p class="breakdown"><span class="chip dot" style="--c:#C62828">ISO/SAE 21434</span><span class="chip dot" style="--c:#E65100">ISO 21448</span><span class="chip dot" style="--c:#2E7D32">ISO 26262</span><span class="chip dot" style="--c:#1565C0">ISO/PAS 8800</span></p><details open><summary>How the method arrives at it</summary><p>G5 claims that verification and validation are sufficient. It is the one goal where every normative standard contributes, and each asks for its own evidence: structural coverage of the non-AI code (ISO 26262), scenario coverage against triggering conditions (ISO 21448), a statistical uncertainty score (ISO/PAS 8800), and an attack success rate from penetration testing (ISO/SAE 21434).</p></details><details><summary>Chosen, or found?</summary><p>Found. One kind of evidence per contributing standard, and the four measure on scales that do not convert into one another. That is the central result: no clause says how to combine them.</p></details><p class="check"><span class="src">Computed from the code.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/analysis/evidence_convergence.py">evidence_convergence.py</a> · <a href="g5_playground.html">try it: the G5 playground</a></p></section><section class="card" id="decision-points"><p class="num">7</p><h2>Decision points</h2><p class="breakdown"><span class="chip">3 structural</span><span class="chip">2 terminological</span><span class="chip">2 methodological</span></p><details open><summary>How the method arrives at it</summary><p>Step 4 examines every goal where claims from two or more standards meet (G1, G2, G4, G5, G6, G8). A decision point is recorded wherever the standards leave a choice to the project instead of prescribing one. Terminological ones (two words for one thing) and methodological ones (two methods for one aim) a project can settle by agreeing on a vocabulary or a method. Structural ones need a decision that no standard prescribes.</p></details><details><summary>Chosen, or found?</summary><p>Found. Seven is what the examination turned up, not a target. The three-way typing is the paper's, and ERRATA.md records the one place where the paper's own table and prose disagree on a type (DP-2).</p></details><p class="check"><span class="src">Computed from the code.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/analysis/decision_points.py">decision_points.py</a> · <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/ERRATA.md">ERRATA.md §1</a></p></section><section class="card" id="findings"><p class="num">5</p><h2>Findings</h2><p class="breakdown"><span class="chip">2 integration-induced: F-3, F-4</span><span class="chip">3 open methodological problems: F-1, F-2, F-5</span></p><details open><summary>How the method arrives at it</summary><p>Step 5 sorts what the integrated argument exposes into two kinds. An integration-induced finding exists only between the scopes of the standards, so no reader of one standard alone can see it: the adversarial-SOTIF boundary that belongs to neither G7 nor G8 (F-3), and the release decision that has to combine all four kinds of evidence (F-4). An open methodological problem is a framework the standards do prescribe, with no published method yet for the numbers it needs (F-1, F-2, F-5). The code writes Gap-1 to Gap-5 for F-1 to F-5.</p></details><details><summary>Chosen, or found?</summary><p>Found, and tested against the obvious objection that a different argument structure would make the integration-induced findings disappear. They were derived under two structures, Activity-based (this work) and Concern hierarchy (Warg &amp; Skoglund): both arise under each. The derivation reports the result either way; it is not tuned.</p></details><p class="check"><span class="src">Computed from the code.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/analysis/gaps.py">gaps.py</a> · <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/analysis/topology_sensitivity.py">topology_sensitivity.py</a> · <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/src/analysis/counterfactual.py">counterfactual.py</a></p></section><section class="card" id="missing-steps"><p class="num">2</p><h2>Missing steps once the vehicle is in service</h2><p class="breakdown"><span class="chip">Assignment: which concern owns the alarm?</span><span class="chip">Resolution: one judgement from the concerns&#x27; results</span></p><details open><summary>How the method arrives at it</summary><p>The position paper follows a runtime alarm that arrives without a label. Rain and a spoofing attack can produce the same missing detections. ISO 21448, ISO/PAS 8800 and ISO/SAE 21434 each define an operation-phase activity within their own concern, but no clause assigns the alarm to one of them (step one), and none says how their results resolve into one judgement on the argument (step two).</p></details><details><summary>Chosen, or found?</summary><p>Argued. These are the two steps the paper finds missing, at clause level. Labelling every alarm would close the first and leave the second, which is why the paper keeps them apart. The paper then states four requirements (R1 to R4) a closing method must meet, each necessary, without claiming the set is sufficient.</p></details><p class="check"><span class="src">From the position paper&#x27;s text; no code computes it.</span> Check: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/notebooks/anomaly_walk.ipynb">the anomaly walk notebook</a> · <a href="seam.html">one problem, two lifecycle points</a></p></section></main>
+<footer>
+<p><a href="index.html">Back to the overview</a> · <a href="gsn_view.html">the argument, node by node</a> · <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/TRACEABILITY.md">TRACEABILITY.md</a>, where every number traces to a paper passage, a clause, or a command.</p>
+<p>Generated page; do not edit by hand. Rebuild: <code>python -m src.visualization.numbers_page</code></p>
+</footer>
+</body>
+</html>

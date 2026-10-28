@@ -46,6 +46,7 @@ help:
 	@echo "  gsn-view     — Regenerate docs/gsn_view.html (interactive GSN)"
 	@echo "  landing      — Regenerate docs/index.html (GitHub Pages landing page)"
 	@echo "  playground   — Regenerate docs/g5_playground.html (interactive G5 page)"
+	@echo "  numbers      — Regenerate docs/numbers.html (where each count comes from)"
 	@echo "  pages        — Regenerate every reader-facing generated page"
 	@echo "  reproduce    — Generate everything, then verify against committed references"
 	@echo "  clean        — Remove generated output directory"
@@ -84,13 +85,17 @@ seam:
 playground:
 	$(PYTHON) -m src.visualization.playground_page
 
+# Regenerate the page that explains where each count comes from.
+numbers:
+	$(PYTHON) -m src.visualization.numbers_page
+
 # Regenerate the notebooks.
 notebook:
 	$(PYTHON) -m src.visualization.anomaly_notebook
 	$(PYTHON) -m src.visualization.g5_notebook
 
 # Every reader-facing generated page.
-pages: gsn-view landing seam playground notebook
+pages: gsn-view landing seam playground numbers notebook
 
 # ── Reproducibility (Gate 3) ─────────────────────────────────────
 # One command from clone to every artefact both papers use, then prove the
@@ -113,6 +118,7 @@ verify-refs:
 	$(PYTHON) -m src.visualization.landing_page --check
 	$(PYTHON) -m src.visualization.seam_page --check
 	$(PYTHON) -m src.visualization.playground_page --check
+	$(PYTHON) -m src.visualization.numbers_page --check
 	$(PYTHON) -m src.visualization.anomaly_notebook --check
 	$(PYTHON) -m src.visualization.g5_notebook --check
 	@echo "All committed references match regeneration."
