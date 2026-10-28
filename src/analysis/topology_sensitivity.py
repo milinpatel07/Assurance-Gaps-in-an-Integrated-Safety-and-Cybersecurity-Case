@@ -36,7 +36,7 @@ functional safety and SOTIF under safety and cybersecurity as a co-concern; it
 does not place AI safety, so putting it under safety is this repository's
 reading and is marked as such.
 
-THE HONEST HAZARD
+WHAT WOULD COUNT AGAINST THE PAPER
 
 If a finding had come out present under one topology and absent under the other,
 that would weaken the paper's retention argument, and this module would report
