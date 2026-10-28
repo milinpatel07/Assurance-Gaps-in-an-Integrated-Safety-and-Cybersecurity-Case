@@ -1,4 +1,4 @@
-"""ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems.
+"""ISO/IEC TR 5469:2024 (Artificial intelligence: Functional safety and AI systems).
 
 This is a technical report (informative, not normative). It assesses which
 established functional safety techniques apply to AI components and which
@@ -34,8 +34,9 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "Classifies AI behavioural errors as systematic failures, "
-                "creating terminological inconsistency I-3 with ISO 21448 "
-                "(functional insufficiency) and ISO 26262 (out of scope)."
+                "a different term for the same concept than ISO 21448 "
+                "(functional insufficiency) and ISO 26262 (out of scope); "
+                "terminological decision point DP-3."
             ),
         ),
         Clause(
@@ -59,8 +60,8 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "NOTE 2 states that properties against intentional malevolent "
-                "inputs contradict functional safety properties. Contributes "
-                "to inconsistency I-5."
+                "inputs can contradict functional safety properties. Bears on "
+                "decision point DP-5."
             ),
         ),
         Clause(
@@ -72,7 +73,8 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "Adding training data for one risk mitigation can affect other "
-                "mitigations. Makes quantitative targets difficult (Gap-1)."
+                "mitigations. Makes quantitative targets difficult to define "
+                "(finding F-1)."
             ),
         ),
         Clause(
@@ -101,7 +103,7 @@ def _build_clauses() -> list[Clause]:
             ai_applicability_note=(
                 "Provides guidance on impact analysis, change protocols, "
                 "and regression validation for AI model modifications, "
-                "but without normative force (Gap-2)."
+                "but without normative force (finding F-2)."
             ),
         ),
     ]
@@ -155,11 +157,11 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
 
 
 class TR5469(Standard):
-    """ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems.
+    """ISO/IEC TR 5469:2024 (Artificial intelligence: Functional safety and AI systems).
 
     Informative technical report providing supplementary guidance on
     AI technology classification, data quality, and change management.
-    Not normative — referenced for completeness.
+    An informative technical report, not a standard; referenced for completeness.
     """
 
     def __init__(self):
@@ -167,7 +169,7 @@ class TR5469(Standard):
         claims = _build_claims(clauses)
         super().__init__(
             standard_id="TR5469",
-            full_name="ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems",
+            full_name="ISO/IEC TR 5469:2024 (Artificial intelligence: Functional safety and AI systems)",
             year=2024,
             scope=(
                 "Informative technical report assessing which functional safety "

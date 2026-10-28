@@ -1,15 +1,21 @@
-"""Generate TRACEABILITY.md, the single index of where every claim comes from.
+"""Generate TRACEABILITY.md, the index of where every number, table, figure and
+statement in this repository comes from.
 
 Every number, table, figure and non-obvious statement in this repository traces
-to exactly one of three things, and the index says which:
+to one or more of three source types, and the index says which:
 
-  PAPER     a passage in one of the two papers, cited by section or table
+  PAPER     a passage in one of the two papers, cited by section, table or figure
   CLAUSE    a clause in a named edition of a named standard
-  COMMAND   a command in this repository that regenerates it
+  COMMAND   a command in this repository that regenerates the artefact
 
-Anything that traces to none of the three does not belong in the repository. The
-index also carries a short list of known inconsistencies, so that a reader meets
-them here rather than discovering them alone.
+Anything that traces to none of the three does not belong in the repository.
+Known discrepancies between the camera-ready papers and this repository are
+recorded in ERRATA.md; the index points there instead of restating them.
+
+Table and figure numbers of the WAISE paper follow the published paper: Fig. 1
+(the integrated GSN pattern, panels (a) and (b)), Table 2 (goals), Table 4
+(decision points) and Table 5 (findings). The position paper's table is
+Table I.
 
 The file is generated, not hand-written, so it cannot drift from the code it
 describes. ``tests/test_traceability_index.py`` regenerates it and fails if the
@@ -27,7 +33,7 @@ import os
 import sys
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.gsn.annex_b_base import compute_extension_delta
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.standards.registry import StandardsRegistry
@@ -35,8 +41,7 @@ from src.standards.registry import StandardsRegistry
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUTPUT_PATH = os.path.join(REPO_ROOT, "TRACEABILITY.md")
 
-WAISE = "paper/waise2026/camera-ready.tex"
-POSITION = "paper/safecomp2026-position/camera-ready.tex"
+WAISE_DOI = "https://doi.org/10.1007/978-3-032-35506-5_55"
 
 GENERATE_ALL = "python -m src.results.generate_all --seed 42 --scenes 50 --output output"
 
@@ -45,16 +50,17 @@ def _header() -> list[str]:
     return [
         "# Traceability Index",
         "",
-        "Where every claim in this repository comes from. One index, not scattered",
-        "footnotes.",
+        "Where every number, table, figure and statement in this repository comes",
+        "from.",
         "",
-        "Each row traces to exactly one of three kinds of source, and says which:",
+        "Each row names its source type. A row may cite more than one, written for",
+        "example PAPER + CLAUSE:",
         "",
-        "| Kind | Meaning |",
+        "| Source type | Meaning |",
         "|---|---|",
-        "| **PAPER** | A passage in one of the two papers. Cited by section or table. |",
+        "| **PAPER** | A passage in one of the two papers, cited by section, table or figure. |",
         "| **CLAUSE** | A clause in a named edition of a named standard. |",
-        "| **COMMAND** | A command in this repository that regenerates it. |",
+        "| **COMMAND** | A command in this repository that regenerates the row's artefact. |",
         "",
         "Anything that traces to none of the three does not belong here. Where the",
         "repository asserts something rather than computing it, the row says so.",
@@ -65,10 +71,20 @@ def _header() -> list[str]:
         "python -m src.results.traceability_index",
         "```",
         "",
-        "The two papers:",
+        "The two papers, both by Milin Patel and Rolf Jung:",
         "",
-        f"- WAISE 2026, GSN integration: `{WAISE}`",
-        f"- SAFECOMP 2026 position: `{POSITION}`",
+        '- The WAISE paper: "Integrating Cybersecurity Into the AI Safety Assurance',
+        "  Argument: A GSN Pattern for AI-Based Perception Components in Highly",
+        '  Automated Driving". In: SAFECOMP 2026 Workshops (WAISE), LNCS, Springer,',
+        f"  pp. 763-779. It covers design time. [doi:10.1007/978-3-032-35506-5_55]({WAISE_DOI}).",
+        '- The position paper: "Operational Safety and Cybersecurity Assurance of',
+        '  AI-Based Perception in Highly Automated Driving", SAFECOMP 2026, to appear.',
+        "  It covers operation.",
+        "",
+        "Table and figure numbers of the WAISE paper follow the published paper:",
+        "Fig. 1 is the integrated GSN pattern, with (a) the top two levels and (b) G5",
+        "expanded; Table 2 lists the goals; Table 4 lists the decision points; Table 5",
+        "lists the findings. The position paper's table is Table I.",
         "",
     ]
 
@@ -91,9 +107,10 @@ def _standards_section(registry: StandardsRegistry) -> list[str]:
         )
     lines += [
         "",
-        "The four normative standards are the ones counted by goal-density and by",
-        'any claim in the papers about "all four standards". ISO/IEC TR 5469 is',
-        "informative and is excluded from those counts.",
+        "The four normative standards are the ones counted when this index says how",
+        'many standards meet at a goal, and by any claim in the papers about "all',
+        'four standards". ISO/IEC TR 5469 is an informative technical report and is',
+        "excluded from those counts.",
         "",
     ]
     return lines
@@ -103,10 +120,9 @@ def _crosswalk_section(catalogue: DecisionPointCatalogue, gaps: GapClassificatio
     lines = [
         "## 2. Identifier crosswalk, paper to code",
         "",
-        "The papers and the code name the same objects differently. A reader holding",
-        "the paper and reading the code needs this table.",
+        "The papers and the code name the same objects differently.",
         "",
-        "| Paper | Code | Object | Where in the code |",
+        "| Paper | Code | Description in the code | Where in the code |",
         "|---|---|---|---|",
     ]
     for inc in catalogue.inconsistencies:
@@ -119,7 +135,7 @@ def _crosswalk_section(catalogue: DecisionPointCatalogue, gaps: GapClassificatio
         n = gap.gap_id.split("-")[1]
         lines.append(
             f"| F-{n} | `{gap.gap_id}` | {gap.description.splitlines()[0]} | "
-            f"`src/analysis/gaps.py` |"
+            f"`src/analysis/findings.py` |"
         )
     lines += [
         "",
@@ -127,6 +143,10 @@ def _crosswalk_section(catalogue: DecisionPointCatalogue, gaps: GapClassificatio
         'findings and open methodological problems". The code calls them',
         "inconsistencies (`I-N`) and gaps (`Gap-N`). The numbers correspond exactly;",
         "only the prefixes differ.",
+        "",
+        "The code's identifiers predate the camera-ready papers; where descriptions",
+        "differ, the papers' terms are authoritative: decision point (DP-N) and",
+        "finding (F-N), with the titles in Tables 4 and 5 of the WAISE paper.",
         "",
     ]
     return lines
@@ -138,7 +158,7 @@ def _goals_section(registry: StandardsRegistry) -> list[str]:
     lines = [
         "## 3. Goals of the integrated pattern",
         "",
-        f"PAPER: Table 2 and Figure 2 of the WAISE paper. COMMAND: `{GENERATE_ALL}`",
+        f"PAPER: Table 2 and Fig. 1 of the WAISE paper. COMMAND: `{GENERATE_ALL}`",
         "",
         "| Goal | Claim | Origin | Normative standards | Clause references |",
         "|---|---|---|---|---|",
@@ -155,10 +175,16 @@ def _goals_section(registry: StandardsRegistry) -> list[str]:
         )
     lines += [
         "",
-        "G5 is the only goal drawing on all four normative standards. That is the",
-        "paper's central structural claim, and it is checked from both of the",
-        "repository's representations by",
+        "G5 is the goal where all four normative standards contribute claims (WAISE",
+        "paper, Section 4.2). The paper's headline result, the evidence asymmetry",
+        "(DP-2), sits there. The repository checks that G5 is the only such goal,",
+        "from both of its representations of goal sources, in",
         "`tests/test_representation_consistency.py`.",
+        "",
+        "The two representations, `source_standards` on each goal and the",
+        "claim-to-goal mapping, are maintained separately. They agree everywhere",
+        "except G8 and G9, where the reasons are recorded in",
+        "`tests/test_representation_consistency.py` and enforced there.",
         "",
     ]
     lines += _extension_delta_lines()
@@ -169,7 +195,7 @@ def _extension_delta_lines() -> list[str]:
     """The 6-to-9 extension, computed from the base and integrated builders."""
     delta = compute_extension_delta()
     lines = [
-        "### Base pattern and the six-to-nine extension",
+        "### From the six Annex B goals to the nine integrated goals",
         "",
         f"The pattern extends the {delta['base_goal_count']}-goal "
         f"{delta['base_pattern']} base "
@@ -194,7 +220,7 @@ def _extension_delta_lines() -> list[str]:
     lines += [
         "",
         "G1 gains its two standards through its contexts (ASIL, TARA) and the",
-        "reformulated top claim rather than through added evidence legs. Computed",
+        "reformulated top claim rather than through added evidence. Computed",
         "by `src/gsn/annex_b_base.py` from the base and integrated builders, and",
         "checked by `tests/test_base_pattern.py`.",
         "",
@@ -250,8 +276,8 @@ def _findings_section(gaps: GapClassification) -> list[str]:
     lines = [
         "## 5. Findings",
         "",
-        "PAPER: the findings table of the WAISE paper, labelled `tab:gaps`.",
-        "Lifecycle phases follow that table.",
+        "PAPER: Table 5 of the WAISE paper. Lifecycle phases follow",
+        "that table.",
         "",
         "| Paper | Code | Lifecycle phase | Integration-induced | Partial coverage |",
         "|---|---|---|---|---|",
@@ -267,8 +293,8 @@ def _findings_section(gaps: GapClassification) -> list[str]:
         "",
         "F-3 and F-4 are the integration-induced findings. F-3's invisibility from",
         "any single standard is derived in `src/analysis/counterfactual.py`. F-4's",
-        "is derived there too, from a premise that module states as a premise rather",
-        "than proves. F-1, F-2 and F-5 are asserted, and that module says so.",
+        "is derived there too, from a premise the module states explicitly and does",
+        "not prove. F-1, F-2 and F-5 are asserted, and that module says so.",
         "",
     ]
     return lines
@@ -279,8 +305,7 @@ def _decision_points_section(catalogue: DecisionPointCatalogue) -> list[str]:
     lines = [
         "## 6. Decision points",
         "",
-        "PAPER: the decision-point table of the WAISE paper, labelled",
-        "`tab:inconsistencies`.",
+        "PAPER: Table 4 of the WAISE paper.",
         "",
         "| Paper | Code | Type | Standards | GSN node |",
         "|---|---|---|---|---|",
@@ -304,28 +329,48 @@ def _artefacts_section() -> list[str]:
     lines = [
         "## 7. Artefacts and their provenance",
         "",
-        "Every artefact is measured, seeded, argued, or generated. No artefact is",
-        "left undeclared.",
+        "Each artefact carries one of five provenance labels:",
+        "",
+        "| Label | Meaning |",
+        "|---|---|",
+        "| argued | The method and the argument, as the WAISE paper describes them, encoded in `src/` and written out in `gsn/` |",
+        "| hand-written | Files written by hand that no command regenerates: `gsn/*.gsn.yaml`, `data/case_study_parameters/`, `data/standards_reference/` |",
+        "| generated | Written by a command from the code; a test or `make verify-refs` fails if a committed copy is out of date |",
+        "| seeded | Generated from a fixed random seed (42); illustrations, not measurements |",
+        "| measured | From trained models, outside this repository |",
+        "",
+        "The position paper's claims are made at clause level and produce no",
+        "artefact; Section 8 traces them.",
         "",
         "| Artefact | Provenance | Source |",
         "|---|---|---|",
+        "| `src/` | argued | The five-step method: standards, claims, goals, decision points, findings |",
         f"| `output/analysis_results.json` | generated | COMMAND: `{GENERATE_ALL}` |",
         f"| `output/csv/*` | generated | COMMAND: `{GENERATE_ALL}` |",
         f"| `output/latex/*.tex` | generated | COMMAND: `{GENERATE_ALL}` |",
         f"| `output/figures/*` | generated | COMMAND: `{GENERATE_ALL}` |",
-        "| `docs/figures/*.png` | seeded and derived | COMMAND: as above. See `docs/figures/README.md` |",
+        "| `docs/figures/*.png` | generated; `weather_heatmap.png` seeded, seed 42 | COMMAND: as above. See `docs/figures/README.md` |",
         "| `data/synthetic_illustrations/*` | seeded, seed 42 | COMMAND: as above. Not measurements. See that directory's README |",
         "| `data/empirical_results/*` | measured | Trained PointPillars ensemble, external to this repository. Cited by neither paper. See that directory's README |",
-        "| `data/carla_configs/*.yaml` | hand-written | Documentation only. Checked against `src/` by `tests/test_config_documentation.py` |",
-        "| `docs/standards-reference/*.yaml` | hand-written | Documentation only. No code loads them |",
-        "| `gsn/*.gsn.yaml` | hand-written | Source for the rendered GSN diagrams |",
+        "| `data/case_study_parameters/*.yaml` | hand-written | Documentation only. Checked against `src/` by `tests/test_config_documentation.py` |",
+        "| `data/standards_reference/*.yaml` | hand-written | Documentation only. No module in `src/` loads them; `tests/test_config_documentation.py` checks part of `case_study.yaml`. See that directory's README |",
+        "| `gsn/*.gsn.yaml` | hand-written | The argument in YAML; source for the rendered GSN diagrams |",
         "| `gsn/*.svg` | generated | COMMAND: `make gsn`, or `gsn2x gsn/<file>.gsn.yaml` |",
         "",
-        "The one number in the WAISE paper's case study that comes from measurement",
-        "is the ensemble-disagreement AUROC at G5 evidence type (c), and the paper",
-        "attributes it to the VEHITS 2026 companion study, measured on simulated",
-        "ensemble outputs. Evidence types (a), (b) and (d) are marked not produced in",
-        "the paper's own Figure 2(b).",
+        "The WAISE paper reports two results for its case study, both for G5",
+        "evidence type (c): an AUROC of 0.982 for geometric ensemble disagreement as the",
+        "uncertainty indicator, and a three-indicator acceptance gate that retains",
+        "22.0 % of detections with no false acceptances observed in the retained",
+        "sample. The paper attributes both to the VEHITS 2026 companion study,",
+        "measured on simulated ensemble outputs (WAISE paper, Section 5.1). Evidence",
+        "types (a), (b) and (d) are marked not produced in Fig. 1(b) of the WAISE",
+        "paper.",
+        "",
+        "The WAISE paper names SECOND as the case-study architecture. The measured",
+        "results in `data/empirical_results/` use PointPillars. Both are single-stage",
+        "LiDAR detectors in OpenPCDet: SECOND is voxel-based, PointPillars",
+        "pillar-based. The substitution is stated in that directory's README and not",
+        "in the paper. Neither paper cites those files.",
         "",
     ]
     return lines
@@ -336,58 +381,39 @@ def _position_paper_section() -> list[str]:
         "## 8. The position paper",
         "",
         "The position paper is argued at clause level. No file in `src/` supports it,",
-        "and none is meant to. This is a fact about its scope, not a gap in the",
-        "repository. Its claims trace to CLAUSE and to PAPER, never to COMMAND.",
+        "and none is meant to. Its claims trace to CLAUSE and to PAPER, never to",
+        "COMMAND.",
         "",
-        "| Claim | Kind | Source |",
+        "| Claim | Source type | Source |",
         "|---|---|---|",
         "| A runtime anomaly carries no concern label | PAPER | Position paper, "
-        "section on assignment and resolution; Figure 1 |",
+        "Section I (Introduction); Fig. 1 |",
         "| Missing step 1: no clause assigns an unlabelled anomaly to a concern | "
-        "PAPER + CLAUSE | Position paper, Table 1 footnote, over ISO 21448:2022, "
+        "PAPER + CLAUSE | Position paper, last row of Table I, over ISO 21448:2022, "
         "ISO/PAS 8800:2024, ISO/SAE 21434:2021 |",
         "| Missing step 2: no clause resolves per-concern re-evaluations into one "
-        "judgment | PAPER + CLAUSE | Position paper, Table 1 footnote, same three "
+        "judgement | PAPER + CLAUSE | Position paper, last row of Table I, same three "
         "standards |",
         "| ISO 21448 defines a SOTIF argument on a field result | CLAUSE | "
         "ISO 21448:2022 Clause 13.4 |",
         "| ISO/SAE 21434 monitoring ends in risk treatment, with no re-evaluation "
         "of the cybersecurity case | CLAUSE | ISO/SAE 21434:2021, Clause 8 |",
         "| Requirements R1 to R4 that a closing method must satisfy | PAPER | "
-        "Position paper, section stating the position |",
-        "| No published incident is attributed to this ambiguity | PAPER | "
-        "Stated by the authors in the position paper itself |",
+        "Position paper, Section V (The Position) |",
+        "| The authors are aware of no published incident that attributes a "
+        "deployed automated-driving failure to this ambiguity | PAPER | "
+        "Position paper, Section I (Introduction) |",
         "",
     ]
 
 
-def _known_inconsistencies_section() -> list[str]:
+def _known_discrepancies_section() -> list[str]:
     return [
-        "## 9. Known inconsistencies",
+        "## 9. Known discrepancies with the papers",
         "",
-        "Recorded so a reader meets them rather than discovering them alone. The",
-        "divergences between the camera-ready papers and this repository are held in",
-        "one place, `ERRATA.md`, and not restated here. This section points to them",
-        "and adds the two repository-internal notes that are not errata about the",
-        "papers.",
-        "",
-        "**Divergences from the papers.** `ERRATA.md` records each, with what the",
-        "paper says, what the repository holds, and how it was resolved: the DP-2",
-        "typing inside the WAISE camera-ready (entry 1), the findings-table",
-        "classifications the code absorbed (entry 2), the F-1 and F-5 title changes",
-        "(entry 3), the paper's 193 tests against the suite's count at that baseline",
-        "(entry 4), and the clause questions at DP-5, G5 and G2 (entries 5 to 7).",
-        "",
-        "**Two representations of goal sources.** `source_standards` on each goal and",
-        "the claim-to-goal mapping are maintained separately. They agree everywhere",
-        "except G8 and G9, where the reasons are recorded in",
-        "`tests/test_representation_consistency.py` and enforced there.",
-        "",
-        "**Architecture substitution.** The WAISE paper names SECOND as the",
-        "case-study architecture. The measured results in `data/empirical_results/`",
-        "use PointPillars. Both are OpenPCDet voxel single-stage detectors. The",
-        "substitution is stated in that directory's README and not in the paper.",
-        "Neither paper cites those files.",
+        "Discrepancies between the camera-ready papers and this repository are",
+        "recorded in [ERRATA.md](ERRATA.md). Each entry states what the paper says,",
+        "what the repository holds, and whether the difference is resolved.",
         "",
     ]
 
@@ -407,7 +433,7 @@ def build_index() -> str:
     lines += _decision_points_section(catalogue)
     lines += _artefacts_section()
     lines += _position_paper_section()
-    lines += _known_inconsistencies_section()
+    lines += _known_discrepancies_section()
     return "\n".join(lines).rstrip() + "\n"
 
 

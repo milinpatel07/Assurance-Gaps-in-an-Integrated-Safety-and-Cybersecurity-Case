@@ -1,16 +1,27 @@
-"""LaTeX table generation for direct inclusion in scientific publications.
+"""LaTeX tables generated from the analysis code.
 
-Generates publication-ready LaTeX tables corresponding to:
-- Table 1: Standards applicability overview
-- Table 2: Clause coverage matrix across lifecycle phases
-- Table 3: Integrated GSN goal structure
-- Table 4: Standard coverage density per goal node
-- Table 5: Requirement inconsistency catalogue
-- Table 6: Assurance gap classification
-- Table 7: Evidence type comparison at G5
-- Table 8: Weather evaluation results (triggering vs non-triggering)
+Each table is written to output/latex/ under a file name that says what it
+holds. The names carry no table numbers, so that they cannot be confused with
+the table numbers of the WAISE paper (Table 1 related work, Table 2 the goals,
+Table 3 the DP-5 worked example, Table 4 the decision points, Table 5 the
+findings). Where a generated table has a counterpart in the paper, it is named:
+- standards_overview.tex: standards and their role in the integration
+  (repository analysis, not in either paper)
+- coverage_matrix.tex: clause coverage matrix across the six lifecycle phases
+  (repository analysis, not in either paper)
+- goals.tex: integrated GSN goal structure (counterpart: WAISE Table 2)
+- goal_density.tex: documents contributing claims per goal (repository
+  analysis, not in either paper)
+- decision_points.tex: decision-point catalogue (counterpart: WAISE Table 4)
+- findings.tex: findings in the paper's two categories (counterpart: WAISE
+  Table 5)
+- evidence_types_g5.tex: the evidence types (a) to (d) at G5 (repository
+  analysis, not in either paper; WAISE Fig. 1(b) shows the four evidence types)
+- weather_illustration.tex: synthetic weather-grid illustration, triggering
+  against non-triggering conditions (seeded, no detector, no CARLA; not a
+  measurement and not in either paper)
 
-All tables use the booktabs package for professional formatting.
+All tables use the booktabs package.
 """
 
 from __future__ import annotations
@@ -18,7 +29,7 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from src.standards.base import LifecyclePhase, InconsistencyType, GapType
+from src.standards.base import LifecyclePhase, InconsistencyType
 from src.standards.registry import StandardsRegistry
 
 
@@ -37,12 +48,12 @@ def _latex_escape(text: str) -> str:
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.gsn.model import Goal, GoalStatus
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 
 
-def generate_table1_standards_overview() -> str:
-    """Table 1: Applicable standards with scope and role in integration."""
+def generate_standards_overview_table() -> str:
+    """Standards and their role in the integration (standards_overview.tex)."""
     registry = StandardsRegistry()
     roles = {
         "ISO26262": "ASIL framework, HW metrics, change management",
@@ -85,8 +96,8 @@ def generate_table1_standards_overview() -> str:
     return "\n".join(lines)
 
 
-def generate_table2_coverage_matrix() -> str:
-    """Table 2: Clause coverage matrix across six lifecycle phases."""
+def generate_coverage_matrix_table() -> str:
+    """Clause coverage matrix across the six lifecycle phases (coverage_matrix.tex)."""
     registry = StandardsRegistry()
     matrix = registry.compute_coverage_matrix()
 
@@ -145,13 +156,13 @@ def generate_table2_coverage_matrix() -> str:
     return "\n".join(lines)
 
 
-def generate_table3_gsn_structure() -> str:
-    """Table 3: Integrated GSN goal structure showing origin and active standards."""
+def generate_goals_table() -> str:
+    """Integrated GSN goal structure with origin and contributing documents (goals.tex)."""
     gsn = build_integrated_gsn()
 
     goal_data = [
         ("G1", "Integrated safety \\& cybersecurity requirements satisfied",
-         "Retained (reformulated)", "3 + 2 context"),
+         "Reformulated from Annex~B G1", "3 + 2 context"),
         ("G2", "Specification sufficient across all domains",
          "Retained (augmented)", "3"),
         ("G3", "Data sets sufficient", "Retained", "1"),
@@ -161,18 +172,19 @@ def generate_table3_gsn_structure() -> str:
          "\\textbf{4 (all)}"),
         ("G6", "Monitoring sufficient across all domains",
          "Retained (augmented)", "3"),
-        ("G7", "SOTIF residual risk acceptable", "\\textbf{New}", "1"),
-        ("G8", "Cybersecurity risks managed", "\\textbf{New}", "2"),
-        ("G9", "Modification assurance", "\\textbf{Gap} (undeveloped)", "0"),
+        ("G7", "SOTIF residual risk acceptable", "\\textbf{Added}", "1"),
+        ("G8", "Cybersecurity risks managed", "\\textbf{Added}", "2"),
+        ("G9", "Modification assurance", "\\textbf{Added} (undeveloped)", "0"),
     ]
 
     lines = [
         r"\begin{table}[t]",
         r"\centering",
-        r"\caption{Integrated GSN goal structure. The base pattern"
-        r" (ISO/PAS~8800 Annex~B) defines G1--G6. G7 and G8 are new goals"
-        r" introduced by the integration. G9 is identified as an undeveloped"
-        r" gap.}",
+        r"\caption{Integrated GSN goal structure. G1 is reformulated from"
+        r" ISO/PAS~8800 Annex~B G1, G2 to G6 are retained, G7 and G8 are"
+        r" added, and G9 is added and undeveloped, because no single standard"
+        r" prescribes the complete re-assurance workflow for a modified AI"
+        r" model.}",
         r"\label{tab:gsn-goals}",
         r"\small",
         r"\begin{tabular}{@{}clll@{}}",
@@ -193,8 +205,8 @@ def generate_table3_gsn_structure() -> str:
     return "\n".join(lines)
 
 
-def generate_table4_goal_density() -> str:
-    """Table 4: Standard coverage density per goal node."""
+def generate_goal_density_table() -> str:
+    """Documents contributing claims per goal (goal_density.tex)."""
     registry = StandardsRegistry()
     density = registry.compute_goal_density()
 
@@ -251,8 +263,8 @@ def generate_table4_goal_density() -> str:
     return "\n".join(lines)
 
 
-def generate_table5_inconsistencies() -> str:
-    """Table 5: decision-point catalogue (paper: DP-1 to DP-7)."""
+def generate_decision_points_table() -> str:
+    """Decision-point catalogue (decision_points.tex; WAISE Table 4: DP-1 to DP-7)."""
     catalogue = DecisionPointCatalogue()
 
     type_map = {
@@ -293,46 +305,35 @@ def generate_table5_inconsistencies() -> str:
     return "\n".join(lines)
 
 
-def generate_table6_gaps() -> str:
-    """Table 6: findings classification (paper: F-1 to F-5)."""
+def generate_findings_table() -> str:
+    """Findings in the paper's two categories (findings.tex; WAISE Table 5: F-1 to F-5)."""
     gaps_cls = GapClassification()
-
-    type_map = {
-        GapType.MISSING_CLAIM: "MC",
-        GapType.MISSING_EVIDENCE: "ME",
-        GapType.UNRESOLVED_INCONSISTENCY: "UI",
-    }
 
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Findings classified by type and lifecycle phase,"
-        r" generated from the analysis code. Types: MC = missing claim,"
-        r" ME = missing evidence, UI = unresolved inconsistency."
-        r" Findings marked with $\dagger$ are integration-induced."
-        r" Identifiers Gap-1 to Gap-5 are the code's names for the findings"
-        r" the paper calls F-1 to F-5. The paper's own table groups these"
-        r" as integration-induced findings and open methodological problems"
-        r" rather than by the three types above.}",
+        r"\caption{Findings by category and lifecycle phase, generated from the"
+        r" analysis code. II = integration-induced finding, OM = open"
+        r" methodological problem. Identifiers Gap-1 to Gap-5 are the code's"
+        r" names for the findings the paper calls F-1 to F-5.}",
         r"\label{tab:gen-findings}",
         r"\small",
-        r"\begin{tabular}{@{}clllp{5.5cm}@{}}",
+        r"\begin{tabular}{@{}cllp{6.5cm}@{}}",
         r"\toprule",
-        r"\textbf{ID} & \textbf{Type} & \textbf{Phase} & "
-        r"\textbf{Induced} & \textbf{Description} \\",
+        r"\textbf{ID} & \textbf{Category} & \textbf{Phase} & "
+        r"\textbf{Description} \\",
         r"\midrule",
     ]
 
     for gap in gaps_cls.gaps:
-        tl = type_map[gap.gap_type]
+        category = "II" if gap.integration_induced else "OM"
         # Escape the phase. "Verification & Validation" contains an ampersand,
         # which unescaped opened an extra column and stopped the table compiling.
         # Use the paper's findings-table wording, which carries every phase for the
         # finding rather than only the primary one.
         phase = _latex_escape(gap.lifecycle_phase_label)
-        induced = r"$\dagger$" if gap.integration_induced else "---"
         desc = _latex_escape(gap.description)
-        lines.append(f"  {gap.gap_id} & {tl} & {phase} & {induced} & {desc} \\\\")
+        lines.append(f"  {gap.gap_id} & {category} & {phase} & {desc} \\\\")
 
     lines += [
         r"\bottomrule",
@@ -342,16 +343,17 @@ def generate_table6_gaps() -> str:
     return "\n".join(lines)
 
 
-def generate_table7_evidence_types() -> str:
-    """Table 7: Evidence type comparison at G5."""
+def generate_evidence_types_table() -> str:
+    """The evidence types (a) to (d) at G5 (evidence_types_g5.tex)."""
     analysis = EvidenceConvergenceAnalysis()
 
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Evidence types converging at G5 (V\&V sufficiency)."
-        r" Each evidence type differs in measurement target, production"
-        r" method, and scale. No standard defines a combination rule.}",
+        r"\caption{Evidence types (a) to (d) at G5, the V\&V goal. They are"
+        r" disjoint by design, each on its own measurement scale, and no"
+        r" standard prescribes how they combine into a single sufficiency"
+        r" claim at G5 (decision point DP-2).}",
         r"\label{tab:evidence-types}",
         r"\small",
         r"\begin{tabular}{@{}lllll@{}}",
@@ -376,14 +378,15 @@ def generate_table7_evidence_types() -> str:
     return "\n".join(lines)
 
 
-def generate_table8_weather_evaluation(eval_summary: dict) -> str:
-    """Table 8: Weather evaluation results comparing triggering vs non-triggering."""
+def generate_weather_illustration_table(eval_summary: dict) -> str:
+    """Synthetic weather-grid illustration, triggering against non-triggering
+    conditions (weather_illustration.tex). No detector, no CARLA."""
     lines = [
         r"\begin{table}[t]",
         r"\centering",
-        r"\caption{Detection performance under SOTIF triggering vs."
-        r" non-triggering weather conditions (CARLA evaluation,"
-        r" 25 weather combinations, 50 scenes each).}",
+        r"\caption{Synthetic weather-grid illustration (no detector, no CARLA):"
+        r" seeded values for SOTIF triggering and non-triggering weather"
+        r" conditions. Not a measurement.}",
         r"\label{tab:weather-eval}",
         r"\small",
         r"\begin{tabular}{@{}lrrr@{}}",
@@ -431,22 +434,22 @@ def generate_all_tables(
 ) -> dict[str, str]:
     """Generate all LaTeX tables and save to files.
 
-    Returns a dict mapping table name to LaTeX source.
+    Returns a dict mapping file name (without .tex) to LaTeX source.
     """
     os.makedirs(output_dir, exist_ok=True)
 
     tables = {
-        "table1_standards": generate_table1_standards_overview(),
-        "table2_coverage": generate_table2_coverage_matrix(),
-        "table3_gsn_goals": generate_table3_gsn_structure(),
-        "table4_density": generate_table4_goal_density(),
-        "table5_inconsistencies": generate_table5_inconsistencies(),
-        "table6_gaps": generate_table6_gaps(),
-        "table7_evidence": generate_table7_evidence_types(),
+        "standards_overview": generate_standards_overview_table(),
+        "coverage_matrix": generate_coverage_matrix_table(),
+        "goals": generate_goals_table(),
+        "goal_density": generate_goal_density_table(),
+        "decision_points": generate_decision_points_table(),
+        "findings": generate_findings_table(),
+        "evidence_types_g5": generate_evidence_types_table(),
     }
 
     if eval_summary:
-        tables["table8_weather"] = generate_table8_weather_evaluation(eval_summary)
+        tables["weather_illustration"] = generate_weather_illustration_table(eval_summary)
 
     for name, latex in tables.items():
         path = os.path.join(output_dir, f"{name}.tex")

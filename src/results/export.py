@@ -16,12 +16,12 @@ import numpy as np
 
 from src.seeds import DEFAULT_SEED
 
-from src.standards.base import LifecyclePhase, InconsistencyType, GapType
+from src.standards.base import LifecyclePhase
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.gsn.model import Goal, GoalStatus
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.evaluation.carla_evaluator import FullEvaluationResult
 from src.analysis.completeness import check_gsn_completeness
@@ -39,6 +39,13 @@ def _json_default(obj):
     if hasattr(obj, "value"):
         return obj.value
     raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
+def _finding_category(gap) -> str:
+    """The finding's category in the WAISE paper's Step 5 (Table 5)."""
+    if gap.integration_induced:
+        return "integration-induced finding"
+    return "open methodological problem"
 
 
 def export_json(
@@ -60,7 +67,7 @@ def export_json(
             ),
             "authors": ["Milin Patel", "Rolf Jung"],
             "affiliation": "Kempten University of Applied Sciences",
-            "venue": "SafeComp 2026 WAISE Workshop",
+            "venue": "WAISE 2026 (workshop at SAFECOMP 2026)",
             # No timestamp: outputs are byte-identical across runs, and the
             # run manifest records when and from what a run was made.
             "methodology": "Five-step constructive integration",
@@ -117,7 +124,9 @@ def export_json(
                 {
                     "id": g.gap_id,
                     "description": g.description,
-                    "type": g.gap_type.value,
+                    # The paper's category (WAISE Table 5). The older MC/ME/UI
+                    # code is repository-only and is not exported.
+                    "category": _finding_category(g),
                     "lifecycle_phase": g.lifecycle_phase.value,
                     # Every phase the paper lists, not only the primary one.
                     "lifecycle_phases": [p.value for p in g.lifecycle_phases],
@@ -238,7 +247,7 @@ def export_csv_tables(
             writer.writerow(row)
     files.append(path)
 
-    # Inconsistencies
+    # Decision points (WAISE Table 4; code ids I-n)
     catalogue = DecisionPointCatalogue()
     path = os.path.join(output_dir, "decision_points.csv")
     with open(path, "w", newline="", encoding="utf-8") as f:
@@ -259,27 +268,26 @@ def export_csv_tables(
             ])
     files.append(path)
 
-    # Gaps
+    # Findings (WAISE Table 5; code ids Gap-n), in the paper's two categories
     gaps = GapClassification()
     path = os.path.join(output_dir, "gaps.csv")
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "ID", "Type", "Description", "Lifecycle Phase",
-            "Integration Induced", "Partial Coverage",
+            "ID", "Category", "Description", "Lifecycle Phase",
+            "Partial Coverage",
         ])
         for gap in gaps.gaps:
             writer.writerow([
                 gap.gap_id,
-                gap.gap_type.value,
+                _finding_category(gap),
                 gap.description,
                 gap.lifecycle_phase_label,
-                "Yes" if gap.integration_induced else "No",
                 "; ".join(gap.partial_coverage),
             ])
     files.append(path)
 
-    # Counterfactual gap visibility matrix
+    # Counterfactual finding-visibility matrix (repository analysis)
     counterfactual = CounterfactualAnalysis()
     gap_matrix = counterfactual.get_gap_visibility_matrix()
     path = os.path.join(output_dir, "counterfactual_gap_visibility.csv")
@@ -345,7 +353,10 @@ def export_summary_report(
     lines.append("-" * 60)
     total_claims = sum(len(s.claims) for s in registry.all_standards)
     total_clauses = sum(len(s.clauses) for s in registry.all_standards)
-    lines.append(f"Standards analysed:    {len(registry.all_standards)}")
+    lines.append(
+        f"Documents analysed:    {len(registry.all_standards)} "
+        "(four standards and one informative technical report)"
+    )
     lines.append(f"Total clauses:         {total_clauses}")
     lines.append(f"Total claims:          {total_claims}")
     lines.append("")
@@ -359,9 +370,9 @@ def export_summary_report(
         lines.append(f"  {key}: {value}")
     lines.append("")
 
-    # Inconsistencies
+    # Decision points (code ids I-n; paper ids DP-n)
     lines.append("-" * 60)
-    lines.append("REQUIREMENT INCONSISTENCIES")
+    lines.append("DECISION POINTS (WAISE Table 4)")
     lines.append("-" * 60)
     inc_stats = catalogue.summary_statistics()
     lines.append(f"  Total: {inc_stats['total']}")
@@ -370,44 +381,56 @@ def export_summary_report(
     lines.append(f"  Methodological:  {inc_stats['methodological']}")
     lines.append("")
     for inc in catalogue.inconsistencies:
-        lines.append(f"  {inc.inconsistency_id}: {inc.description}")
+        dp_id = inc.inconsistency_id.replace("I-", "DP-", 1)
+        lines.append(f"  {dp_id} ({inc.inconsistency_id}): {inc.description}")
     lines.append("")
 
-    # Gaps
+    # Findings (code ids Gap-n; paper ids F-n), in the paper's two categories
     lines.append("-" * 60)
-    lines.append("ASSURANCE GAPS")
+    lines.append("FINDINGS (WAISE Table 5)")
     lines.append("-" * 60)
     gap_stats = gaps.summary_statistics()
+
+    def finding_id(gap_id: str) -> str:
+        return gap_id.replace("Gap-", "F-", 1)
+
+    induced = [finding_id(g.gap_id) for g in gaps.gaps if g.integration_induced]
+    open_problems = [finding_id(g.gap_id) for g in gaps.gaps if not g.integration_induced]
     lines.append(f"  Total: {gap_stats['total']}")
-    lines.append(f"  Missing claim:               {gap_stats['missing_claim']}")
-    lines.append(f"  Missing evidence:            {gap_stats['missing_evidence']}")
-    lines.append(f"  Unresolved inconsistency:    {gap_stats['unresolved_inconsistency']}")
-    lines.append(f"  Integration-induced:         {gap_stats['integration_induced']}")
+    lines.append(
+        f"  Integration-induced findings:   {len(induced)} ({', '.join(induced)})"
+    )
+    lines.append(
+        f"  Open methodological problems:   {len(open_problems)} ({', '.join(open_problems)})"
+    )
     lines.append("")
     for gap in gaps.gaps:
-        ind = " [INTEGRATION-INDUCED]" if gap.integration_induced else ""
-        lines.append(f"  {gap.gap_id}: {gap.description}{ind}")
+        category = _finding_category(gap)
+        lines.append(
+            f"  {finding_id(gap.gap_id)} ({gap.gap_id}): {gap.description} [{category}]"
+        )
     lines.append("")
 
     # Evidence convergence
     lines.append("-" * 60)
-    lines.append("EVIDENCE CONVERGENCE AT G5 (CENTRAL FINDING)")
+    lines.append("EVIDENCE TYPES AT G5 (DECISION POINT DP-2)")
     lines.append("-" * 60)
-    lines.append("Four evidence types converge at the V&V goal:")
-    for i, et in enumerate(convergence.evidence_types, 1):
-        lines.append(f"  [{i}] {et.name} ({et.standard})")
+    lines.append("Evidence types (a) to (d) at G5, the V&V goal:")
+    for letter, et in zip("abcd", convergence.evidence_types):
+        lines.append(f"  ({letter}) {et.name} ({et.standard})")
         lines.append(f"      Scale: {et.scale}")
     lines.append("")
-    lines.append("Finding: No standard defines how to combine these four")
-    lines.append("evidence types into a single sufficiency claim at G5.")
+    lines.append("DP-2: the evidence types are disjoint by design, each on its own")
+    lines.append("measurement scale, and no standard prescribes how they combine")
+    lines.append("into a single sufficiency claim at G5.")
     lines.append("")
 
     # Completeness
     completeness = check_gsn_completeness()
     lines.append("-" * 60)
-    lines.append("GSN COMPLETENESS CHECK")
+    lines.append("CLAIM-MAPPING AND PHASE-COVERAGE CHECK")
     lines.append("-" * 60)
-    lines.append(f"  Complete: {completeness.is_complete}")
+    lines.append(f"  Passed: {completeness.is_complete}")
     lines.append(f"  Claims mapped: {completeness.mapped_claims}/{completeness.total_claims}")
     lines.append(f"  Phases covered: {', '.join(completeness.phases_covered)}")
     if completeness.phases_uncovered:
@@ -419,20 +442,21 @@ def export_summary_report(
     counterfactual = CounterfactualAnalysis()
     gap_matrix = counterfactual.get_gap_visibility_matrix()
     lines.append("-" * 60)
-    lines.append("COUNTERFACTUAL ANALYSIS")
+    lines.append("COUNTERFACTUAL ANALYSIS (REPOSITORY ANALYSIS, NOT IN EITHER PAPER)")
     lines.append("-" * 60)
-    lines.append("Gap visibility from each standard's perspective:")
+    lines.append("Findings visible to a project following only one standard:")
     for std_id, gaps_visible in gap_matrix.items():
-        visible = [g for g, v in gaps_visible.items() if v]
+        visible = [finding_id(g) for g, v in gaps_visible.items() if v]
         lines.append(f"  {std_id:15s}: {', '.join(visible) if visible else '(none)'}")
     lines.append("")
-    lines.append("Key finding: Gap-3 and Gap-4 are invisible from any single standard.")
-    lines.append("They emerge only when standards are integrated into one GSN.")
+    lines.append("F-3 and F-4 are not visible from any single standard; they appear")
+    lines.append("only in the integrated argument.")
     lines.append("")
 
     # Evaluation
     lines.append("-" * 60)
-    lines.append("CARLA EVALUATION RESULTS")
+    lines.append("SYNTHETIC WEATHER-GRID ILLUSTRATION (NO DETECTOR, NO CARLA)")
+    lines.append("Seeded; not a measurement. See data/synthetic_illustrations/README.md.")
     lines.append("-" * 60)
     lines.append(f"  Weather conditions:        {eval_summary['total_weather_conditions']}")
     lines.append(f"  Triggering conditions:     {eval_summary['triggering_conditions']}")

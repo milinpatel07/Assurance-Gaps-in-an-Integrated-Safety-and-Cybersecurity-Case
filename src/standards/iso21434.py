@@ -1,4 +1,4 @@
-"""ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering.
+"""ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering).
 
 This module implements the claim extraction (Step 1) and lifecycle mapping
 (Step 2) for ISO/SAE 21434 as applied to an AI-based perception component.
@@ -7,7 +7,7 @@ Key clauses relevant to the integrated argument:
 - Clause 9: Concept phase cybersecurity requirements
 - Clause 10: Product development cybersecurity requirements
 - Clause 15: Threat analysis and risk assessment (TARA)
-- Clause 8: Continuous cybersecurity activities
+- Clause 8: Continual cybersecurity activities
 - Clause 3.1.11: Cybersecurity case definition
 - [RQ-06-01]: Cybersecurity specification requirements
 - [RQ-15-06]: Safety-cybersecurity bridge requirement
@@ -27,7 +27,7 @@ def _build_clauses() -> list[Clause]:
         Clause(
             standard_id="ISO21434",
             reference="Cl.9",
-            title="Concept phase — cybersecurity relevance and requirements",
+            title="Concept phase: cybersecurity relevance and requirements",
             lifecycle_phases=[LifecyclePhase.CONCEPT],
             normative=True,
             ai_applicable=True,
@@ -35,7 +35,10 @@ def _build_clauses() -> list[Clause]:
         Clause(
             standard_id="ISO21434",
             reference="Cl.10",
-            title="Product development — cybersecurity requirements and controls",
+            title=(
+                "Product development: cybersecurity requirements, controls, "
+                "integration and verification (incl. penetration testing)"
+            ),
             lifecycle_phases=[
                 LifecyclePhase.DESIGN,
                 LifecyclePhase.VERIFICATION,
@@ -65,13 +68,15 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "Assigns risk values (1-5) based on impact rating and attack "
-                "feasibility. Incompatible scale with ASIL (I-1)."
+                "feasibility. A different scale from the ASIL; the risk "
+                "frameworks are not interchangeable by design (decision point "
+                "DP-1)."
             ),
         ),
         Clause(
             standard_id="ISO21434",
             reference="Cl.8",
-            title="Continuous cybersecurity activities",
+            title="Continual cybersecurity activities",
             lifecycle_phases=[
                 LifecyclePhase.OPERATION,
                 LifecyclePhase.MODIFICATION,
@@ -111,9 +116,10 @@ def _build_clauses() -> list[Clause]:
             normative=True,
             ai_applicable=True,
             ai_applicability_note=(
-                "Requires that the safety impact of each threat scenario is "
-                "assessed using ISO 26262-3 severity classes. This is the bridge "
-                "between G8 (cybersecurity) and G1 (functional safety)."
+                "Requires that safety impact ratings of damage scenarios are "
+                "derived from ISO 26262-3 Cl.6.4.3 severity classes. This is the "
+                "bridge between G8 (cybersecurity) and Context C1 of G1 "
+                "(functional safety)."
             ),
         ),
     ]
@@ -173,8 +179,8 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         Claim(
             claim_id="CLM-21434-VER-01",
             text=(
-                "Vulnerability analysis and penetration testing shall verify "
-                "cybersecurity controls."
+                "Cybersecurity verification, including penetration testing, "
+                "shall verify the cybersecurity controls."
             ),
             source_clause=clause_map["Cl.10"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
@@ -188,8 +194,8 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         Claim(
             claim_id="CLM-21434-BRIDGE-01",
             text=(
-                "The safety impact of each threat scenario shall be assessed "
-                "using ISO 26262-3 severity classes."
+                "Safety impact ratings of damage scenarios shall be derived "
+                "from ISO 26262-3 severity classes."
             ),
             source_clause=clause_map["[RQ-15-06]"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
@@ -200,8 +206,9 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         Claim(
             claim_id="CLM-21434-MON-01",
             text=(
-                "Continuous cybersecurity monitoring shall detect vulnerabilities "
-                "and incidents post-deployment."
+                "Continual cybersecurity monitoring shall collect cybersecurity "
+                "information, evaluate cybersecurity events and manage "
+                "vulnerabilities in operation."
             ),
             source_clause=clause_map["Cl.8"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
@@ -237,7 +244,7 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
 
 
 class ISOSAE21434(Standard):
-    """ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering.
+    """ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering).
 
     Provides the TARA framework, cybersecurity case structure, and the
     safety-cybersecurity bridge requirement [RQ-15-06].
@@ -248,7 +255,7 @@ class ISOSAE21434(Standard):
         claims = _build_claims(clauses)
         super().__init__(
             standard_id="ISO21434",
-            full_name="ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+            full_name="ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
             year=2021,
             scope=(
                 "Cybersecurity engineering for road vehicle systems. "

@@ -17,7 +17,7 @@ import re
 import pytest
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.gsn.integrated_pattern import build_integrated_gsn
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -67,8 +67,8 @@ def test_the_structural_counts_the_readme_states_match_the_code():
     findings = len(GapClassification().gaps)
 
     assert "nine-goal pattern" in readme and goals == 9
-    assert f"{_word(decision_points)} decision points" in readme
-    assert f"{_word(findings)} findings" in readme
+    assert f"{_word(decision_points)} decision points" in readme.lower()
+    assert f"{_word(findings)} findings" in readme.lower()
 
 
 def _word(number: int) -> str:
@@ -89,6 +89,10 @@ def test_the_readme_method_table_matches_the_code():
     readme = _read("README.md")
     goals = build_integrated_gsn().get_goals()
     origin = Counter(goal.origin for goal in goals)
+    reformulated = [
+        g.element_id for g in goals
+        if any("reformulated" in ref for ref in g.clause_references)
+    ]
     dp_types = Counter(
         dp.inconsistency_type.value for dp in DecisionPointCatalogue().inconsistencies
     )
@@ -96,9 +100,11 @@ def test_the_readme_method_table_matches_the_code():
     induced = sum(gap.integration_induced for gap in gaps)
 
     assert f"{len(StandardsRegistry().get_all_claims())} claims" in readme
+    assert reformulated == ["G1"]
     assert (
-        f"{origin['retained']} kept, {origin['new']} added (G7, G8), "
-        f"{origin['undeveloped']} left undeveloped (G9)"
+        f"G1 reformulated, {origin['retained'] - 1} retained (G2 to G6), "
+        f"{origin['new']} added (G7, G8), {origin['undeveloped']} added and "
+        "undeveloped (G9)"
     ) in readme
     assert (
         f"{dp_types['structural']} structural, {dp_types['terminological']} "

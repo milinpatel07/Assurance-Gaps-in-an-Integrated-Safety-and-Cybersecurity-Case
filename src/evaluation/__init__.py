@@ -1,1 +1,1 @@
-"""Evaluation pipeline for CARLA simulation under SOTIF triggering conditions."""
+"""Weather grid and synthetic weather-grid illustration (no detector, no CARLA)."""

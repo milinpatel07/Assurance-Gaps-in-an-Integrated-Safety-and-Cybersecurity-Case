@@ -2,9 +2,9 @@
 
 Writes ``docs/index.html``, the root of the GitHub Pages site. A visitor
 arriving from the poster has a phone, daylight, and under a minute, so the page
-carries four panels and nothing else: the interactive argument, the seam
-between the two papers, the traceability index, and the papers themselves. One
-panel per standard colour, in the paper's legend order.
+carries four panels: the interactive GSN view, the G5 playground, the
+comparison of design time and operation, and the two papers. One panel per
+standard colour, in the paper's legend order.
 
 Generated, never edited by hand. ``tests/test_landing_page.py`` rebuilds it and
 fails if the committed copy differs. Every count on the page comes from the code
@@ -26,7 +26,7 @@ import os
 import sys
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.visualization.standard_colors import STANDARD_COLORS, STANDARD_LABELS
 
@@ -47,8 +47,12 @@ BLOB = f"{REPO_URL}/blob/main"
 # version DOI for a specific release lives in CITATION.cff.
 CONCEPT_DOI = "10.5281/zenodo.22091825"
 
-# Legend order follows the paper's Figure 2(a).
+# Legend order follows the WAISE paper's Fig. 1(a) legend.
 LEGEND_ORDER = ["ISOPAS8800", "ISO21448", "ISO21434", "ISO26262"]
+
+
+_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+          6: "six", 7: "seven", 8: "eight", 9: "nine"}
 
 
 def _esc(text: str) -> str:
@@ -78,54 +82,40 @@ def _standards_strip() -> str:
 def _panels(counts: dict[str, int]) -> str:
     panels = [
         {
-            "href": "gsn_view.html",
+            "href": "argument.html",
             "kicker": "Explore",
-            "title": "The argument, one node at a time",
+            "title": "The integrated GSN argument, node by node",
             "body": (
-                f"All {counts['goals']} goals, with the standards behind each, "
-                "the evidence it calls for, and the points where the standards "
-                "leave a gap. Built for a phone."
+                f"All {_WORDS[counts['goals']]} goals of the WAISE paper's argument. Select "
+                "a goal to see which standards contribute to it, the evidence it "
+                "calls for, and the decision points and findings attached to it."
             ),
             "cta": "Open the argument",
             "accent": "four",
         },
         {
-            "href": "seam.html",
-            "kicker": "Connect",
-            "title": "One problem at two lifecycle points",
+            "href": "g5-playground.html",
+            "kicker": "Try",
+            "title": "G5 playground",
             "body": (
-                "Each paper reports the same junction: evidence on scales that "
-                "do not convert, and no clause combining them. One before "
-                "release, one in service. A synthesis drawn here, not a claim "
-                "either paper makes."
+                "Set an acceptance line for each of the four evidence types at "
+                "G5, the verification and validation goal, and see the "
+                "sufficiency judgement change. No clause sets any of the lines."
             ),
-            "cta": "See the connection",
-            "accent": "seam",
+            "cta": "Open the playground",
+            "accent": "compare",
         },
         {
-            "href": f"{BLOB}/TRACEABILITY.md",
-            "kicker": "Check",
-            "title": "Where every claim comes from",
+            "href": "design-time-and-operation.html",
+            "kicker": "Compare",
+            "title": "Design time and operation: the two papers side by side",
             "body": (
-                "One index. Every number, table and figure traces to a passage "
-                "in a paper, a clause in a named standard edition, or a command "
-                "that regenerates it."
+                "G5 in the WAISE paper beside the re-evaluation after a runtime "
+                "anomaly in the position paper. A synthesis drawn in this "
+                "repository, not a claim either paper makes."
             ),
-            "cta": "Open the index",
+            "cta": "Open the comparison",
             "accent": "trace",
-        },
-        {
-            "href": f"{BLOB}/paper",
-            "kicker": "Read",
-            "title": "The two papers",
-            "body": (
-                f"The design-time paper catalogues {counts['decision_points']} "
-                f"decision points and {counts['findings']} findings across "
-                f"{counts['standards']} standards. The position paper asks who "
-                "owns an alarm once the vehicle is in service."
-            ),
-            "cta": "Open the camera-ready sources",
-            "accent": "papers",
         },
     ]
     out = []
@@ -138,6 +128,22 @@ def _panels(counts: dict[str, int]) -> str:
             f'<span class="cta">{_esc(panel["cta"])}</span>'
             "</a>"
         )
+    out.append(
+        '<div class="panel accent-papers">'
+        '<span class="kicker">Read</span>'
+        "<h2>The two papers</h2>"
+        '<p><a href="https://doi.org/10.1007/978-3-032-35506-5_55"><em>Integrating '
+        "Cybersecurity Into the AI Safety Assurance Argument: A GSN Pattern for "
+        "AI-Based Perception Components in Highly Automated Driving</em></a>. "
+        "SAFECOMP 2026 Workshops (WAISE), LNCS, Springer. Design time: the integrated "
+        f"argument, {_WORDS[counts['decision_points']]} decision points and "
+        f"{_WORDS[counts['findings']]} findings.</p>"
+        "<p><em>Operational Safety and Cybersecurity Assurance of AI-Based "
+        "Perception in Highly Automated Driving</em>. SAFECOMP 2026, position "
+        "paper, to appear. Operation: which concern a runtime anomaly belongs "
+        "to.</p>"
+        "</div>"
+    )
     return '<main class="panels">' + "".join(out) + "</main>"
 
 
@@ -178,7 +184,7 @@ h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 8px; }
 }
 .panel:focus-visible { outline: 3px solid #111; outline-offset: 3px; }
 .accent-four { border-top-color: var(--c8800); }
-.accent-seam { border-top-color: var(--c21448); }
+.accent-compare { border-top-color: var(--c21448); }
 .accent-trace { border-top-color: var(--c21434); }
 .accent-papers { border-top-color: var(--c26262); }
 .kicker {
@@ -186,6 +192,7 @@ h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 8px; }
   color: #444; font-weight: 700;
 }
 .panel h2 { font-size: 1.15rem; margin: 4px 0 6px; }
+div.panel p a { font-weight: 600; }
 .panel p { margin: 0 0 10px; }
 .cta { font-weight: 700; text-decoration: underline; }
 footer {
@@ -218,29 +225,43 @@ def build_html() -> str:
         "<header>\n"
         "<h1>Assurance gaps in an integrated safety and cybersecurity case</h1>\n"
         '<p class="byline">Milin Patel and Rolf Jung, Kempten University of '
-        "Applied Sciences. Two SAFECOMP 2026 papers, both accepted.</p>\n"
-        '<p class="lede">Four standards apply at once to an AI perception '
-        "component in a driverless vehicle, and each one prescribes its own "
-        "evidence. These papers build the single argument the four jointly "
-        "imply, then report what the combination exposes.</p>\n"
+        "Applied Sciences. Supplementary material for a WAISE 2026 workshop "
+        "paper and a SAFECOMP 2026 position paper.</p>\n"
+        f'<p class="lede">An AI-based perception component for highly '
+        f"automated driving falls within the scope of "
+        f"{_WORDS[counts['standards']]} standards at once, and each prescribes its own evidence. The WAISE "
+        "paper combines their claims in one GSN argument, a structure no "
+        "standard prescribes, and finds that at the verification and "
+        "validation goal (G5) the four evidence types are on different "
+        "measurement scales and no standard prescribes how they combine. The "
+        "position paper finds a corresponding gap in operation: no clause "
+        "assigns a runtime anomaly to a concern, or resolves the "
+        "concern-specific results into one judgement.</p>\n"
         + _standards_strip()
         + "</header>\n"
         + _panels(counts)
         + "<footer>\n"
-        f"<p>Why {counts['standards']} standards, {counts['goals']} goals, "
-        f"{counts['decision_points']} decision points and {counts['findings']} "
+        f"<p>Why {_WORDS[counts['standards']]} standards, "
+        f"{_WORDS[counts['goals']]} goals, "
+        f"{_WORDS[counts['decision_points']]} decision points and "
+        f"{_WORDS[counts['findings']]} "
         'findings? <a href="numbers.html">Where the numbers come from</a> '
-        "gives the rule behind each count, and says whether it is a choice "
-        "or a result.</p>\n"
-        '<p>Play with it: <a href="g5_playground.html">drag the four V&amp;V '
-        "scales and watch the release decision flip</a>, and see that no "
-        "standard sets the lines.</p>\n"
-        "<p>Reproduce every artefact both papers use, and fail if anything "
-        f"drifted: <code>make reproduce</code>. See <a href=\"{BLOB}/"
-        'REPRODUCING.md">REPRODUCING.md</a>, and '
-        f'<a href="{BLOB}/ERRATA.md">ERRATA.md</a> for what this work found '
-        "about the camera-ready papers.</p>\n"
-        f'<p>Source: <a href="{REPO_URL}">github.com/milinpatel07</a>. '
+        "gives the reason for each count.</p>\n"
+        "<p>Notebooks: "
+        f'<a href="{BLOB}/notebooks/3_runtime_anomaly.ipynb">which concern a runtime '
+        "anomaly is assigned to</a>, "
+        f'<a href="{BLOB}/notebooks/2_g5_evidence_types.ipynb">combining the four '
+        "G5 evidence types</a>, and "
+        f'<a href="{BLOB}/notebooks/1_five_step_method.ipynb">the five-step '
+        "method, run end to end</a>.</p>\n"
+        f'<p>Every number, table and figure traces to a paper passage, a '
+        f'clause or a command in <a href="{BLOB}/TRACEABILITY.md">'
+        "TRACEABILITY.md</a>. Known discrepancies with the papers: "
+        f'<a href="{BLOB}/ERRATA.md">ERRATA.md</a>. To regenerate every '
+        "artefact and check it against the committed copies, run "
+        f'<code>make reproduce</code> (<a href="{BLOB}/REPRODUCING.md">'
+        "REPRODUCING.md</a>).</p>\n"
+        f'<p>Source code and data: <a href="{REPO_URL}">the GitHub repository</a>. '
         f'Cite the papers: <a href="{BLOB}/CITATION.cff">CITATION.cff</a>. '
         f'Archived: <a href="https://doi.org/{CONCEPT_DOI}">{CONCEPT_DOI}</a>. '
         "MIT licence.</p>\n"

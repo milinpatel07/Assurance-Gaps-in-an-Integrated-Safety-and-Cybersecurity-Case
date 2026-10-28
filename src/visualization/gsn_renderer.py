@@ -1,7 +1,12 @@
 """GSN diagram renderer using Graphviz.
 
-Generates visual representations of the integrated GSN argument pattern
-(Figure 2 in the paper) using the Graphviz DOT language.
+Generates a repository rendering of the integrated GSN argument pattern in the
+Graphviz DOT language. The WAISE paper draws its own Fig. 1 in TikZ; this
+rendering is not that figure.
+
+Every node ID is written as a quoted DOT ID. Graphviz does not read an unquoted
+``A1.4`` as one ID, so without quotes the edge ``S1 -> A1.4`` lands on a
+spurious node ``A1``.
 """
 
 from __future__ import annotations
@@ -18,31 +23,65 @@ from src.gsn.model import (
     Solution,
     GoalStatus,
 )
+from src.visualization.standard_colors import (
+    GAP_GREY,
+    STANDARD_COLORS,
+    STANDARD_LABELS,
+)
 
 
-# Color scheme matching the paper's figure
+def _tint(hex_colour: str, keep: float = 0.18) -> str:
+    """Return a light fill tint of a palette colour (blended towards white)."""
+    r, g, b = (int(hex_colour[i:i + 2], 16) for i in (1, 3, 5))
+    mix = [round(255 - (255 - c) * keep) for c in (r, g, b)]
+    return "#{:02X}{:02X}{:02X}".format(*mix)
+
+
+# Goals and solutions take a light tint of their standard's palette colour as
+# fill and the palette colour itself as border, so nodes and legend agree.
 COLORS = {
-    "goal_base": "#E8F0FE",       # Blue tint (ISO/PAS 8800)
-    "goal_sotif": "#FFF3E0",      # Orange tint (ISO 21448)
-    "goal_cyber": "#FFEBEE",      # Red tint (ISO/SAE 21434)
-    "goal_gap": "#F5F5F5",        # Gray (undeveloped)
     "strategy": "#F3E5F5",        # Light purple
-    "context": "#E8F5E9",         # Light green
+    "context": "#F5F5F5",         # Light grey
     "assumption": "#FFF9C4",      # Light yellow
-    "solution": "#E0F7FA",        # Light cyan
-    "border_gap": "#9E9E9E",      # Gray dashed border
+    "goal_gap": "#F5F5F5",        # Undeveloped goal fill
+    "border_gap": GAP_GREY,       # Undeveloped goal border
 }
 
+# Legend order: the four standards.
+LEGEND_ORDER = ("ISO26262", "ISO21448", "ISOPAS8800", "ISO21434")
 
-def _goal_color(goal: Goal) -> str:
-    """Determine the fill color for a goal based on its origin."""
+
+def _q(element_id: str) -> str:
+    """Quote an element ID as a DOT ID."""
+    return '"' + element_id.replace('"', '\\"') + '"'
+
+
+def _esc(text: str) -> str:
+    """Escape double quotes inside a DOT label."""
+    return text.replace('"', '\\"')
+
+
+def _goal_standard(goal: Goal) -> Optional[str]:
+    """The standard whose colour a goal takes, or None for an undeveloped goal.
+
+    G7 is added from ISO 21448 and G8 from ISO/SAE 21434; the other developed
+    goals come from the ISO/PAS 8800 base pattern.
+    """
     if goal.status == GoalStatus.UNDEVELOPED:
-        return COLORS["goal_gap"]
-    if goal.element_id in ("G7",):
-        return COLORS["goal_sotif"]
-    if goal.element_id in ("G8",):
-        return COLORS["goal_cyber"]
-    return COLORS["goal_base"]
+        return None
+    if goal.element_id == "G7":
+        return "ISO21448"
+    if goal.element_id == "G8":
+        return "ISO21434"
+    return "ISOPAS8800"
+
+
+def _solution_standard(sol: Solution) -> Optional[str]:
+    """The standard whose colour a solution takes (its first source standard)."""
+    for std in sol.source_standards or []:
+        if std in STANDARD_COLORS:
+            return std
+    return None
 
 
 def _wrap(text: str, width: int = 24) -> str:
@@ -73,7 +112,7 @@ def render_gsn_to_dot(gsn: GSNArgument) -> str:
         gsn: The integrated GSN argument.
 
     Returns:
-        DOT language string representing the diagram.
+        DOT language string representing the diagram. All node IDs are quoted.
     """
     lines = [
         'digraph GSN {',
@@ -84,86 +123,97 @@ def render_gsn_to_dot(gsn: GSNArgument) -> str:
         '',
     ]
 
-    # Render each element type
     for elem in gsn.elements.values():
+        eid = _q(elem.element_id)
         if isinstance(elem, Goal):
-            color = _goal_color(elem)
-            style = "dashed" if elem.status == GoalStatus.UNDEVELOPED else "solid"
-            stds = "\\n".join(elem.source_standards[:3]) if elem.source_standards else "Gap"
-            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}\\n[{stds}]"
+            std = _goal_standard(elem)
+            if std is None:
+                fill, border, style = COLORS["goal_gap"], COLORS["border_gap"], "dashed"
+            else:
+                fill = _tint(STANDARD_COLORS[std])
+                border, style = STANDARD_COLORS[std], "solid"
+            if elem.source_standards:
+                stds = "\\n".join(
+                    STANDARD_LABELS.get(s, s) for s in elem.source_standards
+                )
+            else:
+                stds = "undeveloped"
+            label = f"{elem.element_id}\\n{_esc(_wrap(elem.text, 24))}\\n[{stds}]"
             lines.append(
-                f'  {elem.element_id} [shape=box, style="{style},filled", '
-                f'fillcolor="{color}", label="{label}"];'
+                f'  {eid} [shape=box, style="{style},filled", penwidth=1.5, '
+                f'color="{border}", fillcolor="{fill}", label="{label}"];'
             )
 
         elif isinstance(elem, Strategy):
-            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}"
+            label = f"{elem.element_id}\\n{_esc(_wrap(elem.text, 24))}"
             lines.append(
-                f'  {elem.element_id} [shape=trapezium, style="filled", '
+                f'  {eid} [shape=trapezium, style="filled", '
                 f'fillcolor="{COLORS["strategy"]}", label="{label}"];'
             )
 
         elif isinstance(elem, Context):
-            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}"
+            label = f"{elem.element_id}\\n{_esc(_wrap(elem.text, 24))}"
             lines.append(
-                f'  {elem.element_id} [shape=box, style="filled,rounded", '
+                f'  {eid} [shape=box, style="filled,rounded", '
                 f'fillcolor="{COLORS["context"]}", label="{label}"];'
             )
 
         elif isinstance(elem, Assumption):
-            label = f"{elem.element_id}\\n{_wrap(elem.text, 24)}"
+            label = f"{elem.element_id}\\n{_esc(_wrap(elem.text, 24))}"
             lines.append(
-                f'  {elem.element_id} [shape=ellipse, style="filled", '
+                f'  {eid} [shape=ellipse, style="filled", '
                 f'fillcolor="{COLORS["assumption"]}", label="{label}"];'
             )
 
         elif isinstance(elem, Solution):
-            label = f"{elem.element_id}\\n{_wrap(elem.text, 16)}"
+            std = _solution_standard(elem)
+            fill = _tint(STANDARD_COLORS[std]) if std else "#FFFFFF"
+            border = STANDARD_COLORS[std] if std else "#000000"
+            label = f"{elem.element_id}\\n{_esc(_wrap(elem.text, 16))}"
             lines.append(
-                f'  "{elem.element_id}" [shape=circle, style="filled", '
-                f'fillcolor="{COLORS["solution"]}", label="{label}", '
+                f'  {eid} [shape=circle, style="filled", penwidth=1.5, '
+                f'color="{border}", fillcolor="{fill}", label="{label}", '
                 f'width=1.5, fixedsize=false];'
             )
 
     lines.append('')
 
-    # Render relationships
+    # Relationships
     for elem in gsn.elements.values():
         if isinstance(elem, (Goal, Strategy)):
             # SupportedBy edges (solid arrows)
             for child_id in elem.supported_by:
                 if child_id in gsn.elements:
-                    lines.append(f'  {elem.element_id} -> "{child_id}";')
+                    lines.append(f'  {_q(elem.element_id)} -> {_q(child_id)};')
 
             # InContextOf edges (hollow arrows)
             for ctx_id in elem.in_context_of:
                 if ctx_id in gsn.elements:
                     lines.append(
-                        f'  {elem.element_id} -> {ctx_id} '
+                        f'  {_q(elem.element_id)} -> {_q(ctx_id)} '
                         f'[arrowhead=onormal, style=dashed];'
                     )
 
-    # Legend
+    # Legend: the four standards in the shared palette, plus undeveloped.
     lines.append('')
     lines.append('  subgraph cluster_legend {')
-    lines.append('    label="Legend";')
+    lines.append('    label="Legend: colour = source standard";')
     lines.append('    style=dotted;')
+    for std in LEGEND_ORDER:
+        lines.append(
+            f'    "leg_{std}" [shape=box, style="filled", penwidth=1.5, '
+            f'color="{STANDARD_COLORS[std]}", '
+            f'fillcolor="{_tint(STANDARD_COLORS[std])}", '
+            f'label="{STANDARD_LABELS[std]}"];'
+        )
     lines.append(
-        f'    leg_base [shape=box, style="filled", fillcolor="{COLORS["goal_base"]}", '
-        f'label="ISO/PAS 8800\\n(base pattern)"];'
+        f'    "leg_undeveloped" [shape=box, style="dashed,filled", '
+        f'color="{COLORS["border_gap"]}", fillcolor="{COLORS["goal_gap"]}", '
+        f'label="Undeveloped goal"];'
     )
-    lines.append(
-        f'    leg_sotif [shape=box, style="filled", fillcolor="{COLORS["goal_sotif"]}", '
-        f'label="ISO 21448\\n(SOTIF)"];'
-    )
-    lines.append(
-        f'    leg_cyber [shape=box, style="filled", fillcolor="{COLORS["goal_cyber"]}", '
-        f'label="ISO/SAE 21434\\n(Cybersecurity)"];'
-    )
-    lines.append(
-        f'    leg_gap [shape=box, style="dashed,filled", fillcolor="{COLORS["goal_gap"]}", '
-        f'label="Gap\\n(undeveloped)"];'
-    )
+    # Invisible edges keep the legend entries in the order listed.
+    order = [f'"leg_{std}"' for std in LEGEND_ORDER] + ['"leg_undeveloped"']
+    lines.append('    {rank=same; ' + ' -> '.join(order) + ' [style=invis];}')
     lines.append('  }')
 
     lines.append('}')

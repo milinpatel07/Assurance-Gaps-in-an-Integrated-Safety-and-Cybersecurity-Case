@@ -1,5 +1,8 @@
-# CARLA weather evaluation configuration
-# Parametric weather grid for SOTIF triggering condition analysis.
+# Weather grid of the case study (documentation only)
+# Parametric grid of rain and fog for SOTIF triggering-condition analysis. It is
+# the grid of the synthetic weather-grid illustration (no detector, no CARLA);
+# live CARLA evaluation is not implemented in this repository. The level names
+# in the comments below are the names the code gives each condition.
 #
 # ISO 21448:2022 Cl.7 covers the identification of hazardous scenarios and
 # triggering conditions. It does not give numeric weather thresholds. The two

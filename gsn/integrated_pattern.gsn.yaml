@@ -1,14 +1,16 @@
 # Integrated Safety and Cybersecurity GSN Pattern
-# Figure 2 in the paper: extends ISO/PAS 8800 Annex B from 6 to 9 goals
+# Fig. 1 in the WAISE paper: extends ISO/PAS 8800 Annex B from 6 to 9 goals
 #
 # Rendered with gsn2x (https://github.com/jonasthewolf/gsn2x)
 # Usage: gsn2x gsn/integrated_pattern.gsn.yaml
 #
 # Node origins:
-#   G1-G6 — retained from ISO/PAS 8800 Annex B (augmented)
-#   G7     — new, from ISO 21448
-#   G8     — new, from ISO/SAE 21434
-#   G9     — undeveloped (assurance gap)
+#   G1     reformulated from ISO/PAS 8800 Annex B G1
+#   G2-G6  retained from ISO/PAS 8800 Annex B (augmented)
+#   G7     added, from ISO 21448
+#   G8     added, from ISO/SAE 21434
+#   G9     added and undeveloped: no single standard prescribes the
+#          complete re-assurance workflow (finding F-2)
 
 G1:
   text: |
@@ -22,7 +24,8 @@ C1:
   text: |
     ASIL D assigned from HARA
     (ISO 26262-3 Cl.6)
-    Controllability C3 at SAE Level 4+
+    Controllability commonly C3
+    at SAE Level 4 and above
 
 C2:
   text: |
@@ -36,15 +39,15 @@ S1:
     (a) AI-specific insufficiencies controlled (8800)
     (b) Functional insufficiencies acceptable (21448)
     (c) Cybersecurity risks managed (21434)
-    (d) HW faults controlled (26262, via A1.4)
+    (d) Hardware faults controlled (26262, via A1.4)
   supportedBy: [G2, G3, G4, G5, G6, G7, G8, G9]
   inContextOf: [A1_4]
 
 A1_4:
   text: |
-    HW random faults and systematic faults
-    in non-AI elements are controlled
-    by ISO 26262 processes
+    Hardware faults in the non-AI
+    elements are controlled
+    under ISO 26262
 
 G2:
   text: |
@@ -119,24 +122,25 @@ G5:
 Sn-G5-mcdc:
   text: |
     MC/DC structural coverage
-    of non-AI wrapper code
+    of surrounding non-AI software
     (ISO 26262-6 Cl.9)
 
 Sn-G5-scenario:
   text: |
-    Scenario-based testing with
-    triggering condition coverage
+    SOTIF triggering condition
+    coverage in scenario testing
     (ISO 21448 Cl.9-11)
 
 Sn-G5-ensemble-uncertainty:
   text: |
-    Deep ensemble uncertainty
-    quantification
+    Deep ensemble disagreement
+    as uncertainty indicator (AUROC)
     (ISO/PAS 8800 Cl.8-9)
 
 Sn-G5-pentest:
   text: |
     Adversarial penetration testing
+    against LiDAR spoofing
     (ISO/SAE 21434 Cl.10)
 
 G6:
@@ -175,7 +179,7 @@ Sn-G7-area-eval:
 
 Sn-G7-acceptance:
   text: |
-    Acceptance criteria assessment
+    Acceptance criteria evaluation
     (ISO 21448 Cl.6.5, Table A.10)
 
 G8:

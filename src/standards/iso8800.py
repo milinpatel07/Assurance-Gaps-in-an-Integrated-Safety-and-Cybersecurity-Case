@@ -1,4 +1,4 @@
-"""ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence.
+"""ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence).
 
 This module implements the claim extraction (Step 1) and lifecycle mapping
 (Step 2) for ISO/PAS 8800 as applied to an AI-based perception component.
@@ -67,7 +67,8 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "Prescribes data quality requirements but no operationalised "
-                "threshold for data sufficiency (Gap-5, I-7)."
+                "threshold for data sufficiency; the threshold is deferred to "
+                "context (finding F-5, decision point DP-7)."
             ),
         ),
         Clause(
@@ -96,16 +97,16 @@ def _build_clauses() -> list[Clause]:
         Clause(
             standard_id="ISOPAS8800",
             reference="Cl.14.8.3",
-            title="Partial re-approval after modification",
+            title="Re-assurance after modification (partial)",
             lifecycle_phases=[LifecyclePhase.MODIFICATION],
             normative=True,
             ai_applicable=True,
             ai_applicability_note=(
-                "Addresses partial re-approval but does not define conditions "
-                "under which partial re-assurance is sufficient (Gap-2)."
+                "Addresses re-assurance after modification but does not define "
+                "when partial re-assurance is sufficient (finding F-2)."
             ),
         ),
-        # Annex B (informative) — the base GSN pattern
+        # Annex B (informative): the base GSN pattern
         Clause(
             standard_id="ISOPAS8800",
             reference="Annex B",
@@ -242,19 +243,21 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         Claim(
             claim_id="CLM-8800-MOD-01",
             text=(
-                "Partial re-approval shall be performed after AI model modification."
+                "Re-assurance shall be performed after AI model modification; "
+                "the clause does not define when partial re-assurance is "
+                "sufficient."
             ),
             source_clause=clause_map["Cl.14.8.3"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
             gsn_goal="G9",
             lifecycle_phase=LifecyclePhase.MODIFICATION,
-            evidence_types=["Partial re-approval report"],
+            evidence_types=["Re-assurance report"],
         ),
     ]
 
 
 class ISOPAS8800(Standard):
-    """ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence.
+    """ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence).
 
     Provides the base GSN pattern (Annex B) and AI-specific safety requirements
     for specification, data quality, design, verification, and monitoring.
@@ -265,7 +268,7 @@ class ISOPAS8800(Standard):
         claims = _build_claims(clauses)
         super().__init__(
             standard_id="ISOPAS8800",
-            full_name="ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+            full_name="ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
             year=2024,
             scope=(
                 "Safety properties specific to AI components in road vehicles. "

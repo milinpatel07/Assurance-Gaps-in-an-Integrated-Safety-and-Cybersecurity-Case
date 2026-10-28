@@ -1,4 +1,6 @@
-# SECOND detector + Deep Ensemble configuration for CARLA evaluation
+# SECOND detector and deep ensemble configuration of the case study
+# (documentation only). No code in this repository connects to CARLA; the
+# weather-grid numbers are a synthetic illustration (no detector, no CARLA).
 # Architecture: Yan et al., "SECOND: Sparsely Embedded Convolutional Detection," Sensors, 2018.
 
 detector:

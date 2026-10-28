@@ -54,7 +54,7 @@ values (Gap-1), ISO/PAS 8800 Clause 14.8.3 gives partial re-approval only
 (Gap-5). The repository holds no machine-readable representation of that
 "exhibits it alone" property. Adding a field for it would move the assertion into
 a new field rather than remove it, so it has not been added. These three remain
-declared judgments traceable to the clauses named in ``gaps.py``.
+declared judgements traceable to the clauses named in ``findings.py``.
 
 An earlier derivation attempt produced {Gap-2, Gap-3} against the published
 {Gap-3, Gap-4}; diagnosing why the rule rather than the paper was wrong exposed
@@ -71,15 +71,19 @@ from dataclasses import dataclass, field
 
 @dataclass
 class StandardPerspective:
-    """What an assessor sees when following a single standard."""
+    """What a project sees when following a single standard."""
 
     standard_id: str
     standard_name: str
     covers: list[str]
+    # What the standard does not address. Silence, not an exclusion: a
+    # standard is said to exclude something only where its scope clause says
+    # so, and those items go in ``explicitly_excludes``.
     excludes: list[str]
     visible_gaps: list[str]
     invisible_gaps: list[str]
     blind_spots: list[str]
+    explicitly_excludes: list[str] = field(default_factory=list)
 
 
 class CounterfactualAnalysis:
@@ -101,13 +105,14 @@ class CounterfactualAnalysis:
                     "HARA and ASIL classification (Part 3, Cl.6)",
                     "Technical safety concept (Part 4, Cl.6.4.3)",
                     "MC/DC structural coverage (Part 6, Cl.9)",
-                    "HW metrics: SPFM, LFM, PMHF (Part 5, Cl.9)",
+                    "Hardware metrics: SPFM, LFM (Part 5, Cl.8) and PMHF (Part 5, Cl.9)",
                     "Change management (Part 8, Cl.8)",
                     "Safety case structure (Part 2, Cl.6.4)",
                 ],
                 excludes=[
-                    "AI/ML components (assumes deterministic SW)",
-                    "Cybersecurity threats (deferred to ISO/SAE 21434)",
+                    "AI/ML-specific requirements and evidence",
+                    "Cybersecurity engineering (Part 2 addresses only the "
+                    "interaction with cybersecurity activities)",
                     "SOTIF / functional insufficiencies",
                     "Data quality for training",
                     "Runtime monitoring for ML",
@@ -117,11 +122,11 @@ class CounterfactualAnalysis:
                     "Gap-2 (no OTA re-assurance)",
                 ],
                 invisible_gaps=[
-                    "Gap-3 (adversarial-SOTIF boundary — not aware SOTIF excludes cyber)",
-                    "Gap-4 (cross-domain release — only sees safety assessment)",
+                    "Gap-3 (adversarial-SOTIF boundary: not aware that SOTIF excludes cybersecurity)",
+                    "Gap-4 (cross-domain release: sees only the safety assessment)",
                 ],
                 blind_spots=[
-                    "An assessor following only ISO 26262 assumes cybersecurity is "
+                    "A project following only ISO 26262 assumes cybersecurity is "
                     "handled elsewhere and SOTIF does not apply. They would produce "
                     "a complete safety case that is structurally sound but misses "
                     "AI-specific failure modes and adversarial threats entirely.",
@@ -138,22 +143,24 @@ class CounterfactualAnalysis:
                     "SOTIF release decision (Cl.12)",
                     "Field monitoring for unknown scenarios (Cl.13)",
                 ],
+                explicitly_excludes=[
+                    "Cybersecurity threats (scope clause, Cl.1)",
+                ],
                 excludes=[
-                    "Cybersecurity threats (Cl.1 explicitly excludes them)",
-                    "Random hardware failures (deferred to ISO 26262)",
+                    "Random hardware failures (left to ISO 26262)",
                     "AI training data quality",
                     "Model uncertainty quantification",
                 ],
                 visible_gaps=["Gap-1 (qualitative, not quantitative acceptance)"],
                 invisible_gaps=[
-                    "Gap-3 (adversarial-SOTIF boundary — excludes cyber by scope, "
-                    "so adversarial inputs that exploit functional insufficiency "
-                    "fall into a void)",
-                    "Gap-4 (cross-domain release — only SOTIF release decision, "
-                    "no combined evaluation with safety/cyber evidence)",
+                    "Gap-3 (adversarial-SOTIF boundary: excludes cybersecurity by "
+                    "scope, so adversarial inputs that exploit a functional "
+                    "insufficiency are analysed by neither standard)",
+                    "Gap-4 (cross-domain release: only the SOTIF release decision, "
+                    "no combined evaluation with safety or cybersecurity evidence)",
                 ],
                 blind_spots=[
-                    "An assessor following only ISO 21448 would identify triggering "
+                    "A project following only ISO 21448 would identify triggering "
                     "conditions and test scenarios but would explicitly exclude "
                     "adversarial perturbations (Cl.1). An adversarial LiDAR spoofing "
                     "attack that exploits a functional insufficiency (e.g., rain-like "
@@ -172,21 +179,21 @@ class CounterfactualAnalysis:
                     "Safety-cybersecurity interface requirement (RQ-15-06)",
                 ],
                 excludes=[
-                    "Functional safety assessment (deferred to ISO 26262)",
+                    "Functional safety assessment (left to ISO 26262)",
                     "SOTIF / performance insufficiency",
                     "AI/ML-specific threats beyond standard software",
                     "Training data poisoning (not explicitly covered)",
                 ],
                 visible_gaps=[],
                 invisible_gaps=[
-                    "Gap-3 (adversarial-SOTIF boundary — cybersecurity includes "
+                    "Gap-3 (adversarial-SOTIF boundary: cybersecurity includes "
                     "adversarial scenarios but does not classify them as SOTIF "
                     "triggering conditions, so the functional impact is unowned)",
-                    "Gap-4 (cross-domain release — only cybersecurity case, "
+                    "Gap-4 (cross-domain release: only the cybersecurity case, "
                     "no combined evaluation)",
                 ],
                 blind_spots=[
-                    "An assessor following only ISO/SAE 21434 would identify LiDAR "
+                    "A project following only ISO/SAE 21434 would identify LiDAR "
                     "spoofing as a cybersecurity threat and require penetration "
                     "testing. But they would not recognise that the same attack "
                     "also triggers a SOTIF functional insufficiency (false negative "
@@ -206,8 +213,8 @@ class CounterfactualAnalysis:
                     "Partial re-approval for AI changes (Cl.14.8.3)",
                 ],
                 excludes=[
-                    "Cybersecurity (deferred to ISO/SAE 21434)",
-                    "SOTIF triggering conditions (deferred to ISO 21448)",
+                    "Cybersecurity (left to ISO/SAE 21434)",
+                    "SOTIF triggering conditions (left to ISO 21448)",
                     "Concrete ASIL decomposition for AI",
                     "Combined release criteria",
                 ],
@@ -216,11 +223,11 @@ class CounterfactualAnalysis:
                     "Gap-5 (data acceptance threshold undefined)",
                 ],
                 invisible_gaps=[
-                    "Gap-3 (adversarial-SOTIF boundary — defers both to other standards)",
-                    "Gap-4 (cross-domain release — base pattern has no combined node)",
+                    "Gap-3 (adversarial-SOTIF boundary: defers both to other standards)",
+                    "Gap-4 (cross-domain release: the base pattern has no combined node)",
                 ],
                 blind_spots=[
-                    "An assessor following only ISO/PAS 8800 would build a 6-goal "
+                    "A project following only ISO/PAS 8800 would build a 6-goal "
                     "GSN argument covering AI-specific concerns. They would defer "
                     "cybersecurity and SOTIF to their respective standards but "
                     "would not verify that those standards actually cover the AI "
@@ -259,7 +266,7 @@ class CounterfactualAnalysis:
         Nothing here encodes the answer. The result follows from which standards
         source which goals.
         """
-        from src.analysis.gaps import GAP_GOAL_MAP
+        from src.analysis.findings import GAP_GOAL_MAP
 
         sources = cls._goal_sources()
         boundary_goals = GAP_GOAL_MAP["Gap-3"]
@@ -275,7 +282,7 @@ class CounterfactualAnalysis:
             "standards_sourcing_both": sees_both,
             "invisible_from_every_single_standard": sees_both == [],
             "derivation": (
-                "Gap-3 lies between G7 and G8. A single-standard assessor sees the "
+                "Gap-3 lies between G7 and G8. A reading of any single standard sees the "
                 "boundary only by sourcing both goals. No standard sources both, so "
                 "the boundary appears in no single-standard view."
             ),
@@ -401,12 +408,16 @@ class CounterfactualAnalysis:
 
         for p in self.perspectives:
             print(f"\n{'─' * 80}")
-            print(f"If an assessor follows ONLY {p.standard_id} ({p.standard_name}):")
+            print(f"If a project follows only {p.standard_id} ({p.standard_name}):")
             print(f"{'─' * 80}")
             print(f"\n  COVERS:")
             for c in p.covers:
                 print(f"    + {c}")
-            print(f"\n  EXCLUDES / DOES NOT ADDRESS:")
+            if p.explicitly_excludes:
+                print(f"\n  EXPLICITLY EXCLUDES (scope clause):")
+                for e in p.explicitly_excludes:
+                    print(f"    - {e}")
+            print(f"\n  DOES NOT ADDRESS:")
             for e in p.excludes:
                 print(f"    - {e}")
             print(f"\n  GAPS VISIBLE from this perspective:")

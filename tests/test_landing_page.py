@@ -15,9 +15,9 @@ import re
 import pytest
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.visualization.landing_page import OUTPUT_PATH, build_html
+from src.visualization.landing_page import _WORDS, OUTPUT_PATH, build_html
 from src.visualization.standard_colors import STANDARD_COLORS, STANDARD_LABELS
 
 
@@ -51,10 +51,14 @@ class TestSelfContained:
         assert "url(" not in html
 
     def test_outbound_links_go_only_to_the_repository_or_the_doi(self, html):
-        """Two destinations are legitimate: the repository, and the DOI
-        resolver for the archived release. Anything else on a page a
+        """Three destinations are legitimate: the repository, the DOI of the
+        archived release, and the DOI of the published WAISE paper. Anything else on a page a
         conference visitor opens would be a surprise."""
-        allowed = ("https://github.com/milinpatel07/", "https://doi.org/10.5281/")
+        allowed = (
+            "https://github.com/milinpatel07/",
+            "https://doi.org/10.5281/",  # the archived release
+            "https://doi.org/10.1007/978-3-032-35506-5_55",  # the WAISE paper
+        )
         urls = re.findall(r'href="(https?://[^"]+)"', html)
         assert urls, "the page should link out to the repository"
         for url in urls:
@@ -69,24 +73,29 @@ class TestPanels:
         assert html.count('class="panel ') == 4
 
     def test_the_four_destinations_are_present(self, html):
-        assert 'href="gsn_view.html"' in html
-        assert 'href="seam.html"' in html
+        assert 'href="argument.html"' in html
+        assert 'href="g5-playground.html"' in html
+        assert 'href="design-time-and-operation.html"' in html
+        assert "https://doi.org/10.1007/978-3-032-35506-5_55" in html
+        assert "Operational Safety and Cybersecurity Assurance" in html
+
+    def test_the_index_and_errata_stay_reachable(self, html):
         assert "/TRACEABILITY.md" in html
-        assert "/paper" in html
+        assert "/ERRATA.md" in html
 
     def test_each_panel_carries_a_different_standard_colour(self, html):
         """One panel per standard colour, so no two panels read as a pair."""
         accents = re.findall(r'class="panel accent-([a-z-]+)"', html)
         assert len(accents) == len(set(accents)) == 4
 
-    def test_the_seam_panel_says_it_is_a_synthesis(self, html):
-        """The QR visitor must not read the seam as a paper claim."""
+    def test_the_comparison_panel_says_it_is_a_synthesis(self, html):
+        """The QR visitor must not read the comparison as a paper claim."""
         assert "not a claim either paper makes" in html
 
-    def test_the_gsn_view_link_is_relative_so_pages_serves_it(self, html):
+    def test_the_argument_link_is_relative_so_pages_serves_it(self, html):
         """Pages serves from /docs; the view sits beside this file."""
-        assert 'href="gsn_view.html"' in html
-        assert "docs/gsn_view.html" not in html
+        assert 'href="argument.html"' in html
+        assert "docs/argument.html" not in html
 
 
 class TestCountsComeFromTheCode:
@@ -96,12 +105,13 @@ class TestCountsComeFromTheCode:
         goals = len(build_integrated_gsn().get_goals())
         decision_points = len(DecisionPointCatalogue().inconsistencies)
         findings = len(GapClassification().gaps)
-        assert f"All {goals} goals" in html
-        assert f"{decision_points} decision points" in html
-        assert f"{findings} findings" in html
+        assert f"All {_WORDS[goals]} goals" in html
+        assert f"{_WORDS[decision_points]} decision points" in html
+        assert f"{_WORDS[findings]} findings" in html
 
     def test_standard_count_matches_the_palette(self, html):
-        assert f"across {len(STANDARD_COLORS)} standards" in html
+        assert f"scope of {_WORDS[len(STANDARD_COLORS)]} standards" in html
+        assert f"Why {_WORDS[len(STANDARD_COLORS)]} standards" in html
 
 
 class TestPalette:
@@ -132,7 +142,7 @@ class TestSiteNavigation:
     the browser's back button."""
 
     PAGES = [
-        "index.html", "gsn_view.html", "seam.html", "g5_playground.html",
+        "index.html", "argument.html", "design-time-and-operation.html", "g5-playground.html",
         "numbers.html",
     ]
 
@@ -158,6 +168,7 @@ class TestSiteNavigation:
             if not link.startswith(("http", "#"))
         ]
         for link in links:
+            link = link.split("#")[0]
             assert os.path.exists(os.path.join(directory, link)), (
                 f"{name} links to {link}, which is not in docs/"
             )
@@ -179,3 +190,23 @@ class TestArchive:
         """The concept DOI tracks the latest version; a version DOI on a page
         that is rebuilt every release would go stale."""
         assert "10.5281/zenodo.22091826" not in html
+
+
+class TestOldAddresses:
+    """Pages renamed after the v1.0.0 archive keep their old addresses, so links
+    in the archived snapshot and elsewhere still lead somewhere."""
+
+    MOVED = {
+        "gsn_view.html": "argument.html",
+        "seam.html": "design-time-and-operation.html",
+        "g5_playground.html": "g5-playground.html",
+    }
+
+    @pytest.mark.parametrize("old,new", sorted(MOVED.items()))
+    def test_old_address_forwards_to_the_new_page(self, old, new):
+        directory = os.path.dirname(OUTPUT_PATH)
+        with open(os.path.join(directory, old), encoding="utf-8") as handle:
+            page = handle.read()
+        assert f'content="0; url={new}"' in page
+        assert f'href="{new}"' in page
+        assert os.path.exists(os.path.join(directory, new))

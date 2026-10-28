@@ -1,4 +1,4 @@
-"""Tests for the CARLA evaluation pipeline."""
+"""Tests for the weather grid and the synthetic weather-grid illustration (no CARLA)."""
 
 import pytest
 
@@ -45,6 +45,15 @@ class TestWeatherConditions:
         assert cond.sotif_triggering
         assert cond.carla_fog_density > 0
 
+    def test_condition_names_are_unique_and_use_documented_levels(self):
+        """Names follow the level names in weather_grid.yaml, one per condition."""
+        names = [c.name for c in generate_weather_grid()]
+        assert len(set(names)) == len(names)
+        assert WeatherCondition.from_parameters(50, 500).name == "heavy_rain_clear"
+        assert WeatherCondition.from_parameters(100, 500).name == "extreme_rain_clear"
+        assert WeatherCondition.from_parameters(0, 50).name == "no_rain_dense_fog"
+        assert WeatherCondition.from_parameters(0, 10).name == "no_rain_very_dense_fog"
+
     def test_triggering_coverage_statistics(self):
         conditions = generate_weather_grid()
         coverage = compute_triggering_coverage(conditions)
@@ -55,7 +64,7 @@ class TestWeatherConditions:
 
 
 class TestSyntheticEvaluation:
-    """Test the synthetic CARLA evaluation."""
+    """Test the synthetic weather-grid illustration (no detector, no CARLA)."""
 
     def test_generates_results(self):
         result = generate_synthetic_illustration(num_scenes_per_weather=5, seed=42)

@@ -1,42 +1,47 @@
-# Synthetic Illustration Outputs
+# Synthetic illustration outputs
 
-This directory holds reference outputs of the synthetic illustration pipeline. The
-files demonstrate the format and structure of the analysis and evaluation outputs.
-They are not empirical measurements.
+Provenance: generated (deterministic) and seeded (seed 42). Nothing in this
+directory is a measurement.
 
-## Origin
+These are the committed reference outputs that `make verify-refs` compares a
+fresh run against. The decision-point catalogue and the findings classification
+follow the WAISE paper: Patel and Jung, "Integrating Cybersecurity Into the AI
+Safety Assurance Argument: A GSN Pattern for AI-Based Perception Components in
+Highly Automated Driving", WAISE 2026 (workshop at SAFECOMP 2026), LNCS.
 
-The weather-evaluation outputs are produced by `src/evaluation/carla_evaluator.py`,
-function `generate_synthetic_illustration()`. That function does not connect to
-CARLA and does not run a detector. It produces per-scene detection counts and
-uncertainty values from a deterministic, seeded procedure (seed = 42): a weather-
-severity term drives recall, precision, and divergence through fixed formulas plus
-seeded Gaussian noise. Re-running with the same seed reproduces the files exactly.
+## What these numbers are
 
-The standards, GSN, inconsistency, and gap tables are deterministic outputs of the
-analysis code in `src/`; they do not depend on a random seed.
+The files contain two different things.
 
-## What these numbers are, and are not
+- **Deterministic analysis outputs.** The decision-point catalogue, the findings
+  classification, and the standards, GSN and findings sections of the summary
+  report come from the analysis code in `src/`. They do not depend on a random
+  seed.
+- **A seeded illustration of the weather-grid evaluation.** The numbers in
+  `weather_evaluation_seed42.csv` and in the synthetic illustration section of
+  `summary_report_seed42.txt` come from `generate_synthetic_illustration()` in
+  `src/evaluation/carla_evaluator.py`. That function does not connect to CARLA
+  and does not run a detector. A weather-severity term drives recall, precision
+  and divergence through fixed formulas plus seeded Gaussian noise (seed 42), so
+  re-running with the same seed reproduces the files exactly. The numbers show
+  what the evaluation pipeline produces and how its output is organised. They
+  are not measurements of a trained detector and must not be cited as empirical
+  results.
 
-The weather-evaluation numbers in `weather_evaluation_seed42.csv` and the CARLA
-evaluation section of `summary_report_seed42.txt` are illustrative. They show what
-the evaluation pipeline produces and how its output is organised. They are not
-measurements of a trained detector and must not be cited as empirical results.
-
-For measured results of the kind the G5 and G6 goals call for, see
-`data/empirical_results/`: AUROC and MDR/MFAR results from a trained
-PointPillars deep ensemble on KITTI and nuScenes. Those measurements support a
-paper in preparation and are claimed by neither paper in this repository; their
-provenance README states this in its first line.
+Measured results from a trained PointPillars deep ensemble on KITTI and nuScenes
+are in `data/empirical_results/`. Its README states their provenance and that
+neither paper claims them.
 
 ## Files
 
-- `gaps.csv` - assurance gap classification; deterministic output of the analysis
-  code.
-- `decision_points.csv` - requirement inconsistency catalogue; deterministic output
-  of the analysis code.
-- `summary_report_seed42.txt` - consolidated report. The standards, GSN, and gap
-  sections are deterministic; the CARLA evaluation section is synthetic
-  illustration.
-- `weather_evaluation_seed42.csv` - per-weather-condition evaluation; synthetic
-  illustration, seed = 42.
+- `decision_points.csv`: decision-point catalogue (WAISE Table 4). DP-1 to DP-7,
+  written `I-1` to `I-7` in the file. Deterministic.
+- `gaps.csv`: findings classification (WAISE Table 5). F-1 to F-5, written
+  `Gap-1` to `Gap-5` in the file; the Category column holds the paper's two
+  categories, II (integration-induced finding) and OM (open methodological
+  problem). Deterministic.
+- `summary_report_seed42.txt`: consolidated plain-text report. The standards,
+  GSN, decision-point and findings sections are deterministic; the synthetic
+  illustration section is seeded.
+- `weather_evaluation_seed42.csv`: per-weather-condition output of the synthetic
+  illustration, seed 42.

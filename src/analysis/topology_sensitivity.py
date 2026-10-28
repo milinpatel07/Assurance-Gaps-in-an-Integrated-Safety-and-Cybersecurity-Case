@@ -90,7 +90,7 @@ def activity_based_topology() -> Topology:
 def concern_hierarchy_topology() -> Topology:
     """Warg and Skoglund: standards assigned to nodes by concern.
 
-    Encoded from the paper's description (line 233): functional safety and SOTIF
+    Encoded from the WAISE paper's description (Section 4.1): functional safety and SOTIF
     as sub-concerns of safety, cybersecurity as a co-concern, meeting at the top
     claim. Each standard is grouped by its subject. AI safety (ISO/PAS 8800) is
     placed under safety here; the paper does not place it, so that is this
@@ -137,7 +137,7 @@ def derive_gap3(topology: Topology) -> dict:
         "standards_spanning_both": spanning,
         "arises": spanning == [],
         "derivation": (
-            "The boundary belongs to no single assessor when no standard owns "
+            "The boundary falls outside every single-standard assessment when no standard owns "
             "both the SOTIF node and the cybersecurity node."
         ),
     }

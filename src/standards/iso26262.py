@@ -1,4 +1,4 @@
-"""ISO 26262:2018 — Road vehicles — Functional safety.
+"""ISO 26262:2018 (Road vehicles: Functional safety).
 
 This module implements the claim extraction (Step 1) and lifecycle mapping
 (Step 2) for ISO 26262 as applied to an AI-based perception component.
@@ -9,9 +9,10 @@ Key clauses relevant to the integrated argument:
 - Part 4, Clause 7: System integration and testing
 - Part 4, Clause 8: Safety validation
 - Part 6, Clause 8: Software unit design (limited AI applicability)
-- Part 6, Clause 9: Software unit testing (limited AI applicability)
+- Part 6, Clause 9: Software unit verification (limited AI applicability)
 - Part 8, Clause 8: Change management
-- Part 5, Clause 9: Hardware metrics (SPFM, LFM, PMHF)
+- Part 5, Clauses 8 and 9: hardware architectural metrics (SPFM, LFM) and
+  evaluation of safety goal violations due to random hardware failures (PMHF)
 """
 
 from src.standards.base import (
@@ -35,20 +36,23 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "HARA applies to the system function regardless of implementation. "
-                "At SAE Level 4+, controllability is C3 (no human driver), "
-                "yielding ASIL D for high severity/exposure events."
+                "At SAE Level 4 and above, controllability is commonly rated "
+                "C3 in the absence of a driver, which yields ASIL D for "
+                "hazardous events with high severity and exposure."
             ),
         ),
         Clause(
             standard_id="ISO26262",
             reference="Part 3, Cl.6.4.3",
-            title="Controllability classification",
+            title="Classification of hazardous events",
             lifecycle_phases=[LifecyclePhase.CONCEPT],
             normative=True,
             ai_applicable=True,
             ai_applicability_note=(
-                "Clause 6.4.3.8: At SAE Level 4+, C3 is the common assignment "
-                "because the human driver is absent and cannot intervene."
+                "Severity, exposure and controllability are classified per "
+                "hazardous event, and the ASIL is determined from them. "
+                "Clause 6.4.3.8: at SAE Level 4 and above, C3 is the common "
+                "rating because no driver is present to intervene."
             ),
         ),
         Clause(
@@ -93,15 +97,20 @@ def _build_clauses() -> list[Clause]:
         ),
         Clause(
             standard_id="ISO26262",
-            reference="Part 5, Cl.9",
-            title="Evaluation of HW architectural metrics",
+            reference="Part 5, Cl.8-9",
+            title=(
+                "Evaluation of the hardware architectural metrics (Cl.8) and of "
+                "safety goal violations due to random hardware failures (Cl.9)"
+            ),
             lifecycle_phases=[LifecyclePhase.VERIFICATION],
             normative=True,
             ai_applicable=True,
             ai_applicability_note=(
-                "Hardware metrics (SPFM >= 99% at ASIL D, LFM >= 90%, "
-                "PMHF < 10^-8 h^-1) apply to the hardware platform. "
-                "No equivalent exists for AI component failures (Gap-1)."
+                "At ASIL D the hardware architectural metrics (Cl.8: "
+                "SPFM >= 99%, LFM >= 90%) and the random hardware failure "
+                "target (Cl.9: PMHF < 10^-8 h^-1) apply to the hardware "
+                "platform only. No equivalent exists for AI component "
+                "failures (finding F-1)."
             ),
         ),
         Clause(
@@ -120,14 +129,14 @@ def _build_clauses() -> list[Clause]:
         Clause(
             standard_id="ISO26262",
             reference="Part 6, Cl.9",
-            title="Software unit testing",
+            title="Software unit verification",
             lifecycle_phases=[LifecyclePhase.VERIFICATION],
             normative=True,
             ai_applicable=None,
             ai_applicability_note=(
                 "Limited applicability. MC/DC structural coverage at ASIL D "
-                "applies to the non-AI wrapper code but not to the neural "
-                "network inference path."
+                "applies to the surrounding non-AI software but not to the "
+                "neural network inference path."
             ),
         ),
         Clause(
@@ -140,7 +149,7 @@ def _build_clauses() -> list[Clause]:
             ai_applicability_note=(
                 "Assumes conventional software where change impact can be traced "
                 "to specific requirements. For a retrained neural network, "
-                "the entire weight space changes (Gap-2)."
+                "the entire weight space changes (finding F-2)."
             ),
         ),
         Clause(
@@ -179,8 +188,8 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         Claim(
             claim_id="CLM-26262-CTRL-01",
             text=(
-                "At SAE Level 4+, controllability shall be classified as C3 "
-                "because no human driver is available to intervene."
+                "At SAE Level 4 and above, controllability is commonly rated "
+                "C3 because no human driver is available to intervene."
             ),
             source_clause=clause_map["Part 3, Cl.6.4.3"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
@@ -257,10 +266,11 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         Claim(
             claim_id="CLM-26262-HWMET-01",
             text=(
-                "Hardware architectural metrics shall meet ASIL D targets: "
-                "SPFM >= 99%, LFM >= 90%, PMHF < 10^-8 h^-1."
+                "The hardware architectural metrics (Cl.8: SPFM >= 99%, "
+                "LFM >= 90%) and the random hardware failure target (Cl.9: "
+                "PMHF < 10^-8 h^-1) shall meet ASIL D targets."
             ),
-            source_clause=clause_map["Part 5, Cl.9"],
+            source_clause=clause_map["Part 5, Cl.8-9"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
             gsn_goal="G5",
             lifecycle_phase=LifecyclePhase.VERIFICATION,
@@ -269,8 +279,9 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
         Claim(
             claim_id="CLM-26262-MCDC-01",
             text=(
-                "At ASIL D, modified condition/decision coverage (MC/DC) "
-                "shall be achieved for software unit testing."
+                "At ASIL D, structural coverage shall be measured in software "
+                "unit verification, with modified condition/decision coverage "
+                "(MC/DC) highly recommended."
             ),
             source_clause=clause_map["Part 6, Cl.9"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
@@ -306,7 +317,7 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
 
 
 class ISO26262(Standard):
-    """ISO 26262:2018 — Road vehicles — Functional safety.
+    """ISO 26262:2018 (Road vehicles: Functional safety).
 
     Provides the HARA/ASIL framework and prescribes functional safety
     requirements at ASIL D for the case study perception component.
@@ -317,7 +328,7 @@ class ISO26262(Standard):
         claims = _build_claims(clauses)
         super().__init__(
             standard_id="ISO26262",
-            full_name="ISO 26262:2018 — Road vehicles — Functional safety",
+            full_name="ISO 26262:2018 (Road vehicles: Functional safety)",
             year=2018,
             scope=(
                 "Functional safety of electrical and electronic systems "

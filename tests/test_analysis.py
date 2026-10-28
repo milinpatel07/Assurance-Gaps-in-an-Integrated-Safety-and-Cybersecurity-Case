@@ -4,7 +4,7 @@ import pytest
 
 from src.standards.base import InconsistencyType, GapType, LifecyclePhase
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 
 

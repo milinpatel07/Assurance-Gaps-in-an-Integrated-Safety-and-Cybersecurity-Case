@@ -14,7 +14,7 @@ import re
 import pytest
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.standards.base import LifecyclePhase
 from src.standards.registry import StandardsRegistry
@@ -69,7 +69,8 @@ class TestSelfContained:
         directory = os.path.dirname(OUTPUT_PATH)
         for link in re.findall(r'href="([^"#][^"]*)"', html):
             if not link.startswith("http"):
-                assert os.path.exists(os.path.join(directory, link)), link
+                path = link.split("#")[0]
+                assert os.path.exists(os.path.join(directory, path)), link
 
     def test_size_fits_the_conference_wifi_budget(self, html):
         assert len(html.encode("utf-8")) < 30_000
@@ -93,13 +94,19 @@ class TestCountsComeFromTheCode:
         goals = build_integrated_gsn().get_goals()
         card = _card(html, "goals")
         assert _number(card) == len(goals)
-        retained = sum(g.origin == "retained" for g in goals)
+        reformulated = [
+            g for g in goals
+            if any("reformulated" in ref for ref in g.clause_references)
+        ]
+        assert [g.element_id for g in reformulated] == ["G1"]
+        retained = sum(g.origin == "retained" for g in goals) - len(reformulated)
         added = sum(g.origin == "new" for g in goals)
         undeveloped = sum(g.origin == "undeveloped" for g in goals)
-        assert retained + added + undeveloped == len(goals)
-        assert f"{retained} kept from" in card
-        assert f"{added} added" in card
-        assert f"{undeveloped} left open" in card
+        assert len(reformulated) + retained + added + undeveloped == len(goals)
+        assert f"{len(reformulated)} reformulated" in card
+        assert f"{retained} retained" in card
+        assert f"{added} added:" in card
+        assert f"{undeveloped} added, undeveloped" in card
 
     def test_evidence_kinds_at_g5(self, html):
         g5 = next(g for g in build_integrated_gsn().get_goals() if g.element_id == "G5")
@@ -132,6 +139,6 @@ class TestProvenance:
         assert "Generated page; do not edit by hand" in html
         assert "python -m src.visualization.numbers_page" in html
 
-    def test_every_card_answers_chosen_or_found(self, html):
+    def test_every_card_says_what_kind_of_number_it_is(self, html):
         cards = re.findall(r'<section class="card"', html)
-        assert html.count("Chosen, or found?") == len(cards) >= 8
+        assert html.count("Scope choice, result, or encoding?") == len(cards) >= 8

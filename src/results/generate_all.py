@@ -1,12 +1,16 @@
-"""Master results generator — produces all outputs for the publication.
+"""Results generator: produces every output of the analysis code.
 
-This script runs the complete five-step methodology and generates:
+This script runs the five-step method of the WAISE paper and generates:
 1. Structured JSON results (output/analysis_results.json)
 2. CSV tables for each analysis component (output/csv/)
-3. LaTeX tables ready for paper inclusion (output/latex/)
-4. Visualization figures (output/figures/)
-5. GSN diagram in DOT and rendered formats (output/figures/)
+3. LaTeX tables, named by content (output/latex/)
+4. Figures (output/figures/)
+5. GSN diagram in DOT and rendered formats (output/figures/); Graphviz is
+   optional, and without it only the DOT file is written
 6. Plain-text summary report (output/summary_report.txt)
+
+The weather-grid numbers are a synthetic illustration (no detector, no CARLA),
+seeded and not a measurement.
 
 Usage:
     python -m src.results.generate_all [--seed 42] [--scenes 50] [--output output]
@@ -26,7 +30,7 @@ import numpy as np
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.evaluation.weather_conditions import generate_weather_grid, compute_triggering_coverage
@@ -103,7 +107,7 @@ def run_step3() -> dict:
 
 
 def run_step4() -> dict:
-    """Step 4: Junction-point analysis (inconsistencies)."""
+    """Step 4: Junction-point analysis, output the decision points (WAISE Table 4)."""
     catalogue = DecisionPointCatalogue()
     return {
         "summary": catalogue.summary_statistics(),
@@ -121,14 +125,18 @@ def run_step4() -> dict:
 
 
 def run_step5() -> dict:
-    """Step 5: Gap identification and classification."""
+    """Step 5: Finding identification, in the paper's two categories (WAISE Table 5)."""
     gaps = GapClassification()
     return {
         "summary": gaps.summary_statistics(),
         "items": [
             {
                 "id": g.gap_id,
-                "type": g.gap_type.value,
+                "category": (
+                    "integration-induced finding"
+                    if g.integration_induced
+                    else "open methodological problem"
+                ),
                 "description": g.description,
                 "phase": g.lifecycle_phase_label,
                 "integration_induced": g.integration_induced,
@@ -139,7 +147,7 @@ def run_step5() -> dict:
 
 
 def run_evidence_convergence() -> dict:
-    """Evidence convergence analysis at G5."""
+    """The evidence types (a) to (d) at G5 (decision point DP-2)."""
     analysis = EvidenceConvergenceAnalysis()
     return {
         "num_evidence_types": len(analysis.evidence_types),
@@ -149,7 +157,7 @@ def run_evidence_convergence() -> dict:
 
 
 def generate_figures(registry, gsn, eval_result, output_dir):
-    """Generate all visualization figures."""
+    """Generate all figures."""
     fig_dir = os.path.join(output_dir, "figures")
     os.makedirs(fig_dir, exist_ok=True)
 
@@ -268,22 +276,24 @@ def main():
     print(f"  {stats['goals']} goals, {stats['solutions']} solutions, "
           f"{stats['junction_points']} junction points")
 
-    # ── Step 4: Inconsistency analysis ────────────────────────────────
-    print("[Step 4] Analysing junction-point inconsistencies...")
+    # ── Step 4: Decision points ───────────────────────────────────────
+    print("[Step 4] Junction-point analysis: decision points...")
     step4 = run_step4()
-    print(f"  {step4['summary']['total']} inconsistencies "
+    print(f"  {step4['summary']['total']} decision points "
           f"({step4['summary']['structural']}S, "
           f"{step4['summary']['terminological']}T, "
           f"{step4['summary']['methodological']}M)")
 
-    # ── Step 5: Gap identification ────────────────────────────────────
-    print("[Step 5] Identifying assurance gaps...")
+    # ── Step 5: Finding identification ────────────────────────────────
+    print("[Step 5] Finding identification...")
     step5 = run_step5()
-    print(f"  {step5['summary']['total']} gaps "
-          f"({step5['summary']['integration_induced']} integration-induced)")
+    n_induced = step5['summary']['integration_induced']
+    print(f"  {step5['summary']['total']} findings "
+          f"({n_induced} integration-induced, "
+          f"{step5['summary']['total'] - n_induced} open methodological problems)")
 
     # ── Evidence convergence ──────────────────────────────────────────
-    print("[Analysis] Evidence convergence at G5...")
+    print("[Analysis] Evidence types at G5 (DP-2)...")
     convergence = run_evidence_convergence()
     print(f"  {convergence['num_evidence_types']} evidence types, "
           f"{convergence['num_analysis_paths']} analysis paths")
@@ -295,7 +305,7 @@ def main():
           f"{completeness.mapped_claims}/{completeness.total_claims} claims mapped")
 
     # ── Counterfactual analysis ────────────────────────────────────
-    print("[Analysis] Counterfactual analysis (per-standard perspective)...")
+    print("[Analysis] Counterfactual analysis (repository analysis, not in either paper)...")
     counterfactual = CounterfactualAnalysis()
     gap_matrix = counterfactual.get_gap_visibility_matrix()
     integration_only = sum(
@@ -303,11 +313,11 @@ def main():
         if all(not gap_matrix[s].get(g, False) for s in gap_matrix if s != "Integrated")
     )
     print(f"  {len(counterfactual.perspectives)} standard perspectives, "
-          f"{integration_only} gaps visible only through integration")
+          f"{integration_only} findings visible only through integration")
 
-    # ── CARLA evaluation ──────────────────────────────────────────────
-    print(f"[Evaluation] Running synthetic CARLA evaluation "
-          f"({args.scenes} scenes/weather)...")
+    # ── Synthetic weather-grid illustration ───────────────────────────
+    print(f"[Illustration] Synthetic weather-grid illustration, no detector, "
+          f"no CARLA ({args.scenes} scenes/weather)...")
     eval_result = generate_synthetic_illustration(
         num_scenes_per_weather=args.scenes,
         seed=args.seed,
@@ -317,7 +327,7 @@ def main():
           f"recall: {eval_summary['overall_mean_recall']:.4f}")
 
     # ── Sensitivity analysis ──────────────────────────────────────────
-    print("[Analysis] Running sensitivity analysis (5 seeds)...")
+    print("[Illustration] Seed sensitivity of the synthetic illustration (5 seeds)...")
     sensitivity = run_sensitivity_analysis(scenes_per_weather=args.scenes)
     sens_summary = sensitivity.summary()
     print(f"  Recall gap: {sens_summary['recall_gap_mean']:.4f} "
@@ -341,7 +351,7 @@ def main():
     tables = generate_all_tables(eval_summary,
                                   os.path.join(output_dir, "latex"))
     for name in tables:
-        print(f"  LaTeX:   output/latex/{name}.tex")
+        print(f"  LaTeX:   {os.path.join(output_dir, 'latex', name + '.tex')}")
 
     # Sensitivity results
     sens_path = os.path.join(output_dir, "csv", "sensitivity_analysis.csv")
@@ -379,9 +389,9 @@ def main():
 
     # Figures
     print()
-    print("[Figures] Generating visualizations...")
+    print("[Figures] Generating figures...")
     generate_figures(registry, gsn, eval_result, output_dir)
-    print("  Saved to output/figures/")
+    print(f"  Saved to {os.path.join(output_dir, 'figures')}/")
 
     # ── Run manifest ──────────────────────────────────────────────────
     manifest_path = write_manifest(output_dir, seed=args.seed, scenes=args.scenes)
@@ -394,21 +404,22 @@ def main():
     print(f"Output directory: {output_dir}/")
     print("=" * 72)
 
-    # Print key findings
+    # Summary of the results
     print()
-    print("KEY FINDINGS:")
-    print(f"  - {step4['summary']['total']} requirement inconsistencies "
+    print("SUMMARY:")
+    print(f"  - {step4['summary']['total']} decision points, WAISE Table 4 "
           f"({step4['summary']['structural']} structural, "
           f"{step4['summary']['terminological']} terminological, "
           f"{step4['summary']['methodological']} methodological)")
-    print(f"  - {step5['summary']['total']} assurance gaps "
-          f"({step5['summary']['integration_induced']} integration-induced)")
-    print(f"  - Central finding: evidence type asymmetry at G5 (I-2)")
-    print(f"  - G5 is the only node where all 4 normative standards contribute")
-    print(f"  - Triggering condition recall: {eval_summary['triggering_mean_recall']:.4f} "
-          f"vs non-triggering: {eval_summary['non_triggering_mean_recall']:.4f}")
-    print(f"  - Triggering divergence: {eval_summary['triggering_mean_divergence']:.4f} "
-          f"(elevated uncertainty under adverse weather)")
+    print(f"  - {step5['summary']['total']} findings, WAISE Table 5 "
+          f"({n_induced} integration-induced, "
+          f"{step5['summary']['total'] - n_induced} open methodological problems)")
+    print("  - DP-2 (I-2): the evidence types at G5 are disjoint by design, each "
+          "on its own measurement scale, and no standard prescribes how they combine")
+    print("  - G5 is the goal where all four standards contribute claims")
+    print("  - Synthetic weather-grid illustration (seeded, not a measurement): "
+          f"triggering recall {eval_summary['triggering_mean_recall']:.4f}, "
+          f"non-triggering recall {eval_summary['non_triggering_mean_recall']:.4f}")
 
 
 if __name__ == "__main__":

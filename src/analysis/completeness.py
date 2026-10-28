@@ -84,16 +84,16 @@ def check_gsn_completeness() -> CompletenessCheckResult:
 
     if is_complete:
         explanation = (
-            f"The 9-goal GSN is structurally complete. "
+            f"Claim-mapping and phase-coverage check passed. "
             f"{len(all_claims) - len(unmapped) - len(out_of_scope)} of "
             f"{len(all_claims)} claims from {len(registry.all_standards)} standards "
             f"map to GSN nodes; {len(out_of_scope)} recorded as outside the "
             f"AI-component scope; none unmapped. "
             f"All {len(all_phases)} lifecycle phases are covered. "
-            f"G9 is intentionally undeveloped (Gap-2: no re-assurance workflow). "
-            f"The extension from 6 to 9 goals is justified: G7 (SOTIF), G8 (cybersecurity), "
-            f"and G9 (modification) are required to host claims that have no home in the "
-            f"base ISO/PAS 8800 Annex B pattern."
+            f"G9 is undeveloped because no single standard prescribes the "
+            f"complete re-assurance workflow (F-2). G7 (SOTIF residual risk), "
+            f"G8 (cybersecurity risk) and G9 (modification) hold claims that no "
+            f"goal of the ISO/PAS 8800 Annex B pattern can take."
         )
     else:
         explanation = (
@@ -150,65 +150,66 @@ def get_related_work_comparison() -> list[RelatedApproach]:
             key_limitation=(
                 "Focuses on ML lifecycle only; does not integrate "
                 "cybersecurity or SOTIF standards, so cannot identify "
-                "cross-standard gaps like Gap-3 and Gap-4"
+                "cross-standard findings like F-3 and F-4"
             ),
         ),
         RelatedApproach(
-            name="SACE (Safety Assurance Cases for AI Ethics)",
-            authors="Bloomfield & Rushby",
-            year=2020,
-            standards_covered=["ISO 26262 (conceptual)", "AI ethics frameworks"],
+            name="SACE (Safety Assurance of autonomous systems in Complex Environments)",
+            authors="Hawkins, Habli & McDermid",
+            year=2022,
+            standards_covered=["None (domain-independent guidance)"],
             methodology=(
-                "Structured argument framework extending safety cases "
-                "to include AI ethical considerations"
+                "Guidance with GSN patterns for assuring an autonomous system "
+                "operating in a complex environment"
             ),
             identifies_integration_gaps=False,
             uses_gsn=True,
-            case_study_domain="General AI systems",
+            case_study_domain="Autonomous systems (general)",
             key_limitation=(
-                "Conceptual framework without concrete standard clause "
-                "mapping; does not perform systematic claim extraction "
-                "or junction-point analysis"
+                "No clause-level traceability to automotive standards (as the "
+                "WAISE paper notes); does not address cybersecurity, so cannot "
+                "identify cross-standard findings like F-3 and F-4"
             ),
         ),
         RelatedApproach(
-            name="Integrated safety-security using STPA-Sec",
-            authors="Friedberg et al.",
+            name="STPA-SafeSec",
+            authors="Friedberg, McLaughlin, Smith, Laverty & Sezer",
             year=2017,
-            standards_covered=["ISO 26262", "ISO/SAE 21434 (precursor)"],
+            standards_covered=["None of the four standards"],
             methodology=(
-                "Combined STPA analysis for safety and security, "
-                "identifying interactions between hazards and threats"
+                "Extends STPA to analyse safety and security together and shows "
+                "the dependencies between cybersecurity vulnerabilities and "
+                "system safety (J. Inf. Secur. Appl. 34, 2017)"
             ),
             identifies_integration_gaps=False,
             uses_gsn=False,
-            case_study_domain="Automotive ECU",
+            case_study_domain="Power grid",
             key_limitation=(
-                "Focuses on hazard/threat analysis only (HARA/TARA equivalent); "
-                "does not address assurance evidence, V&V, or AI-specific "
-                "concerns. No SOTIF or AI safety standards."
+                "A hazard and threat analysis method; it builds no assurance "
+                "argument, does not address V&V evidence or AI components, and "
+                "uses none of the four automotive standards"
             ),
         ),
         RelatedApproach(
-            name="This work: Five-step constructive integration",
+            name="This work: five-step constructive integration (WAISE paper)",
             authors="Patel & Jung",
             year=2026,
             standards_covered=[
                 "ISO 26262", "ISO 21448", "ISO/SAE 21434",
-                "ISO/PAS 8800", "ISO/IEC TR 5469",
+                "ISO/PAS 8800", "ISO/IEC TR 5469 (informative technical report)",
             ],
             methodology=(
-                "Claim extraction -> lifecycle mapping -> GSN extension -> "
-                "junction-point analysis -> gap classification, with "
-                "CARLA-based evaluation"
+                "Claim extraction -> lifecycle-phase mapping -> GSN construction -> "
+                "junction-point analysis -> integration-induced finding "
+                "identification"
             ),
             identifies_integration_gaps=True,
             uses_gsn=True,
-            case_study_domain="AI-based LiDAR perception (SAE L4+)",
+            case_study_domain="AI-based LiDAR perception (HAD)",
             key_limitation=(
-                "Case-study specific goals (G7-G9); synthetic CARLA "
-                "evaluation rather than empirical; inconsistency "
-                "catalogue from expert analysis (single assessor)"
+                "Claim extraction by a single assessor, with no inter-rater "
+                "reliability assessment; only evidence type (c) at G5 is "
+                "instantiated in the case study (WAISE paper, Section 6.3)"
             ),
         ),
     ]
@@ -227,13 +228,14 @@ def print_related_work_table(approaches: list[RelatedApproach]):
         print(f"  Standards:         {', '.join(a.standards_covered)}")
         print(f"  Methodology:       {a.methodology}")
         print(f"  Uses GSN:          {'Yes' if a.uses_gsn else 'No'}")
-        print(f"  Integration gaps:  {'Yes' if a.identifies_integration_gaps else 'No'}")
+        print(f"  Integration-induced findings: {'Yes' if a.identifies_integration_gaps else 'No'}")
         print(f"  Domain:            {a.case_study_domain}")
-        print(f"  Key limitation:    {a.key_limitation}")
+        print(f"  Main limitation:   {a.key_limitation}")
 
     print(f"\n{'=' * 100}")
-    print("KEY DIFFERENTIATOR: This work is the only approach that:")
-    print("  1. Integrates 5 standards (including AI-specific: ISO/PAS 8800, TR 5469)")
-    print("  2. Systematically identifies integration-induced gaps (Gap-3, Gap-4)")
-    print("  3. Provides quantitative evaluation under SOTIF triggering conditions")
+    print("Scope of this work against the rows above:")
+    print("  1. Four standards (ISO 26262, ISO 21448, ISO/SAE 21434, ISO/PAS 8800)")
+    print("     and one informative technical report (ISO/IEC TR 5469)")
+    print("  2. Integration-induced findings identified (F-3, F-4)")
+    print("  3. One integrated GSN argument pattern with cybersecurity claims")
     print("=" * 100)

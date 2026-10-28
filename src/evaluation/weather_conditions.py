@@ -1,11 +1,15 @@
-"""SOTIF triggering conditions: weather parameter configurations for CARLA.
+"""SOTIF triggering conditions: the weather grid of the case study.
 
-Implements the parametric weather variation described in Section 3.1:
-rain (0-100 mm/h) and fog (visibility 10-500m) at controlled intensities,
-evaluated in CARLA for ISO 21448 Cl.9-11 triggering condition coverage.
+The WAISE paper's case study (Section 3.1) names rain, fog and reduced
+visibility as SOTIF-relevant triggering conditions. This module defines a grid
+over them: rain (0 to 100 mm/h) and fog (visibility 10 to 500 m) at controlled
+levels, the input to ISO 21448 Cl.9-11 triggering-condition coverage. The
+levels, their names and the triggering thresholds are choices of this
+repository, documented in data/case_study_parameters/weather_grid.yaml.
 
-The weather parameters are defined independently so they can be varied
-in a controlled grid, as required by the SOTIF verification strategy.
+The weather parameters are defined independently so they can be varied in a
+controlled grid. Each condition also carries the CARLA weather parameters it
+would map to; nothing in this repository connects to CARLA.
 """
 
 from __future__ import annotations
@@ -16,25 +20,27 @@ from itertools import product
 
 @dataclass
 class WeatherCondition:
-    """A single weather configuration for CARLA evaluation.
+    """A single weather configuration of the grid.
 
     Attributes:
-        name: Human-readable name (e.g., "heavy_rain_dense_fog").
-        rain_intensity: Rain intensity in mm/h (0 = no rain, 100 = heavy).
-        fog_density: Fog density as visibility in meters (500 = clear, 10 = dense).
+        name: Human-readable name (e.g., "heavy_rain_dense_fog"), built from the
+            level names in weather_grid.yaml.
+        rain_intensity: Rain intensity in mm/h (0 = no rain, 100 = extreme).
+        fog_density: Fog density as visibility in metres (500 = clear,
+            10 = very dense).
         sun_altitude: Sun altitude angle in degrees (-90 to 90).
         wetness: Road wetness (0 to 1).
         carla_cloudiness: CARLA cloudiness parameter (0 to 100).
         carla_precipitation: CARLA precipitation parameter (0 to 100).
         carla_fog_density: CARLA fog density parameter (0 to 100).
-        carla_fog_distance: CARLA fog start distance in meters.
+        carla_fog_distance: CARLA fog start distance in metres.
         sotif_triggering: Whether this condition is a SOTIF triggering condition.
         sotif_description: Description of the SOTIF relevance.
     """
 
     name: str
     rain_intensity: float  # mm/h
-    fog_density: float  # visibility in meters
+    fog_density: float  # visibility in metres
     sun_altitude: float = 45.0
     wetness: float = 0.0
     carla_cloudiness: float = 0.0
@@ -53,8 +59,8 @@ class WeatherCondition:
     ) -> "WeatherCondition":
         """Create a weather condition from physical parameters.
 
-        Maps physical parameters (rain in mm/h, visibility in m) to
-        CARLA simulation parameters.
+        Maps physical parameters (rain in mm/h, visibility in m) to the
+        CARLA weather parameters they would correspond to.
         """
         # Map rain intensity to CARLA parameters
         carla_precip = min(100.0, rain_mm_h)
@@ -71,18 +77,23 @@ class WeatherCondition:
         # Determine SOTIF triggering condition
         is_triggering = rain_mm_h > 20 or visibility_m < 200
 
-        # Build name
+        # Build the name from the level names in weather_grid.yaml:
+        # rain 0 none, 10 light, 25 moderate, 50 heavy, 100 extreme;
+        # visibility 500 clear, 200 light, 100 moderate, 50 dense, 10 very dense.
+        # Values between grid levels fall into the nearer named band.
         rain_level = (
             "no_rain" if rain_mm_h == 0
             else "light_rain" if rain_mm_h <= 20
-            else "moderate_rain" if rain_mm_h <= 50
-            else "heavy_rain"
+            else "moderate_rain" if rain_mm_h <= 40
+            else "heavy_rain" if rain_mm_h <= 75
+            else "extreme_rain"
         )
         fog_level = (
             "clear" if visibility_m >= 500
             else "light_fog" if visibility_m >= 200
-            else "moderate_fog" if visibility_m >= 50
-            else "dense_fog"
+            else "moderate_fog" if visibility_m >= 100
+            else "dense_fog" if visibility_m >= 30
+            else "very_dense_fog"
         )
         name = f"{rain_level}_{fog_level}"
 
@@ -121,7 +132,7 @@ class WeatherCondition:
 # Rain intensities (mm/h): 5 levels
 RAIN_LEVELS = [0, 10, 25, 50, 100]
 
-# Visibility (meters): 5 levels
+# Visibility (metres): 5 levels
 VISIBILITY_LEVELS = [500, 200, 100, 50, 10]
 
 # Sun altitudes for additional variation
@@ -133,10 +144,10 @@ def generate_weather_grid(
     visibility_levels: list[float] | None = None,
     sun_altitudes: list[float] | None = None,
 ) -> list[WeatherCondition]:
-    """Generate the parametric weather grid for CARLA evaluation.
+    """Generate the parametric weather grid.
 
-    Default: 5 rain x 5 fog = 25 combinations (as described in Section 5.2,
-    evidence type 2). With sun altitude variation: 5 x 5 x 3 = 75 conditions.
+    Default: 5 rain levels x 5 fog levels = 25 combinations. With sun altitude
+    variation: 5 x 5 x 3 = 75 conditions.
 
     Args:
         rain_levels: Rain intensities in mm/h. Default: [0, 10, 25, 50, 100].

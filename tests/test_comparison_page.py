@@ -1,6 +1,6 @@
-"""The seam: the synthesis must stay tied to what the papers state.
+"""The comparison page: the synthesis must stay tied to what the papers state.
 
-The seam page is the one artefact in this repository that says something
+The comparison page (design time and operation) is the one artefact in this repository that says something
 neither paper says. These tests hold it to the conditions that make that
 admissible: it is labelled a synthesis, it carries what differs as well as what
 is shared, its design-time side is read from the analysis rather than retyped,
@@ -15,15 +15,15 @@ import re
 import pytest
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
-from src.analysis.seam import (
+from src.analysis.findings import GapClassification
+from src.analysis.design_time_vs_operation import (
     design_time_point,
     operation_time_point,
-    seam,
+    comparison,
     what_differs,
 )
 from src.gsn.integrated_pattern import build_integrated_gsn
-from src.visualization.seam_page import OUTPUT_PATH, build_html
+from src.visualization.comparison_page import OUTPUT_PATH, build_html
 
 
 @pytest.fixture(scope="module")
@@ -33,11 +33,11 @@ def html() -> str:
 
 class TestGeneratedFileIsCurrent:
     def test_committed_copy_matches_a_rebuild(self, html):
-        assert os.path.exists(OUTPUT_PATH), "docs/seam.html is missing"
+        assert os.path.exists(OUTPUT_PATH), "docs/design-time-and-operation.html is missing"
         with open(OUTPUT_PATH, encoding="utf-8") as handle:
             assert handle.read() == html, (
-                "docs/seam.html is stale. "
-                "Run: python -m src.visualization.seam_page"
+                "docs/design-time-and-operation.html is stale. "
+                "Run: python -m src.visualization.comparison_page"
             )
 
     def test_build_is_deterministic(self, html):
@@ -49,19 +49,19 @@ class TestTheSynthesisIsDeclared:
 
     def test_page_says_neither_paper_states_it(self, html):
         assert "synthesis drawn in this repository" in html
-        assert "Neither paper states it" in html
+        assert "neither paper states it" in html
 
     def test_the_declaration_precedes_the_figure(self, html):
         assert html.index("synthesis drawn in this repository") < html.index("<svg")
 
     def test_page_records_what_differs_not_only_what_is_shared(self, html):
-        assert "What is not the same" in html
+        assert "What differs" in html
         for item in what_differs():
             assert item in html, f"difference dropped from the page: {item}"
 
     def test_both_paper_sources_are_named(self, html):
-        assert "paper/waise2026/camera-ready.tex" in html
-        assert "paper/safecomp2026-position/camera-ready.tex" in html
+        assert "doi:10.1007/978-3-032-35506-5_55" in html
+        assert "Position paper, SAFECOMP 2026" in html
 
 
 class TestDesignTimeSideComesFromTheAnalysis:
@@ -74,24 +74,34 @@ class TestDesignTimeSideComesFromTheAnalysis:
 
     def test_identifiers_track_the_catalogues(self):
         point = design_time_point()
-        assert point.paper_identifiers == ["DP-2", "F-4"]
+        assert point.paper_identifiers == ["DP-2"]
         assert DecisionPointCatalogue().get_by_id("I-2") is not None
         assert GapClassification().get_by_id("Gap-4") is not None
 
-    def test_missing_rule_is_the_findings_own_description(self):
+    def test_missing_rule_is_decision_point_dp2(self):
+        """The rule missing at G5 is decision point DP-2, in the WAISE paper's
+        words (Section 5.1). F-4 (the release decision) is a different finding
+        and is named separately in the source note, with its own recorded
+        description."""
+        point = design_time_point()
+        assert point.missing_rule == (
+            "No standard defines how the disjoint evidence types combine to "
+            "support a single sufficiency claim at G5"
+        )
+        assert "DP-2" in point.source_note
         f4 = GapClassification().get_by_id("Gap-4")
-        assert design_time_point().missing_rule == " ".join(f4.description.split())
+        assert " ".join(f4.description.split()) in point.source_note
 
-    def test_assignment_seam_uses_the_recorded_f3(self):
+    def test_assignment_comparison_uses_the_recorded_f3(self):
         f3 = GapClassification().get_by_id("Gap-3")
-        assert seam()["assignment_seam"]["design_time"] == " ".join(
+        assert comparison()["assignment_comparison"]["design_time"] == " ".join(
             f3.description.split()
         )
 
 
 class TestTheFigureAssertsNoRule:
     def test_both_junctions_mark_the_absence(self, html):
-        assert html.count("No clause combines them") == 2
+        assert html.count("No clause says how to combine them") == 2
 
     def test_the_absence_bar_is_dashed_at_both_junctions(self, html):
         svg = html[html.index("<svg"): html.index("</svg>")]

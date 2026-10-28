@@ -1,11 +1,11 @@
 """The G5 playground: generated, current, self-contained, asserts no rule.
 
-``docs/g5_playground.html`` lets a reader drag four acceptance lines and watch
-the release verdict flip. These tests rebuild it and fail if the committed copy
-differs, hold it to the offline constraint the other pages carry, check the four
-legs are the ones the argument holds, and check it presents the verdict as the
-reader's own rather than asserting the combination rule finding F-4 says is
-missing.
+``docs/g5-playground.html`` lets a reader set four acceptance lines and see
+whether G5 is supported under one stated rule. These tests rebuild it and fail
+if the committed copy differs, hold it to the offline constraint the other pages
+carry, check the four evidence types are the ones the argument holds, and check
+it presents the rule and the lines as the reader's own rather than as the
+combination rule that decision point DP-2 records no standard prescribes.
 """
 
 from __future__ import annotations
@@ -30,12 +30,12 @@ def html() -> str:
 class TestGeneratedFileIsCurrent:
     def test_committed_copy_matches_a_rebuild(self, html):
         assert os.path.exists(OUTPUT_PATH), (
-            "docs/g5_playground.html is missing. "
+            "docs/g5-playground.html is missing. "
             "Run: python -m src.visualization.playground_page"
         )
         with open(OUTPUT_PATH, encoding="utf-8") as handle:
             assert handle.read() == html, (
-                "docs/g5_playground.html is stale. "
+                "docs/g5-playground.html is stale. "
                 "Run: python -m src.visualization.playground_page"
             )
 
@@ -84,19 +84,20 @@ class TestTheFourLegsComeFromTheArgument:
 
 class TestItAssertsNoCombinationRule:
     def test_both_verdicts_are_reachable(self, html):
-        """A page that only ever said RELEASE would hide that the verdict is the
-        reader's. Both outcomes must be in the page."""
-        assert "RELEASE" in html
-        assert "HOLD" in html
+        """A page that only ever showed one result would hide that the result is
+        the reader's. Both outcomes must be in the page."""
+        assert "SUFFICIENT" in html
+        assert "NOT SUFFICIENT" in html
 
     def test_it_says_the_lines_are_the_readers(self, html):
         assert "no clause" in html.lower()
-        assert "F-4" in html
+        assert "DP-2" in html
 
-    def test_it_defines_no_rule(self, html):
-        """The page must not present an authoritative way to combine the scales;
-        that would assert the rule F-4 records as missing."""
-        assert "none exists to define" in html
+    def test_it_names_its_rule_and_disowns_it(self, html):
+        """The page applies a rule (all four must pass). It must say so, and say
+        that no standard prescribes it, rather than claim to apply none."""
+        assert "applies one possible rule" in html
+        assert "no standard prescribes it" in html
         for claim in ("the correct verdict", "the right answer", "how to combine them is"):
             assert claim not in html.lower()
 
@@ -107,7 +108,7 @@ class TestItAssertsNoCombinationRule:
 
 class TestSiteFit:
     def test_it_offers_a_way_onward(self, html):
-        for target in ("index.html", "seam.html", "gsn_view.html"):
+        for target in ("index.html", "design-time-and-operation.html", "argument.html#G5", "numbers.html"):
             assert f'href="{target}"' in html
 
     def test_no_root_relative_links(self, html):

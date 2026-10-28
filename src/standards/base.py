@@ -7,7 +7,7 @@ This module defines the core data model used throughout the analysis:
 - LifecyclePhase: enumeration of AI component lifecycle phases
 
 The lifecycle phases follow the six-phase model defined in Section 3.2
-of the paper (Table 2): Concept/Requirements, Design/Training, V&V,
+of the WAISE paper: Concept/Requirements, Design/Training, V&V,
 Integration/Deployment, Operation/Monitoring, Modification/Re-assurance.
 """
 
@@ -178,7 +178,7 @@ class AssuranceGap:
         gap_type: Classification (missing claim, missing evidence, unresolved inconsistency).
         lifecycle_phase: The primary lifecycle phase where the gap occurs.
         additional_lifecycle_phases: Further phases the camera-ready table lists
-            for this finding. The paper's findings table (tab:gaps) gives two
+            for this finding. The paper's findings table (Table 5, tab:gaps) gives two
             phases for F-1 ("Concept,
             Verification") and for F-3 ("Verification, Operation"). The primary
             field is kept so existing callers keep working; use
