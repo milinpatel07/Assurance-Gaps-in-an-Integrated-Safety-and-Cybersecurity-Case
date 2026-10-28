@@ -1,10 +1,12 @@
-"""The seam: one problem, two lifecycle points.
+"""Design time and operation: the two papers side by side.
 
-Both papers report that evidence from several concerns meets at a single point,
-arrives on measurement scales that do not convert into one another, and that no
-clause says how to combine it. The WAISE paper reports this at design time, at
-the G5 release decision. The position paper reports it at operation time, at the
-in-service re-evaluation that follows an anomaly.
+Each paper reports, for its own lifecycle phase, that results from several
+assurance domains (WAISE paper) or concerns (position paper) have to support a
+single claim, are expressed on different measurement scales, and that no clause
+in the standards examined says how to combine them. The WAISE paper reports
+this at design time, at G5, the verification and validation (V&V) goal. The
+position paper reports it in operation, at the re-evaluation of the assurance
+argument that follows a runtime anomaly.
 
 WHAT THIS MODULE ASSERTS, AND ON WHOSE AUTHORITY
 
@@ -17,8 +19,7 @@ What each paper does state, and what carries the synthesis:
 
   * WAISE, design time. The four evidence types at G5 are "disjoint by design"
     and "no standard defines how the disjoint evidence types combine to support
-    a single sufficiency claim at G5" (DP-2). Finding F-4 records the same
-    absence at the release decision.
+    a single sufficiency claim at G5" (DP-2).
   * Position, operation time: "the concern-specific results still meet at the
     top claim, where the evidence has different measurement scales, such as a
     calibrated probability, an ensemble disagreement value, a binary event
@@ -26,7 +27,7 @@ What each paper does state, and what carries the synthesis:
   * The position paper contrasts the two settings itself: "Operation adds
     conditions that design-time analysis does not face". That sentence
     distinguishes operation from design-time analysis in general rather than
-    from the G5 junction in particular, so it supports the synthesis without
+    from G5 in particular, so it supports the synthesis without
     establishing it. The position paper does cite the WAISE paper.
 
 The design-time identifiers are read from the analysis catalogues rather than
@@ -34,12 +35,13 @@ repeated here, so they cannot drift. The operation-time entries are transcribed
 from the position paper, which no code backs by design; each carries the paper
 as its source.
 
-A second, looser seam is recorded below, on the assignment step rather than the
-combination: the position paper's missing step 1 sits beside WAISE finding F-3,
-the unowned adversarial-SOTIF boundary. It is looser because the two cases
-differ. F-3 is a boundary reached when the cause is known and belongs to two
-concerns at once; missing step 1 is a boundary reached when the cause is not
-known at all. ``assignment_seam()`` says so, and the page repeats it.
+A second, looser comparison is recorded below, on the assignment step rather
+than the combination: the position paper's missing step 1 sits beside WAISE
+finding F-3, the unowned adversarial-SOTIF boundary. It is looser because the
+two cases differ. In F-3 the cause is known: the failure mode is both a threat
+scenario and a triggering condition, and no standard allocates it to G7 or G8.
+In missing step 1 the cause is not known at all. ``assignment_comparison()`` says
+so, and the page repeats it.
 """
 
 from __future__ import annotations
@@ -47,16 +49,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.gsn.integrated_pattern import build_integrated_gsn
 
-PAPER_WAISE = "paper/waise2026/camera-ready.tex"
-PAPER_POSITION = "paper/safecomp2026-position/camera-ready.tex"
+PAPER_WAISE = "WAISE paper, SAFECOMP 2026 Workshops (LNCS), doi:10.1007/978-3-032-35506-5_55"
+PAPER_POSITION = "Position paper, SAFECOMP 2026 (to appear)"
 
 
 @dataclass(frozen=True)
 class Scale:
-    """One measurement scale that meets the others at the junction."""
+    """One measurement scale among those that have to support the same claim."""
 
     label: str
     kind: str
@@ -66,7 +68,7 @@ class Scale:
 
 @dataclass(frozen=True)
 class LifecyclePoint:
-    """One end of the seam."""
+    """One of the two lifecycle phases compared."""
 
     point_id: str
     lifecycle: str
@@ -99,8 +101,8 @@ def _design_time_scales() -> list[Scale]:
 
 
 # Transcribed from the position paper, which no code backs by design. The paper
-# lists these four as the scales that meet at the top claim once an anomaly has
-# been assigned to a concern.
+# gives these four as examples ("such as") of the scales that meet at the top
+# claim once an anomaly has been assigned to a concern.
 #
 # The paper attributes none of the four to a standard, so neither does this
 # module. An earlier version assigned three of them by inference, which put a
@@ -108,7 +110,7 @@ def _design_time_scales() -> list[Scale]:
 # design-time side, where a reader could not tell the two apart.
 _OPERATION_SCALES = [
     Scale("Calibrated probability", "probability", None),
-    Scale("Ensemble disagreement value", "statistical metric", None),
+    Scale("Ensemble disagreement value", "disagreement value per detection", None),
     Scale("Binary event indicator", "binary indicator", None),
     Scale("Risk rating", "risk rating", None),
 ]
@@ -122,18 +124,22 @@ def design_time_point() -> LifecyclePoint:
     return LifecyclePoint(
         point_id="design-time",
         lifecycle="Design time",
-        where="G5, the release decision",
+        where="G5, the verification and validation (V&V) goal",
         question=(
-            "Every prescribed verification activity is complete. Is the "
-            "evidence together enough to release?"
+            "Suppose every prescribed verification activity is complete. Is "
+            "the V&V evidence, taken together, sufficient?"
         ),
         paper=PAPER_WAISE,
-        paper_identifiers=["DP-2", "F-4"],
+        paper_identifiers=["DP-2"],
         scales=_design_time_scales(),
-        missing_rule=" ".join(f4.description.split()),
+        missing_rule=(
+            "No standard defines how the disjoint evidence types combine to "
+            "support a single sufficiency claim at G5"
+        ),
         source_note=(
-            f"WAISE paper, decision point DP-2 ({dp2.description}) and finding "
-            "F-4. The code calls them I-2 and Gap-4."
+            f"WAISE paper, decision point DP-2 ({dp2.description}), Table 4. "
+            "A related finding concerns the release decision, F-4 (Table 5): "
+            f"{' '.join(f4.description.split())}."
         ),
     )
 
@@ -141,22 +147,23 @@ def design_time_point() -> LifecyclePoint:
 def operation_time_point() -> LifecyclePoint:
     return LifecyclePoint(
         point_id="operation-time",
-        lifecycle="Operation time",
-        where="In-service re-evaluation, after an anomaly",
+        lifecycle="Operation",
+        where="Re-evaluation of the assurance argument after a runtime anomaly",
         question=(
-            "A monitor output is abnormal and each concern has re-evaluated. "
-            "Does the assurance argument still hold?"
+            "A runtime monitor output is abnormal and each concern has "
+            "re-evaluated. Does the assurance argument still hold?"
         ),
         paper=PAPER_POSITION,
         paper_identifiers=["Missing step 2, resolution"],
         scales=list(_OPERATION_SCALES),
         missing_rule=(
-            "Concern-specific results must meet the top claim on different "
+            "The concern-specific results meet at the top claim on different "
             "measurement scales, and no rule combines them"
         ),
         source_note=(
-            "Position paper, missing step 2 of two. Its figure labels this "
-            "step resolution into one judgement, with no clause."
+            "Position paper, missing step 2 (resolution): no clause resolves "
+            "the concern-specific results into one judgement on the assurance "
+            "argument. The four scales above are the paper's examples."
         ),
         extra_conditions=[
             "Evidence arrives asynchronously",
@@ -167,31 +174,33 @@ def operation_time_point() -> LifecyclePoint:
 
 
 def shared_structure() -> list[str]:
-    """What is the same at both ends. Each item holds at both points."""
+    """What the two phases have in common. Each item holds in both."""
     return [
-        "Several concerns each complete their own activity within their own scope",
-        "Their results land on measurement scales that do not convert into one another",
-        "The results have to support a single claim at one junction",
-        "No clause in any of the standards says how to combine them",
-        "So the engineer can finish every prescribed activity and still not answer the question",
+        "Each assurance domain or concern completes its own activity within "
+        "its own scope",
+        "The results are expressed on different measurement scales",
+        "The results have to support a single claim",
+        "No clause in the standards examined says how to combine them",
     ]
 
 
 def what_differs() -> list[str]:
-    """What is not the same. Recorded so the synthesis does not overstate."""
+    """What differs. Recorded so the synthesis does not overstate."""
     return [
-        "The design-time junction is reached once, before release; the "
-        "operation-time one recurs whenever a monitor output is abnormal",
+        "At design time the question arises before release and again after "
+        "each modification (G9); in operation it recurs whenever a runtime "
+        "monitor output is abnormal",
         "At design time the evidence is assembled deliberately; in operation it "
         "arrives asynchronously and the component may have changed under an update",
         "Operation carries a reporting duty that requires a current judgement on demand",
-        "Operation needs an assignment step first, which design time does not: the "
-        "anomaly carries no concern label",
+        "In operation the cause of an anomaly is unknown, so it must first be "
+        "assigned to a concern; at design time the cause is known, although its "
+        "allocation between G7 and G8 can still be open (DP-5)",
     ]
 
 
-def assignment_seam() -> dict[str, str]:
-    """The parallel seam, on the assignment step rather than the combination."""
+def assignment_comparison() -> dict[str, str]:
+    """The second comparison, on the assignment step rather than the combination."""
     f3 = GapClassification().get_by_id("Gap-3")
     return {
         "design_time": " ".join(f3.description.split()),
@@ -203,24 +212,23 @@ def assignment_seam() -> dict[str, str]:
         ),
         "operation_time_identifier": "Missing step 1, assignment",
         "note": (
-            "Setting these two beside each other is a second synthesis drawn "
-            "here, and it is looser than the first. They are not the same "
-            "case. The WAISE paper's F-3 is a boundary between two concerns "
-            "when the cause is known: an adversarial input that exploits a "
-            "functional insufficiency belongs to both, and no standard "
-            "allocates it. The position paper's missing step 1 is a boundary "
-            "when the cause is unknown: the anomaly carries no concern label "
-            "at all. What they share is that a case falls between scopes and "
-            "no clause claims it."
+            "This comparison is looser than the first, because the two cases "
+            "differ. In the WAISE paper's F-3 the cause is known: an "
+            "adversarial input that exploits a functional insufficiency is "
+            "both a threat scenario and a triggering condition, yet belongs to "
+            "neither G7 nor G8, because no standard allocates it. In the "
+            "position paper's missing step 1 the cause is unknown: the anomaly "
+            "carries no concern label at all. What they share is that a case "
+            "falls between the standards' scopes and no clause assigns it."
         ),
     }
 
 
-def seam() -> dict:
+def comparison() -> dict:
     """The whole synthesis, as one object for the page and the figure."""
     return {
         "points": [design_time_point(), operation_time_point()],
         "shared": shared_structure(),
         "differs": what_differs(),
-        "assignment_seam": assignment_seam(),
+        "assignment_comparison": assignment_comparison(),
     }

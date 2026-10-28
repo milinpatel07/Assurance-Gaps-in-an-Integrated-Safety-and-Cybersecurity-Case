@@ -40,7 +40,7 @@ CORE_PACKAGES = [
 INPUT_GLOBS = [
     ("gsn", ".gsn.yaml"),
     ("configs", ".yaml"),
-    (os.path.join("data", "carla_configs"), ".yaml"),
+    (os.path.join("data", "case_study_parameters"), ".yaml"),
 ]
 
 

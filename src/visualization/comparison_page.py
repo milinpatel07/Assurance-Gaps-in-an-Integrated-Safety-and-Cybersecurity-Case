@@ -1,23 +1,24 @@
-"""Build the seam page and its figure: one problem, two lifecycle points.
+"""Build the comparison page: design time and operation, the two papers side by side.
 
-Writes ``docs/seam.html``, including an inline SVG figure generated from
-``src/analysis/seam.py``. No node text and no identifier is hand-authored here;
+Writes ``docs/design-time-and-operation.html``, including an inline SVG figure generated from
+``src/analysis/design_time_vs_operation.py``. No node text and no identifier is hand-authored here;
 the design-time side is read from the analysis catalogues and the built
 argument, so the page cannot drift from the code.
 
-The page states in its first paragraph that the unification is a synthesis
+The page states in its first paragraph that the comparison is a synthesis
 drawn in this repository and not a claim either paper makes, and it carries a
-section on what differs between the two points, so a reader cannot mistake the
-synthesis for an identity.
+section on what differs between the two phases, so a reader cannot mistake the
+comparison for an identity.
 
-The figure shows the scales meeting at each junction and marks the missing
+The figure shows the scales that have to support one claim in each phase and
+marks the missing
 combination rule with a dashed bar, following the papers' own convention for
 an absence. It draws no arrow through that bar, because drawing one would
 assert the very rule both papers report as missing.
 
 Usage:
-    python -m src.visualization.seam_page          # write docs/seam.html
-    python -m src.visualization.seam_page --check  # exit 1 if out of date
+    python -m src.visualization.comparison_page          # write docs/design-time-and-operation.html
+    python -m src.visualization.comparison_page --check  # exit 1 if out of date
 """
 
 from __future__ import annotations
@@ -27,14 +28,14 @@ import html
 import os
 import sys
 
-from src.analysis.seam import PAPER_POSITION, PAPER_WAISE, seam
+from src.analysis.design_time_vs_operation import PAPER_POSITION, PAPER_WAISE, comparison
 from src.visualization.standard_colors import GAP_GREY, STANDARD_COLORS, STANDARD_LABELS
 
 REPO_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
-OUTPUT_PATH = os.path.join(REPO_ROOT, "docs", "seam.html")
-REBUILD_COMMAND = "python -m src.visualization.seam_page"
+OUTPUT_PATH = os.path.join(REPO_ROOT, "docs", "design-time-and-operation.html")
+REBUILD_COMMAND = "python -m src.visualization.comparison_page"
 
 # The traceability index and errata live at the repository root, outside the
 # docs/ tree GitHub Pages serves, so they are reachable only by absolute URL.
@@ -94,13 +95,13 @@ def _junction_svg(point, top: int) -> list[str]:
     )
     parts.append(
         f'<text x="190" y="{bar_y + 19}" class="t-gap" text-anchor="middle">'
-        "No clause combines them</text>"
+        "No clause says how to combine them</text>"
     )
     return parts, bar_y + 30
 
 
 def _figure_svg() -> str:
-    data = seam()
+    data = comparison()
     design, operation = data["points"]
 
     body: list[str] = []
@@ -114,7 +115,7 @@ def _figure_svg() -> str:
     )
     body.append(
         f'<text x="190" y="{link_y + 34}" class="t-link" text-anchor="middle">'
-        "Same structure, different lifecycle point</text>"
+        "Set side by side on this page</text>"
     )
 
     op_parts, op_end = _junction_svg(operation, link_y + 62)
@@ -124,8 +125,9 @@ def _figure_svg() -> str:
     return (
         f'<svg viewBox="0 0 380 {height}" width="100%" height="auto" '
         'xmlns="http://www.w3.org/2000/svg" role="img" '
-        'aria-label="The same missing combination rule at two lifecycle points: '
-        'the design-time release decision and the operation-time re-evaluation.">'
+        'aria-label="Measurement scales that have to support one claim, at '
+        'design time (G5, the V&amp;V goal) and in operation (re-evaluation '
+        'after a runtime anomaly), with no clause saying how to combine them.">'
         "<style>"
         ".t-lifecycle{font:700 15px system-ui,sans-serif;fill:#111}"
         ".t-where{font:12px system-ui,sans-serif;fill:#444}"
@@ -145,14 +147,23 @@ def _point_section(point) -> str:
     chips = "".join(
         f'<li><span class="dot" style="--c:{_colour(s.standard)}"></span>'
         f"<strong>{_esc(s.label)}</strong><br>"
-        f'<span class="kind">Scale: {_esc(s.kind)}. '
-        f"Source: {_esc(_standard_label(s.standard))}.</span></li>"
+        f'<span class="kind">Scale: {_esc(s.kind)}.'
+        + (f" Source: {_esc(_standard_label(s.standard))}." if s.standard else "")
+        + "</span></li>"
         for s in point.scales
     )
+    if all(s.standard is None for s in point.scales):
+        chips += (
+            '<li class="note">The position paper gives these scales as '
+            "examples and attributes none of them to a single standard.</li>"
+        )
     extra = ""
     if point.extra_conditions:
         items = "".join(f"<li>{_esc(c)}</li>" for c in point.extra_conditions)
-        extra = f"<p>Operation also adds:</p><ul class='plain'>{items}</ul>"
+        extra = (
+            "<p>Conditions that operation adds (position paper):</p>"
+            f"<ul class='plain'>{items}</ul>"
+        )
     return (
         '<section class="point">'
         f"<h2>{_esc(point.lifecycle)}: {_esc(point.where)}</h2>"
@@ -161,7 +172,7 @@ def _point_section(point) -> str:
         f'<p class="missing">{_esc(point.missing_rule)}.</p>'
         + extra
         + f'<p class="src">{_esc(point.source_note)} '
-        f"Source file: <code>{_esc(point.paper)}</code></p>"
+        f"Source: {_esc(point.paper)}.</p>"
         "</section>"
     )
 
@@ -179,6 +190,7 @@ header { padding-top: 22px; }
 h1 { font-size: 1.4rem; line-height: 1.25; margin: 0 0 10px; }
 h2 { font-size: 1.1rem; margin: 0 0 6px; }
 h3 { font-size: 1rem; margin: 18px 0 6px; }
+.papers { margin: 0 0 10px; color: #222; }
 .synthesis {
   border: 2px solid #111; border-radius: 8px; padding: 10px 12px;
   margin: 12px 0; background: #fafafa;
@@ -216,72 +228,70 @@ a { color: #111; }
 
 
 def build_html() -> str:
-    data = seam()
+    data = comparison()
     shared = "".join(f"<li>{_esc(item)}</li>" for item in data["shared"])
     differs = "".join(f"<li>{_esc(item)}</li>" for item in data["differs"])
-    assignment = data["assignment_seam"]
+    assignment = data["assignment_comparison"]
 
     return (
         "<!doctype html>\n"
         '<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        "<title>One problem at two lifecycle points</title>\n"
+        "<title>Design time and operation: the two papers side by side</title>\n"
         f"<style>{CSS}</style>\n</head>\n<body>\n"
         "<header>\n"
-        "<h1>One problem at two lifecycle points</h1>\n"
+        "<h1>Design time and operation: the two papers side by side</h1>\n"
+        '<p class="papers">The WAISE paper (<em>Integrating Cybersecurity Into '
+        "the AI Safety Assurance Argument</em>, WAISE 2026) covers design time. "
+        "The position paper (<em>Operational Safety and Cybersecurity Assurance "
+        "of AI-Based Perception in Highly Automated Driving</em>, SAFECOMP "
+        "2026) covers operation.</p>"
         '<div class="synthesis">'
-        "<p><strong>What this page is.</strong> Each paper reports, "
-        "separately, that evidence from several concerns has to support one "
-        "claim on scales that do not convert into one another, and that no "
-        "clause says how to combine it. One paper reports it before release, "
-        "the other during service. Putting the two together is a synthesis "
-        "drawn in this repository. Neither paper states it, and this page is "
-        "not evidence for it beyond what each paper already says.</p>"
+        "<p><strong>What this page does.</strong> Each paper reports, for its "
+        "own phase, that results from several standards have to support one "
+        "claim, are expressed on different measurement scales, and that no "
+        "clause says how to combine them. This page sets the two reports side "
+        "by side. The comparison is a synthesis drawn in this repository; "
+        "neither paper states it, and the page adds no evidence beyond what "
+        "each paper says.</p>"
         "</div>\n"
         "</header>\n<main>\n"
         "<figure>"
         + _figure_svg()
-        + "<figcaption>The same junction at two points in the lifecycle, set "
-        "side by side by this repository rather than by either paper. Each "
-        "paper reports its own end. The dashed bar marks the missing rule, "
-        "following the papers' own convention for an absence. This figure "
-        "draws nothing through that bar, because an arrow there would assert "
-        "the rule both papers report as missing. MC/DC is modified "
-        "condition/decision coverage. The figure's data comes from "
-        "<code>src/analysis/seam.py</code>; the page is built by "
-        "<code>src.visualization.seam_page</code>, the rebuild command in the "
-        "footer.</figcaption></figure>\n"
+        + "<figcaption>Top: the four evidence types at G5 (WAISE paper). "
+        "Bottom: the four example scales the position paper gives for "
+        "operation. The dashed bar marks the missing combination rule, "
+        "following the papers' convention for an absence; nothing is drawn "
+        "through it. MC/DC is modified condition/decision coverage. Data: "
+        "<code>src/analysis/design_time_vs_operation.py</code>.</figcaption></figure>\n"
         + _point_section(data["points"][0])
         + _point_section(data["points"][1])
-        + f"<h3>What is the same at both points</h3><ul>{shared}</ul>"
-        + f"<h3>What is not the same</h3><ul>{differs}</ul>"
-        + "<h3>The same boundary, one step earlier</h3>"
-        + "<p>Before the combination question can arise, the anomaly has to "
-        "belong to a concern. Each paper reports a case that falls between "
-        "concerns at that earlier step. Reading the two as one boundary is a "
-        "second synthesis drawn here, and a looser one than the first: the "
-        "two cases differ, as the note below says. SOTIF is safety of the "
-        "intended functionality.</p>"
-        + f"<p><strong>{_esc(assignment['design_time_identifier'])}, design "
-        f"time.</strong> {_esc(assignment['design_time'])}.</p>"
-        + f"<p><strong>{_esc(assignment['operation_time_identifier'])}, "
-        f"operation time.</strong> {_esc(assignment['operation_time'])}.</p>"
+        + f"<h3>What the two phases have in common</h3><ul>{shared}</ul>"
+        + f"<h3>What differs</h3><ul>{differs}</ul>"
+        + "<h3>A second comparison: cases that fall between two standards</h3>"
+        + "<p>Before results can be combined, each case has to belong to a "
+        "concern. Each paper reports a case that falls between the scopes of "
+        "the standards (SOTIF is the safety of the intended functionality, "
+        "ISO 21448).</p>"
+        + f"<p><strong>Design time, {_esc(assignment['design_time_identifier'])}."
+        f"</strong> {_esc(assignment['design_time'])}.</p>"
+        + f"<p><strong>Operation, {_esc(assignment['operation_time_identifier'])}."
+        f"</strong> {_esc(assignment['operation_time'])}.</p>"
         + f"<p>{_esc(assignment['note'])}</p>"
         + "</main>\n<footer>\n"
         "<p>Generated page; do not edit by hand. The design-time side is read "
-        "from the analysis catalogues and the built argument; the "
-        "operation-time side is transcribed from the position paper, which no "
-        "code backs by design. Sources: "
-        f"<code>{_esc(PAPER_WAISE)}</code> and "
-        f"<code>{_esc(PAPER_POSITION)}</code>. "
+        "from the analysis code; the operation side is transcribed from the "
+        "position paper, which has no code behind it. Sources: "
+        f"{_esc(PAPER_WAISE)}; {_esc(PAPER_POSITION)}. "
         f"Rebuild: <code>{REBUILD_COMMAND}</code></p>\n"
-        "<p>Every design-time identifier here is traced in "
-        f'<a href="{BLOB_URL}/TRACEABILITY.md">TRACEABILITY.md</a>, and what '
-        "this work found about the papers is in "
+        "<p>Each identifier is traced in "
+        f'<a href="{BLOB_URL}/TRACEABILITY.md">TRACEABILITY.md</a>. Known '
+        "discrepancies with the papers: "
         f'<a href="{BLOB_URL}/ERRATA.md">ERRATA.md</a>.</p>\n'
-        '<p><a href="index.html">Back to the start</a> · '
-        '<a href="gsn_view.html">The argument, one node at a time</a> · '
-        '<a href="g5_playground.html">Try to combine the four scales</a></p>\n'
+        '<p><a href="index.html">Start page</a> · '
+        '<a href="argument.html#G5">G5 in the integrated GSN argument</a> · '
+        '<a href="g5-playground.html">G5 playground</a> · '
+        '<a href="numbers.html">Where the numbers come from</a></p>\n'
         "</footer>\n</body>\n</html>\n"
     )
 
@@ -290,7 +300,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--check", action="store_true",
-        help="exit 1 if docs/seam.html is out of date",
+        help="exit 1 if docs/design-time-and-operation.html is out of date",
     )
     args = parser.parse_args(argv)
 

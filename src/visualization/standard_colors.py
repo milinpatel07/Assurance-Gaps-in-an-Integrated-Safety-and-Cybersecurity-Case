@@ -5,7 +5,7 @@ GSN view consumes it now; the poster and the talk deck consume it rather than
 defining their own. Decided by the authors on 2026-08-24.
 
 Rationale, as recorded by the authors: the first three values darken the WAISE
-paper's own Figure 2 tints (blue for the ISO/PAS 8800 base, orange for ISO
+paper's own Fig. 1 tints (blue for the ISO/PAS 8800 base, orange for ISO
 21448 at G7, red for ISO/SAE 21434 at G8) to daylight-contrast strength, so the
 published figure and every generated view agree in hue. ISO 26262 gets green
 because the paper leaves it uncoloured, and green is distinguishable from the
@@ -15,7 +15,7 @@ the sole carrier: every swatch sits beside the standard's name.
 Grey is reserved for undeveloped/gap nodes. There is no fifth accent colour.
 
 Known defect, to be fixed in its own change: ``coverage_plots.py`` assigns blue
-to ISO 26262, which conflicts with this palette and with the paper's Figure 2.
+to ISO 26262, which conflicts with this palette and with the paper's Fig. 1.
 It must move to this module's values.
 """
 

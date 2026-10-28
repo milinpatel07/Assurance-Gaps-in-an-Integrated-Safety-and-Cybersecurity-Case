@@ -1,11 +1,12 @@
-"""Evidence convergence analysis at G5 (the central finding).
+"""Evidence convergence analysis at G5 (decision point DP-2).
 
-This module analyses the evidence type asymmetry identified as I-2:
-four fundamentally different evidence types converge at the V&V goal,
-and no standard defines how to combine them.
+This module analyses the evidence type asymmetry, decision point DP-2 (I-2 in
+the code): the four evidence types at the V&V goal are disjoint by design,
+each on its own measurement scale, and no standard prescribes how they combine
+into a single sufficiency claim.
 
-Figure 3 in the paper illustrates this convergence for a single failure
-event (missed pedestrian detection).
+The single-failure-event view (a missed pedestrian detection) is repository
+analysis, not in either paper.
 """
 
 from __future__ import annotations
@@ -63,21 +64,27 @@ class EvidenceConvergenceAnalysis:
                 name="Structural coverage (MC/DC)",
                 standard="ISO 26262",
                 clause="Part 6, Cl.9",
-                what_measured="Code structure of non-AI wrapper",
-                how_produced="Static analysis / instrumented testing",
-                scale="Binary (pass/fail per condition)",
+                what_measured="Code structure of the surrounding non-AI software",
+                how_produced="Structural coverage analysis in software unit verification",
+                scale=(
+                    "Coverage ratio (fraction of conditions shown to "
+                    "independently affect the decision outcome)"
+                ),
                 case_study_instance=(
                     "MC/DC coverage of the non-AI code surrounding the SECOND "
                     "detector (pre-processing, post-processing, interface code)"
                 ),
             ),
             EvidenceType(
-                name="Scenario-based testing with triggering condition coverage",
+                name="SOTIF triggering condition coverage in scenario testing",
                 standard="ISO 21448",
                 clause="Cl.9-11",
                 what_measured="Scenario space and triggering condition coverage",
-                how_produced="Simulation (CARLA) with parametric weather variation",
-                scale="Count (scenarios tested / triggering conditions covered)",
+                how_produced="Scenario simulation in CARLA under controlled rain and fog",
+                scale=(
+                    "Coverage fraction (identified triggering conditions "
+                    "covered by scenario tests)"
+                ),
                 case_study_instance=(
                     "CARLA evaluation under parametrically controlled rain "
                     "(0-100mm/h) and fog (visibility 10-500m) at 5 intensity "
@@ -85,25 +92,32 @@ class EvidenceConvergenceAnalysis:
                 ),
             ),
             EvidenceType(
-                name="AI-specific uncertainty quantification",
+                name="Deep ensemble disagreement as uncertainty indicator",
                 standard="ISO/PAS 8800",
                 clause="Cl.8-9",
-                what_measured="Model prediction confidence / OOD detection",
-                how_produced="Deep ensemble inference with geometric divergence",
-                scale="Statistical distribution (e.g., AUROC for OOD detection)",
+                what_measured=(
+                    "How well the uncertainty indicator separates correct from "
+                    "incorrect detections"
+                ),
+                how_produced="Deep ensemble inference with geometric disagreement",
+                scale=(
+                    "AUROC, a scalar in [0, 1] (separation of correct from "
+                    "incorrect detections)"
+                ),
                 case_study_instance=(
                     "Deep ensemble of 5 independently trained SECOND instances. "
-                    "Geometric divergence of predicted 3D bounding boxes. "
-                    "AUROC for detecting out-of-distribution inputs."
+                    "Geometric disagreement of predicted 3D bounding boxes. "
+                    "AUROC of the disagreement for separating correct from "
+                    "incorrect detections."
                 ),
             ),
             EvidenceType(
-                name="Adversarial penetration testing",
+                name="Adversarial penetration testing against LiDAR spoofing and perturbation",
                 standard="ISO/SAE 21434",
                 clause="Cl.10",
                 what_measured="Attacker capability against the component",
-                how_produced="Red-teaming with defined threat models",
-                scale="Rate (attack success rate under threat model)",
+                how_produced="Penetration testing with defined threat models",
+                scale="Attack success rate under the threat model",
                 case_study_instance=(
                     "LiDAR spoofing attacks (injected ghost points) and "
                     "adversarial point cloud perturbations (PGD on voxel features). "
@@ -113,10 +127,10 @@ class EvidenceConvergenceAnalysis:
         ]
 
     def _build_failure_event(self) -> FailureEvent:
-        """Build the example failure event from Figure 3."""
+        """Build the example failure event (repository analysis)."""
         return FailureEvent(
             description=(
-                "LiDAR detector misses a pedestrian — a single physical event "
+                "LiDAR detector misses a pedestrian: a single physical event "
                 "that enters the integrated argument through three analysis paths"
             ),
             analysis_paths=[
@@ -124,15 +138,15 @@ class EvidenceConvergenceAnalysis:
                     standard="ISO 26262",
                     analysis_method="HARA (Part 3, Cl.6)",
                     output="ASIL D (severity S3, exposure E4, controllability C3)",
-                    evidence_type="MC/DC coverage (deterministic, binary)",
+                    evidence_type="MC/DC structural coverage (coverage ratio)",
                     gsn_node="G5",
                 ),
                 AnalysisPath(
                     standard="ISO 21448",
-                    analysis_method="Triggering condition analysis (Cl.9)",
+                    analysis_method="Triggering condition identification (Cl.7)",
                     output="Triggering condition: heavy rain reduces point density",
                     evidence_type=(
-                        "Scenario coverage + ensemble uncertainty (statistical)"
+                        "Triggering-condition coverage in scenario testing"
                     ),
                     gsn_node="G5",
                 ),
@@ -162,7 +176,7 @@ class EvidenceConvergenceAnalysis:
     def print_analysis(self):
         """Print the evidence convergence analysis."""
         print("=" * 80)
-        print("EVIDENCE CONVERGENCE ANALYSIS AT G5 (Central Finding)")
+        print("EVIDENCE CONVERGENCE AT G5 (decision point DP-2)")
         print("=" * 80)
 
         print("\n--- Four Evidence Types at G5 ---")
@@ -174,7 +188,7 @@ class EvidenceConvergenceAnalysis:
             print(f"      Scale:        {et.scale}")
             print(f"      Case study:   {et.case_study_instance[:80]}...")
 
-        print(f"\n--- Single Failure Event Analysis (Figure 3) ---")
+        print("\n--- Single failure event (repository analysis, not in either paper) ---")
         print(f"\n  Event: {self.failure_event.description}")
         for path in self.failure_event.analysis_paths:
             print(f"\n  Path via {path.standard}:")
@@ -183,44 +197,58 @@ class EvidenceConvergenceAnalysis:
             print(f"    Evidence: {path.evidence_type}")
             print(f"    Node:     {path.gsn_node}")
 
-        print("\n--- Key Finding ---")
+        print("\n--- Decision point DP-2 ---")
         print(
-            "  No standard defines how to combine these four evidence types "
-            "into a single sufficiency claim at G5, or what 'sufficient' means "
-            "when all four are present."
+            "  The four evidence types are disjoint by design, each on its own "
+            "measurement scale, and no standard prescribes how they combine "
+            "into a single sufficiency claim at G5; the integrated V&V strategy "
+            "is the engineer's responsibility."
         )
 
     def get_solution_sketch(self) -> dict:
-        """Return a sketch of potential approaches to combine the four evidence types.
+        """Return a sketch of possible approaches to combining the four evidence types.
 
-        This does not solve the problem fully — it provides direction for future
-        research and demonstrates that the authors have considered resolution paths.
+        Repository analysis, not in either paper. It does not solve the
+        combination problem; it records directions for further work. The
+        example threshold values are illustrative: no clause in the four
+        standards gives any of them.
         """
+        label = "Repository analysis, not in either paper."
         return {
+            "label": label,
             "problem": (
-                "Four incommensurable evidence types converge at G5. Each uses a "
-                "different scale (binary, count, probability, rate). No standard "
-                "defines a combination rule or joint sufficiency criterion."
+                f"{label} At G5, the four evidence types (a) to (d) are disjoint "
+                "by design, each on its own measurement scale (coverage ratio, "
+                "count, AUROC, attack success rate), and none of the four "
+                "standards prescribes how they combine into a single sufficiency "
+                "claim at G5."
             ),
             "approaches": [
                 {
-                    "name": "Threshold-per-type with conjunctive rule",
+                    "name": "Threshold per evidence type with a conjunctive rule",
                     "description": (
                         "Define a minimum threshold for each evidence type independently "
-                        "(e.g., MC/DC >= 100%, scenario coverage >= 95%, AUROC >= 0.95, "
-                        "attack success rate <= 5%). Claim sufficiency iff ALL thresholds met."
+                        "and claim sufficiency only if all thresholds are met. Example "
+                        "values, illustrative only and not taken from any standard: "
+                        "MC/DC 100%, scenario coverage 95%, AUROC 0.95, attack success "
+                        "rate at most 5%."
                     ),
                     "pros": [
-                        "Simple to implement and audit",
-                        "Each threshold can be justified from its source standard",
-                        "Conservative (all must pass)",
+                        "It is simple to implement and to audit.",
+                        "It is conservative, because every evidence type must pass.",
                     ],
                     "cons": [
-                        "Does not capture interactions between evidence types",
-                        "No principled basis for threshold values",
-                        "Cannot trade off strength in one area against weakness in another",
+                        "It does not capture interactions between evidence types.",
+                        "No clause in the four standards gives the threshold values, "
+                        "so each value is an engineering decision that needs its own "
+                        "justification.",
+                        "It cannot trade strength in one evidence type against "
+                        "weakness in another.",
                     ],
-                    "feasibility": "HIGH — can be implemented immediately",
+                    "feasibility": (
+                        "It could be applied with existing tooling once the threshold "
+                        "values are chosen and justified."
+                    ),
                 },
                 {
                     "name": "Weighted Dempster-Shafer belief combination",
@@ -231,16 +259,18 @@ class EvidenceConvergenceAnalysis:
                         "Bel(sufficient) exceeds a threshold."
                     ),
                     "pros": [
-                        "Handles uncertainty and conflicting evidence formally",
-                        "Well-established in safety assessment literature",
-                        "Can model partial confidence in each evidence type",
+                        "It represents uncertainty and conflicting evidence formally.",
+                        "It can model partial confidence in each evidence type.",
                     ],
                     "cons": [
-                        "Requires mapping each scale to belief masses (subjective)",
-                        "Dempster's rule can give counterintuitive results with high conflict",
-                        "Computationally more complex to audit",
+                        "Mapping each scale to belief masses is a subjective step.",
+                        "Dempster's rule can give counterintuitive results when the "
+                        "evidence conflicts strongly.",
+                        "The combination is harder to audit than a set of thresholds.",
                     ],
-                    "feasibility": "MEDIUM — requires expert elicitation for mass assignments",
+                    "feasibility": (
+                        "It needs expert elicitation to assign the belief masses."
+                    ),
                 },
                 {
                     "name": "Multi-criteria decision analysis (MCDA)",
@@ -250,23 +280,26 @@ class EvidenceConvergenceAnalysis:
                         "Weight criteria by safety relevance."
                     ),
                     "pros": [
-                        "Flexible weighting scheme",
-                        "Transparent decision process",
-                        "Can incorporate stakeholder preferences",
+                        "The weighting scheme is flexible.",
+                        "The decision process is transparent.",
+                        "It can take stakeholder preferences into account.",
                     ],
                     "cons": [
-                        "Weights are subjective",
-                        "Not standard practice in functional safety",
-                        "May not satisfy regulatory auditors",
+                        "The weights are subjective.",
+                        "It is not standard practice in functional safety.",
+                        "Regulatory auditors may not accept it.",
                     ],
-                    "feasibility": "MEDIUM — well-understood but novel in this context",
+                    "feasibility": (
+                        "The methods are well understood, but they have not been "
+                        "applied to this combination problem."
+                    ),
                 },
             ],
             "recommendation": (
-                "We recommend starting with the threshold-per-type approach for "
-                "practical deployments, as it is the most auditable and aligns with "
-                "existing standard practices. For research, the Dempster-Shafer "
-                "approach offers the most principled combination of heterogeneous "
-                "evidence under uncertainty. Both warrant further investigation."
+                f"{label} The threshold-per-type approach is the most auditable "
+                "starting point for practical use, provided each threshold value "
+                "is justified as an engineering decision. The Dempster-Shafer "
+                "approach gives a formal combination of heterogeneous evidence "
+                "under uncertainty and is a candidate for further research."
             ),
         }

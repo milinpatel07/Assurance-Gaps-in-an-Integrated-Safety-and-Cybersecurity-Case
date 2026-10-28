@@ -1,4 +1,4 @@
-"""Build the page that explains where each number in the papers comes from.
+"""Build the page that explains where each count in the papers comes from.
 
 Writes ``docs/numbers.html``. A reader meeting "four standards, nine goals,
 seven decision points, five findings" for the first time asks why those
@@ -26,7 +26,7 @@ import sys
 from collections import Counter
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.analysis.topology_sensitivity import topology_report
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.standards.base import LifecyclePhase
@@ -80,6 +80,21 @@ def _paper_id(gap_id: str) -> str:
     return gap_id.replace("Gap-", "F-")
 
 
+# Why a decision point attaches to a goal that is not a junction. Keyed by goal;
+# the goals themselves are read from the catalogue.
+_DP_EXTRA_REASON = {
+    "G3": "there ISO/PAS 8800 meets the informative ISO/IEC TR 5469 on data "
+          "sufficiency",
+    "G7": "DP-3 concerns the AI-error terminology used at both G2 and G7, and "
+          "DP-5 the boundary between G7 and G8",
+}
+
+
+def _dp_id(dp) -> str:
+    """The papers write DP-2 where the code writes I-2."""
+    return dp.inconsistency_id.replace("I-", "DP-")
+
+
 def _facts() -> dict:
     """Everything the page states, read from the code that produces it."""
     registry = StandardsRegistry()
@@ -88,9 +103,26 @@ def _facts() -> dict:
     catalogue = DecisionPointCatalogue().inconsistencies
     gaps = GapClassification().gaps
 
-    origin = Counter(goal.origin for goal in goals)
     g5 = next(goal for goal in goals if goal.element_id == "G5")
-    junctions = [goal.element_id for goal in goals if len(goal.source_standards) >= 2]
+    reformulated = [
+        g.element_id for g in goals
+        if any("reformulated" in ref for ref in g.clause_references)
+    ]
+    dp_nodes = sorted({node for dp in catalogue for node in dp.gsn_nodes},
+                      key=lambda n: int(n[1:]))
+    junctions = [g.element_id for g in goals if len(g.source_standards) >= 2]
+    dp_extra = {
+        node: [_dp_id(dp) for dp in catalogue if node in dp.gsn_nodes]
+        for node in dp_nodes if node not in junctions
+    }
+    # "also" only where the decision point sits at a junction as well.
+    dp_also = {
+        node: all(
+            any(n in junctions for n in dp.gsn_nodes)
+            for dp in catalogue if node in dp.gsn_nodes
+        )
+        for node in dp_extra
+    }
     dp_types = Counter(dp.inconsistency_type.value for dp in catalogue)
 
     report = topology_report()
@@ -109,12 +141,19 @@ def _facts() -> dict:
         "documents": len(registry.all_standards),
         "phases": [PHASE_NAMES[p] for p in LifecyclePhase],
         "goals": [goal.element_id for goal in goals],
-        "retained": [g.element_id for g in goals if g.origin == "retained"],
+        "reformulated": reformulated,
+        "retained": [
+            g.element_id for g in goals
+            if g.origin == "retained" and g.element_id not in reformulated
+        ],
         "added": [g.element_id for g in goals if g.origin == "new"],
         "undeveloped": [g.element_id for g in goals if g.origin == "undeveloped"],
-        "origin": origin,
         "g5_standards": sorted(g5.source_standards),
+        "dp_nodes": dp_nodes,
         "junctions": junctions,
+        "dp_extra": dp_extra,
+        "dp_also": dp_also,
+        "junctions_without_dp": [j for j in junctions if j not in dp_nodes],
         "decision_points": len(catalogue),
         "dp_types": dp_types,
         "findings": len(gaps),
@@ -155,9 +194,9 @@ def _card(
         f'<p class="num">{number}</p>'
         f"<h2>{_esc(title)}</h2>"
         f'<p class="breakdown">{breakdown}</p>'
-        "<details open><summary>How the method arrives at it</summary>"
+        "<details open><summary>Where the number comes from</summary>"
         f"<p>{rule}</p></details>"
-        "<details><summary>Chosen, or found?</summary>"
+        "<details><summary>Scope choice, result, or encoding?</summary>"
         f"<p>{choice}</p></details>"
         f'<p class="check"><span class="src">{_esc(source)}.</span> Check: {links}</p>'
         "</section>"
@@ -167,9 +206,6 @@ def _card(
 def _cards(f: dict) -> str:
     normative = len(f["normative"])
     goals = len(f["goals"])
-    retained, added, undeveloped = (
-        len(f["retained"]), len(f["added"]), len(f["undeveloped"]),
-    )
     ii, om = len(f["integration_induced"]), len(f["open_problems"])
     dp = f["dp_types"]
     g5 = len(f["g5_standards"])
@@ -179,54 +215,60 @@ def _cards(f: dict) -> str:
     cards.append(_card(
         anchor="standards",
         number=normative,
-        title="Standards that apply normatively",
+        title="Standards in scope",
         breakdown=(
             "".join(_standard_chip(s) for s in f["normative"])
             + "".join(
-                _chip(f"{INFORMATIVE_LABELS.get(s, s)} (informative, not counted)")
+                _chip(f"{INFORMATIVE_LABELS.get(s, s)} (informative report, not counted)")
                 for s in f["informative"]
             )
         ),
         rule=(
-            f"An AI-based perception component in a road vehicle draws on "
-            f"{_word(normative)} standards: functional safety (ISO 26262), the safety of the intended "
-            "functionality, or SOTIF (ISO 21448), cybersecurity (ISO/SAE 21434), and "
-            "safety of AI (ISO/PAS 8800). ISO/IEC TR 5469 is read too, because the "
-            "WAISE paper cites it, but it is an informative technical report. "
-            "Any statement about &ldquo;all four standards&rdquo; counts only the "
-            "normative ones."
+            "The WAISE paper gives one reason per standard: an AI-based "
+            "perception component falls within the scope of all "
+            f"{_word(normative)} at once. ISO 26262 applies because a perception "
+            "failure can contribute to ASIL D hazardous events at SAE Level 4; "
+            "ISO 21448 (SOTIF, the safety of the intended functionality) because "
+            "the intended function can produce hazardous behaviour without a "
+            "fault; ISO/SAE 21434 because the sensor data are vulnerable to "
+            "adversarial manipulation; ISO/PAS 8800 because the component is a "
+            "trained neural network. ISO/IEC TR 5469 is cited as an informative "
+            "technical report and is not counted."
         ),
         choice=(
-            "This is the scope of the papers. The scope is not tuned to produce a "
-            "result: it is the set the WAISE abstract names as the standards the "
-            "component requires evidence from. A fifth normative standard, if one "
-            "applied, would enter as another leg of the argument and could add "
-            "junctions."
+            "A scope choice of the papers. ISO/TS 5083 (safety at the level of "
+            "the automated driving system), ISO 26262 Parts 9 to 12, UL 4600, "
+            "the EU AI Act and UNECE R155/R156 are outside it. The position "
+            "paper works with three of the four: ISO 21448, ISO/PAS 8800 and "
+            "ISO/SAE 21434, each of which defines an operation-phase activity "
+            "that uses runtime monitor evidence."
         ),
+        source="Counted from the code",
         check=[
             ("registry.py", f"{BLOB}/src/standards/registry.py"),
-            ("TRACEABILITY.md §1", f"{BLOB}/TRACEABILITY.md"),
+            ("TRACEABILITY.md, section 1", f"{BLOB}/TRACEABILITY.md#1-standards-and-editions"),
         ],
     ))
 
     cards.append(_card(
         anchor="claims",
         number=f["claims"],
-        title="Clause-level claims extracted",
+        title="Clause-level claims encoded",
         breakdown=_esc(
             f"From {_word(f['documents'])} documents: the {_word(normative)} "
             "standards and the informative report."
         ),
         rule=(
-            "Step 1 of the method reads each standard at clause level. A claim is "
-            "a normative requirement, a defined work product, or a required "
-            "lifecycle activity, and each one names the clause it comes from."
+            "Step 1 of the WAISE method (claim extraction) reads each standard "
+            "at clause level. A claim is a normative requirement, a defined work "
+            "product, or a required lifecycle activity, and each one names the "
+            "clause it comes from."
         ),
         choice=(
-            "Found, with a caveat. The count depends on how finely a clause is "
-            "split into claims, so it describes this encoding, not the standards. "
-            "None of the findings depends on the total; they depend on which "
-            "standards meet at which goal."
+            "Repository encoding. Neither paper reports this count, and it "
+            "depends on how finely a clause is split into claims. No decision "
+            "point or finding depends on the total; they depend on which "
+            "standards contribute to which goal."
         ),
         check=[
             ("src/standards/", f"{REPO_URL}/tree/main/src/standards"),
@@ -239,16 +281,18 @@ def _cards(f: dict) -> str:
         title="Lifecycle phases",
         breakdown="".join(_chip(p) for p in f["phases"]),
         rule=(
-            "Step 2 places every claim on one phase of the component's life, from "
-            "the first requirement to the retrained model in service. The grid "
-            "shows where the standards cover the same phase and where none does."
+            "Step 2 of the WAISE method (lifecycle-phase mapping) places every "
+            "claim on one phase, from the first requirement to the retrained "
+            "model in operation. The grid shows where the standards cover the "
+            "same phase and where none of them does."
         ),
         choice=(
-            f"Chosen. The {_word(len(f['phases']))} phases are a mapping grid the "
-            "WAISE paper defines in its method. A finer "
-            "grid would move claims between cells but would not create or remove "
-            "a junction in the argument."
+            "A choice of the WAISE paper: a mapping grid that spans the "
+            "lifecycles of the four standards rather than the phase model of any "
+            "one of them. A finer grid would move claims between cells but would "
+            "not change which standards contribute to which goal."
         ),
+        source="Counted from the code",
         check=[
             ("base.py, LifecyclePhase", f"{BLOB}/src/standards/base.py"),
         ],
@@ -257,59 +301,69 @@ def _cards(f: dict) -> str:
     cards.append(_card(
         anchor="goals",
         number=goals,
-        title="Goals in the integrated argument",
+        title="Goals in the integrated GSN argument",
         breakdown=(
-            _chip(f"{retained} kept from ISO/PAS 8800 Annex B: " + ", ".join(f["retained"])
-                  + " (G1 reworded)")
-            + _chip(f"{added} added: " + ", ".join(f["added"]))
-            + _chip(f"{undeveloped} left open: " + ", ".join(f["undeveloped"]), GAP_GREY)
+            _chip(f"{len(f['reformulated'])} reformulated: " + ", ".join(f["reformulated"]))
+            + _chip(f"{len(f['retained'])} retained: " + ", ".join(f["retained"]))
+            + _chip(f"{len(f['added'])} added: " + ", ".join(f["added"]))
+            + _chip(f"{len(f['undeveloped'])} added, undeveloped: "
+                    + ", ".join(f["undeveloped"]), GAP_GREY)
         ),
         rule=(
-            "Step 3 starts from the Annex B pattern, the published argument pattern "
-            "for AI components in road vehicles, and keeps its goals. A claim from "
-            "another standard is attached to an existing goal when it serves the "
-            "same purpose. A new goal is created only when nothing in the base "
-            "fits. That happened twice: G7 and G8 each claim that a residual risk "
-            "is acceptable (SOTIF and cybersecurity), which is a judgement, not a "
-            "verification activity, so neither belongs under G5. G9, re-assurance "
-            "after an update or retraining, is drawn but left undeveloped, because "
-            "no standard prescribes the complete workflow."
+            "Step 3 of the WAISE method starts from the GSN pattern in ISO/PAS "
+            "8800 Annex B: a top-level goal G1 and five sub-goals G2 to G6. The "
+            "rule is to attach claims from the other standards to an existing "
+            "goal where the assurance domain matches, and to create a new goal "
+            "only where no equivalent exists. G1 is reformulated to claim the "
+            "integrated safety and cybersecurity requirements, because the "
+            "strategy now argues over four assurance domains. G7 (SOTIF residual "
+            "risk) and G8 (cybersecurity risk) are added because each claims "
+            "that a residual risk is acceptable, which is a judgement rather "
+            "than a verification activity. G9 (re-assurance after a modification) "
+            "is added and left undeveloped, because no single standard "
+            "prescribes the complete re-assurance workflow."
         ),
         choice=(
-            f"The base pattern is a choice; the {_word(goals)} follows from it. "
-            "With a different base (AMLAS or SACE, for example) the goals would be "
-            "numbered and cut differently. What the papers rely on is not the "
-            "count but where the standards meet, and that is checked separately: "
-            "see the findings card below."
+            "The base pattern is a choice; the count follows from it and from "
+            "the rule above. The WAISE paper names an alternative top-level "
+            "structure, the concern hierarchy of Warg and Skoglund, and keeps "
+            "the Annex B structure because it preserves the activity-based "
+            "decomposition and keeps each branch traceable to one standard."
         ),
         check=[
             ("integrated_pattern.py", f"{BLOB}/src/gsn/integrated_pattern.py"),
             ("annex_b_base.py", f"{BLOB}/src/gsn/annex_b_base.py"),
-            ("the argument, node by node", "gsn_view.html"),
+            ("the integrated GSN argument", "argument.html"),
         ],
     ))
 
     cards.append(_card(
         anchor="evidence",
         number=g5,
-        title="Kinds of evidence at G5, the V&V goal",
+        title="Evidence types at G5, the V&V goal",
         breakdown="".join(_standard_chip(s) for s in f["g5_standards"]),
         rule=(
-            "G5 claims that verification and validation are sufficient. It is the "
-            "one goal where every normative standard contributes, and each asks "
-            "for its own evidence: structural coverage of the non-AI code "
-            "(ISO 26262), scenario coverage against triggering conditions "
-            "(ISO 21448), a statistical uncertainty score (ISO/PAS 8800), and an "
-            "attack success rate from penetration testing (ISO/SAE 21434)."
+            "G5 claims that the verification and validation (V&V) evidence is "
+            "sufficient. It is the goal to which all four standards contribute, "
+            "and the case-study evidence set has one evidence type from each: "
+            "(a) MC/DC structural coverage of the surrounding non-AI software "
+            "(ISO 26262), (b) SOTIF triggering-condition coverage in scenario "
+            "testing (ISO 21448), (c) deep-ensemble disagreement as an "
+            "uncertainty indicator, measured by AUROC (ISO/PAS 8800), and (d) "
+            "adversarial penetration testing, measured as attack success rate "
+            "(ISO/SAE 21434)."
         ),
         choice=(
-            "Found. One kind of evidence per contributing standard, and the four "
-            "measure on scales that do not convert into one another. That is the "
-            "central result: no clause says how to combine them."
+            "The count follows from the scope: one evidence type per "
+            "contributing standard. The result is what the WAISE paper finds "
+            "about them: the types are disjoint by design, each on its own "
+            "measurement scale, and no standard prescribes how they combine "
+            "into a single sufficiency claim at G5 (decision point DP-2)."
         ),
         check=[
             ("evidence_convergence.py", f"{BLOB}/src/analysis/evidence_convergence.py"),
-            ("try it: the G5 playground", "g5_playground.html"),
+            ("G5 playground", "g5-playground.html"),
+            ("G5 in the argument", "argument.html#G5"),
         ],
     ))
 
@@ -323,23 +377,42 @@ def _cards(f: dict) -> str:
             + _chip(f"{dp.get('methodological', 0)} methodological")
         ),
         rule=(
-            "Step 4 examines every goal where claims from two or more standards "
-            f"meet ({', '.join(f['junctions'])}). A decision point is recorded "
-            "wherever the standards leave a choice to the project instead of "
-            "prescribing one. Terminological ones (two words for one thing) and "
-            "methodological ones (two methods for one aim) a project can settle "
-            "by agreeing on a vocabulary or a method. Structural ones need a "
-            "decision that no standard prescribes."
+            "Step 4 of the WAISE method (junction-point analysis) examines each "
+            "goal where claims from two or more standards meet, and records a "
+            "decision point wherever the standards defer to application context, "
+            "so that the engineer has to decide. In this argument "
+            f"{_word(len(f['junctions']))} goals are junctions: "
+            f"{', '.join(f['junctions'])}. "
+            + "".join(
+                f"{' and '.join(ids)} "
+                + ((f"also {'attaches' if len(ids) == 1 else 'attach'} to "
+                    if f["dp_also"][node]
+                    else f"{'sits' if len(ids) == 1 else 'sit'} at ")
+                   + f"{node}, to ")
+                + "which only one of the four standards contributes: "
+                f"{_DP_EXTRA_REASON.get(node, 'see decision_points.py')}. "
+                for node, ids in f["dp_extra"].items()
+            )
+            + (
+                f"{', '.join(f['junctions_without_dp'])} is a junction without a "
+                "decision point. " if f["junctions_without_dp"] else ""
+            )
+            + "The paper distinguishes three types: "
+            "terminological (different terms for the same concept), "
+            "methodological (different methods for the same objective), and "
+            "structural (frameworks requiring decisions that no standard "
+            "prescribes). A project can settle the first two by agreeing on a "
+            "vocabulary or a method."
         ),
         choice=(
-            f"Found. {_word(f['decision_points']).capitalize()} is what the "
-            "examination turned up, not a target. The "
-            "three-way typing is the paper's, and ERRATA.md records the one place "
-            "where the paper's own table and prose disagree on a type (DP-2)."
+            "A result of the analysis: the count is what the examination found. "
+            "The split by type follows the paper's prose; the paper's Table 4 "
+            "types DP-2 as both structural and methodological, which ERRATA.md "
+            "records."
         ),
         check=[
             ("decision_points.py", f"{BLOB}/src/analysis/decision_points.py"),
-            ("ERRATA.md §1", f"{BLOB}/ERRATA.md"),
+            ("ERRATA.md, entry 1", f"{BLOB}/ERRATA.md"),
         ],
     ))
 
@@ -356,55 +429,60 @@ def _cards(f: dict) -> str:
                     + ", ".join(_paper_id(g.gap_id) for g in f["open_problems"]))
         ),
         rule=(
-            "Step 5 sorts what the integrated argument exposes into two kinds. An "
-            "integration-induced finding exists only between the scopes of the "
-            "standards, so no reader of one standard alone can see it: the "
-            "adversarial-SOTIF boundary that belongs to neither G7 nor G8 (F-3), "
-            "and the release decision that has to combine all four kinds of "
-            "evidence (F-4). An open methodological problem is a framework the "
-            "standards do prescribe, with no published method yet for the numbers "
-            "it needs (F-1, F-2, F-5). The code writes Gap-1 to Gap-5 for F-1 to F-5."
+            "Step 5 of the WAISE method sorts the findings into two categories. "
+            "An integration-induced finding emerges only between the scopes of "
+            "the standards and cannot be detected from any one of them alone: "
+            "F-3, adversarial inputs that exploit a functional insufficiency "
+            "fall between G7 and G8 and belong to neither; F-4, no standard "
+            "requires evaluating the combined residual risk across domains for "
+            "the release decision. An open methodological problem is one where "
+            "the standards prescribe a framework, but no published method "
+            "supplies what it needs: application-specific quantitative acceptance criteria (F-1) "
+            "and data acceptance criteria (F-5) for AI components, and a "
+            "complete re-assurance workflow after an over-the-air update (F-2)."
         ),
         choice=(
-            "Found, and tested against the obvious objection that a different "
-            "argument structure would make the integration-induced findings "
-            "disappear. They were derived under two structures, "
-            f"{_esc(topologies)}: "
-            + ("both arise under each." if robust else "they do not both arise under each.")
-            + " The derivation reports the result either way; it is not tuned."
+            "A result of the analysis. As a further check, not reported in "
+            "either paper, this repository derives F-3 and F-4 under two "
+            f"argument structures, {_esc(topologies)}: "
+            + ("both findings arise under each." if robust
+               else "they do not both arise under each.")
         ),
         check=[
-            ("gaps.py", f"{BLOB}/src/analysis/gaps.py"),
+            ("findings.py", f"{BLOB}/src/analysis/findings.py"),
             ("topology_sensitivity.py", f"{BLOB}/src/analysis/topology_sensitivity.py"),
-            ("counterfactual.py", f"{BLOB}/src/analysis/counterfactual.py"),
         ],
     ))
 
     cards.append(_card(
         anchor="missing-steps",
         number=2,
-        title="Missing steps once the vehicle is in service",
-        breakdown=_chip("Assignment: which concern owns the alarm?")
-        + _chip("Resolution: one judgement from the concerns' results"),
+        title="Missing steps in operation (position paper)",
+        breakdown=_chip("Assignment of an anomaly to a concern")
+        + _chip("Resolution of the concern-specific results into one judgement"),
         rule=(
-            "The position paper follows a runtime alarm that arrives without a "
-            "label. Rain and a spoofing attack can produce the same missing "
-            "detections. ISO 21448, ISO/PAS 8800 and ISO/SAE 21434 each define "
-            "an operation-phase activity within their own concern, but no "
-            "clause assigns the alarm to one of them (step one), and none says "
-            "how their results resolve into one judgement on the argument "
-            "(step two)."
+            "In operation, a runtime monitor can report an abnormal output, for "
+            "example a scene region where detections drop. The anomaly carries "
+            "no concern label: rain and a spoofing attack can produce the same "
+            "missing detections. ISO 21448, ISO/PAS 8800 and ISO/SAE 21434 each "
+            "define an operation-phase activity within their own concern, but no "
+            "clause in these standards assigns the anomaly to a concern "
+            "(step 1), and none resolves the concern-specific results into one "
+            "judgement on the assurance argument (step 2)."
         ),
         choice=(
-            "Argued. These are the two steps the paper finds missing, at clause "
-            "level. Labelling every alarm would close the first and leave the "
-            "second, which is why the paper keeps them apart. The paper then "
-            "states four requirements (R1 to R4) a closing method must meet, each "
-            "necessary, without claiming the set is sufficient."
+            "Argued from clause text. The two steps are kept apart because "
+            "labelling every anomaly would close the first and leave the second. "
+            "The paper's position is that closing the gap is an in-service "
+            "re-evaluation of the safety case, not an in-vehicle runtime "
+            "function, and it states four requirements for a method that closes "
+            "it: R1 heterogeneous evidence, R2 assignment, R3 traceability and "
+            "currency, R4 modification. Each is necessary; the paper does not "
+            "claim the set is sufficient."
         ),
         check=[
-            ("the anomaly walk notebook", f"{BLOB}/notebooks/anomaly_walk.ipynb"),
-            ("one problem, two lifecycle points", "seam.html"),
+            ("the anomaly notebook", f"{BLOB}/notebooks/3_runtime_anomaly.ipynb"),
+            ("the comparison page", "design-time-and-operation.html"),
         ],
         source="From the position paper's text; no code computes it",
     ))
@@ -477,7 +555,7 @@ JUMPS = [
     ("evidence", "G5 evidence"),
     ("decision-points", "Decision points"),
     ("findings", "Findings"),
-    ("missing-steps", "In service"),
+    ("missing-steps", "Operation"),
 ]
 
 
@@ -497,18 +575,18 @@ def build_html() -> str:
         f'<p class="lede">{_word(len(facts["normative"])).capitalize()} standards, '
         f'{_word(len(facts["goals"]))} goals, {_word(facts["decision_points"])} '
         f'decision points, {_word(facts["findings"])} findings. '
-        "None of these was a target. Each is what one step of "
-        "the method produced, and each card below names that step, shows "
-        "what the number breaks down into, and says whether it reflects a "
-        "choice or a result.</p>\n"
+        "Each card below names the step of the WAISE paper's five-step method "
+        "that produced the number, shows what it breaks down into, and says "
+        "whether it reflects a scope choice of the papers, a result of the "
+        "analysis, or this repository's encoding.</p>\n"
         f'<nav class="jump" aria-label="Jump to">{jumps}</nav>\n'
         "</header>\n"
         f"<main>{_cards(facts)}</main>\n"
         "<footer>\n"
-        '<p><a href="index.html">Back to the overview</a> · '
-        '<a href="gsn_view.html">the argument, node by node</a> · '
-        f'<a href="{BLOB}/TRACEABILITY.md">TRACEABILITY.md</a>, where every '
-        "number traces to a paper passage, a clause, or a command.</p>\n"
+        '<p><a href="index.html">Start page</a> · '
+        '<a href="argument.html">The integrated GSN argument, node by node</a> · '
+        f'<a href="{BLOB}/TRACEABILITY.md">TRACEABILITY.md</a>, which traces '
+        "each number to a paper passage, a clause, or a command.</p>\n"
         f"<p>Generated page; do not edit by hand. Rebuild: "
         f"<code>{REBUILD_COMMAND}</code></p>\n"
         "</footer>\n</body>\n</html>\n"

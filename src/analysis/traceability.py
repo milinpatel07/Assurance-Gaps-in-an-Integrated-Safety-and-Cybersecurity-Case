@@ -18,7 +18,7 @@ from typing import Optional
 from src.standards.registry import StandardsRegistry
 from src.gsn.integrated_pattern import build_integrated_gsn
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GAP_GOAL_MAP, GapClassification
+from src.analysis.findings import GAP_GOAL_MAP, GapClassification
 
 
 @dataclass
@@ -58,7 +58,7 @@ class TraceabilityMatrix:
                     inc.inconsistency_id
                 )
 
-        # Build lookup: goal -> gap IDs, from the single source in gaps.py.
+        # Build lookup: goal -> gap IDs, from the single source in findings.py.
         goal_gaps: dict[str, list[str]] = {}
         goal_int_gaps: dict[str, list[str]] = {}
         for g in self.gap_classification.gaps:

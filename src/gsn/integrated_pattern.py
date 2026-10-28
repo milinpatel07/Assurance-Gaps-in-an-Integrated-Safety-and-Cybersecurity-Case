@@ -6,7 +6,7 @@ This module builds the integrated GSN by:
 3. Augmenting existing goals with claims from ISO 21448 and ISO/SAE 21434
 4. Adding new goals G7 (SOTIF residual risk), G8 (cybersecurity risk), G9 (modification)
 
-The output is the integrated GSN shown in Figure 2 and Table 3 of the paper.
+The output is the integrated GSN shown in Fig. 1 and Table 2 of the WAISE paper.
 """
 
 from src.gsn.model import (
@@ -41,8 +41,11 @@ def build_integrated_gsn() -> GSNArgument:
         element_id="C1",
         element_type=None,  # set in __post_init__
         text=(
-            "ASIL D assigned from HARA. At SAE Level 4+, controllability is C3 "
-            "(no human driver). High severity and exposure yield ASIL D."
+            "ASIL D for the case study, from the ISO 26262-3 hazard analysis "
+            "and risk assessment (HARA): at SAE Level 4 and above, "
+            "controllability is commonly rated C3 in the absence of a driver; "
+            "with severity S3 and exposure E4 this gives ASIL D (Cl.6.4.3, "
+            "classification of hazardous events)."
         ),
         source_standards=["ISO26262"],
         clause_references=["ISO 26262-3 Cl.6", "ISO 26262-3 Cl.6.4.3"],
@@ -52,9 +55,10 @@ def build_integrated_gsn() -> GSNArgument:
         element_id="C2",
         element_type=None,
         text=(
-            "TARA results: threat scenarios identified for the LiDAR perception "
-            "component (LiDAR spoofing, adversarial point cloud perturbation, "
-            "model poisoning), with associated risk values (1-5)."
+            "Results of the threat analysis and risk assessment (TARA): threat "
+            "scenarios identified for the LiDAR perception component (LiDAR "
+            "spoofing, adversarial point cloud perturbation, model poisoning), "
+            "each with a risk value from 1 to 5."
         ),
         source_standards=["ISO21434"],
         clause_references=["ISO/SAE 21434 Cl.15"],
@@ -65,8 +69,8 @@ def build_integrated_gsn() -> GSNArgument:
         element_id="A1.4",
         element_type=None,
         text=(
-            "Hardware random faults and systematic faults in non-AI elements "
-            "are controlled by established ISO 26262 processes."
+            "Hardware faults in the non-AI elements are controlled under "
+            "ISO 26262 (Annex B Assumption A1.4)."
         ),
         source_standards=["ISO26262", "ISOPAS8800"],
         clause_references=["ISO/PAS 8800 Annex B A1.4", "ISO 26262 Part 5"],
@@ -99,9 +103,9 @@ def build_integrated_gsn() -> GSNArgument:
             "Argue over four assurance domains: (a) AI-specific insufficiencies "
             "are controlled (ISO/PAS 8800), (b) functional insufficiencies produce "
             "acceptable residual risk (ISO 21448), (c) cybersecurity risks are "
-            "managed to an acceptable level (ISO/SAE 21434), (d) hardware random "
-            "faults and systematic faults in non-AI elements are controlled "
-            "(ISO 26262, via A1.4)."
+            "managed to an acceptable level (ISO/SAE 21434), (d) hardware faults "
+            "in the non-AI elements are controlled (ISO 26262, delegated "
+            "through Assumption A1.4)."
         ),
         source_standards=["ISOPAS8800", "ISO21448", "ISO21434", "ISO26262"],
         clause_references=["ISO/PAS 8800 Annex B S1 (extended)"],
@@ -115,9 +119,10 @@ def build_integrated_gsn() -> GSNArgument:
         element_type=None,
         text=(
             "The specification is sufficient for all applicable assurance "
-            "domains: AI-specific completeness (ISO/PAS 8800), ODD and "
-            "triggering condition completeness (ISO 21448), and cybersecurity "
-            "requirement completeness (ISO/SAE 21434)."
+            "domains: AI-specific completeness of the semantic and syntactic "
+            "input space derived from the system-level operational design "
+            "domain (ISO/PAS 8800), SOTIF triggering condition coverage "
+            "(ISO 21448), and cybersecurity requirements (ISO/SAE 21434)."
         ),
         source_standards=["ISOPAS8800", "ISO21448", "ISO21434"],
         clause_references=[
@@ -147,10 +152,11 @@ def build_integrated_gsn() -> GSNArgument:
         supported_by=["Sn-G3-data-quality", "Sn-G3-distribution", "Sn-G3-annotation"],
         metadata={
             "note": (
-                "ISO/PAS 8800 is the only standard making normative claims at "
-                "this goal, and G3 is the only retained goal (G2 to G6) with a "
-                "single contributing standard. No other applicable standard "
-                "addresses data quality for AI."
+                "Of the four standards in scope, only ISO/PAS 8800 contributes "
+                "normative claims to G3, so G3 is the only retained goal (G2 to "
+                "G6) with a single contributing standard. ISO/IEC TR 5469 "
+                "Cl.9.3.2 links data distributions to HARA-identified risks but "
+                "is an informative technical report."
             )
         },
     )
@@ -181,18 +187,21 @@ def build_integrated_gsn() -> GSNArgument:
         element_type=None,
         text=(
             "Verification and validation evidence is sufficient across all "
-            "assurance domains. Four evidence types converge: (a) MC/DC "
-            "structural coverage (ISO 26262), (b) scenario-based testing with "
-            "triggering condition coverage (ISO 21448), (c) AI-specific metrics "
-            "and uncertainty evaluation (ISO/PAS 8800), (d) vulnerability "
-            "analysis and penetration testing (ISO/SAE 21434)."
+            "assurance domains. The case-study evidence set includes one "
+            "evidence type per standard: (a) MC/DC structural coverage of the "
+            "surrounding non-AI software (ISO 26262), (b) SOTIF triggering "
+            "condition coverage in scenario testing (ISO 21448), (c) deep "
+            "ensemble disagreement as uncertainty indicator, measured by AUROC "
+            "(ISO/PAS 8800), (d) adversarial penetration testing against LiDAR "
+            "spoofing and perturbation (ISO/SAE 21434)."
         ),
         source_standards=["ISOPAS8800", "ISO26262", "ISO21448", "ISO21434"],
         clause_references=[
             "ISO/PAS 8800 Cl.8-9 (AI V&V)",
-            "ISO 26262-6 Cl.9 (MC/DC at ASIL D)",
+            "ISO 26262-6 Cl.9 (software unit verification, MC/DC at ASIL D)",
             "ISO 21448 Cl.9-11 (scenario testing, triggering conditions)",
-            "ISO/SAE 21434 Cl.10 (vulnerability analysis, pen testing)",
+            "ISO/SAE 21434 Cl.10 (integration and verification, incl. "
+            "penetration testing)",
         ],
         origin="retained",
         augmented_from=["ISO26262", "ISO21448", "ISO21434"],
@@ -202,9 +211,11 @@ def build_integrated_gsn() -> GSNArgument:
         ],
         metadata={
             "note": (
-                "The only node where all four applicable standards contribute "
-                "claims at once. The four evidence types measure on scales "
-                "that do not combine."
+                "G5 is the goal where all four standards contribute claims. "
+                "The four evidence types are disjoint by design, each on its "
+                "own measurement scale, and no standard prescribes how they "
+                "combine into a single sufficiency claim at G5 (decision point "
+                "DP-2)."
             ),
             "inconsistency": "I-2",
         },
@@ -218,13 +229,14 @@ def build_integrated_gsn() -> GSNArgument:
             "Operational monitoring covers AI (out-of-distribution detection, "
             "distributional drift), SOTIF (safety of the intended "
             "functionality: field performance, new triggering conditions), "
-            "and cybersecurity (vulnerabilities, incidents)."
+            "and cybersecurity (cybersecurity events, vulnerabilities)."
         ),
         source_standards=["ISOPAS8800", "ISO21448", "ISO21434"],
         clause_references=[
             "ISO/PAS 8800 Cl.14 (AI monitoring)",
             "ISO 21448 Tables A.13-A.14 (field monitoring)",
-            "ISO/SAE 21434 Cl.8 (continuous cybersecurity monitoring)",
+            "ISO/SAE 21434 Cl.8 (continual cybersecurity activities, "
+            "cybersecurity monitoring)",
         ],
         origin="retained",
         augmented_from=["ISO21448", "ISO21434"],
@@ -239,8 +251,8 @@ def build_integrated_gsn() -> GSNArgument:
         text=(
             "Residual risk from functional insufficiencies meets the "
             "acceptance criteria defined per ISO 21448 Clause 6.5. "
-            "Area 3 (unknown potentially hazardous) is reduced to an "
-            "acceptable level."
+            "Areas 2 and 3 (known and unknown hazardous scenarios) are "
+            "reduced to an acceptable level."
         ),
         source_standards=["ISO21448"],
         clause_references=[
@@ -252,7 +264,7 @@ def build_integrated_gsn() -> GSNArgument:
         supported_by=["Sn-G7-area-eval", "Sn-G7-acceptance"],
         metadata={
             "note": (
-                "Separate goal (not sub-goal of G5) because it represents "
+                "A separate goal (not a sub-goal of G5) because it represents "
                 "an acceptability judgement about residual risk, not a "
                 "verification activity."
             ),
@@ -266,8 +278,8 @@ def build_integrated_gsn() -> GSNArgument:
         element_type=None,
         text=(
             "Cybersecurity risks identified through TARA are treated to an "
-            "acceptable level. The safety impact of each threat scenario is "
-            "assessed using ISO 26262-3 severity classes ([RQ-15-06])."
+            "acceptable level. Safety impact ratings of damage scenarios are "
+            "derived from ISO 26262-3 Cl.6.4.3 severity classes ([RQ-15-06])."
         ),
         source_standards=["ISO21434", "ISO26262"],
         clause_references=[
@@ -279,15 +291,15 @@ def build_integrated_gsn() -> GSNArgument:
         supported_by=["Sn-G8-tara", "Sn-G8-treatment", "Sn-G8-bridge"],
         metadata={
             "note": (
-                "Separate goal for same reason as G7: cybersecurity risk "
-                "treatment is an acceptability judgement, not a verification "
-                "activity."
+                "A separate goal for the same reason as G7: the claim that "
+                "residual cybersecurity risk is acceptable is an acceptability "
+                "judgement, not a verification activity."
             ),
             "inconsistency": "I-5",
         },
     )
 
-    # ── G9: Modification assurance (UNDEVELOPED / GAP) ─────────────
+    # ── G9: Modification assurance (undeveloped; finding F-2) ──────
     g9 = Goal(
         element_id="G9",
         element_type=None,
@@ -299,7 +311,8 @@ def build_integrated_gsn() -> GSNArgument:
         source_standards=[],
         clause_references=[
             "ISO 26262-8 Cl.8 (change management, partial)",
-            "ISO/PAS 8800 Cl.14.8.3 (partial re-approval, partial)",
+            "ISO/PAS 8800 Cl.14.8.3 (does not define when partial "
+            "re-assurance is sufficient)",
             "ISO/IEC TR 5469 Table A.8 (change protocols, informative)",
         ],
         status=GoalStatus.UNDEVELOPED,
@@ -307,9 +320,10 @@ def build_integrated_gsn() -> GSNArgument:
         metadata={
             "gap": "Gap-2",
             "note": (
-                "Undeveloped because no standard prescribes a complete "
-                "workflow for re-assuring an AI component after modification. "
-                "For a retrained neural network, the entire weight space changes."
+                "Undeveloped because no single standard prescribes the "
+                "complete re-assurance workflow for a modified AI model; "
+                "partial coverage exists across the cited standards. For a "
+                "retrained neural network, the entire weight space changes."
             ),
         },
     )
@@ -408,73 +422,78 @@ def _build_solutions() -> list[Solution]:
             evidence_type="security_controls",
             evidence_description="Design of cybersecurity controls against identified threats.",
         ),
-        # G5 solutions — THE FOUR CONVERGING EVIDENCE TYPES
+        # G5 solutions: the four evidence types (a) to (d)
         Solution(
             element_id="Sn-G5-mcdc",
             element_type=None,
-            text="MC/DC structural coverage of non-AI wrapper code (ISO 26262-6 Cl.9)",
-            source_standards=["ISO26262"],
-            evidence_type="deterministic_coverage",
-            evidence_description=(
-                "Modified condition/decision coverage at ASIL D. "
-                "Deterministic pass/fail metric. Applies to non-AI code only."
+            text=(
+                "MC/DC coverage of the surrounding non-AI software "
+                "(ISO 26262-6 Cl.9)"
             ),
-            # Figure 2(b): evidence leg (a), dashed.
+            source_standards=["ISO26262"],
+            evidence_type="MC/DC coverage ratio",
+            evidence_description=(
+                "Modified condition/decision coverage (MC/DC), a coverage "
+                "ratio: the fraction of conditions shown to independently "
+                "affect the decision outcome. Structural coverage at software "
+                "unit level, highly recommended for ASIL D (ISO 26262-6 Cl.9). "
+                "Applies to the non-AI software around the network only."
+            ),
+            # Fig. 1(b): evidence type (a), dashed.
             instantiation="not produced",
         ),
         Solution(
             element_id="Sn-G5-scenario",
             element_type=None,
             text=(
-                "Scenario-based testing with triggering condition coverage "
+                "SOTIF triggering condition coverage in scenario testing "
                 "(ISO 21448 Cl.9-11)"
             ),
             source_standards=["ISO21448"],
-            evidence_type="scenario_coverage",
+            evidence_type="triggering-condition coverage fraction",
             evidence_description=(
-                "Scenario count with demonstrated triggering condition "
-                "coverage, under parametrically controlled conditions such "
-                "as rain and fog."
+                "Fraction of the identified triggering conditions covered by "
+                "scenario tests, under parametrically controlled conditions "
+                "such as rain and fog intensity."
             ),
-            # Figure 2(b): evidence leg (b), dashed.
+            # Fig. 1(b): evidence type (b), dashed.
             instantiation="not produced",
         ),
         Solution(
             element_id="Sn-G5-ensemble-uncertainty",
             element_type=None,
             text=(
-                "Deep ensemble uncertainty quantification "
+                "Deep ensemble disagreement, measured by AUROC "
                 "(ISO/PAS 8800 Cl.8-9)"
             ),
             source_standards=["ISOPAS8800"],
-            evidence_type="statistical_metric",
+            evidence_type="AUROC of ensemble disagreement",
             evidence_description=(
                 "Geometric disagreement among ensemble members as the "
-                "uncertainty indicator; AUROC measures the separation of "
-                "correct from incorrect detections. A statistical "
-                "distribution, not a binary pass/fail. Reported on simulated "
-                "ensemble outputs calibrated to published LiDAR uncertainty "
-                "distributions; validation with trained ensemble inference "
-                "is future work."
+                "uncertainty indicator. AUROC, a scalar between 0 and 1, "
+                "scores how well the indicator separates correct from "
+                "incorrect detections. Reported on simulated ensemble outputs "
+                "calibrated to published LiDAR uncertainty distributions; "
+                "validation with trained ensemble inference is future work."
             ),
-            # Figure 2(b): evidence leg (c), solid: the case study's one
-            # instantiated leg, on simulated outputs.
+            # Fig. 1(b): evidence type (c), solid: the one evidence type the
+            # case study instantiates, on simulated outputs.
             instantiation="provided (simulated)",
         ),
         Solution(
             element_id="Sn-G5-pentest",
             element_type=None,
             text=(
-                "Adversarial penetration testing results "
+                "Adversarial penetration testing against LiDAR spoofing "
                 "(ISO/SAE 21434 Cl.10)"
             ),
             source_standards=["ISO21434"],
-            evidence_type="attack_success_rate",
+            evidence_type="attack success rate",
             evidence_description=(
-                "Attack success rates against LiDAR spoofing and point cloud "
+                "Attack success rate against LiDAR spoofing and point cloud "
                 "perturbation under defined threat models."
             ),
-            # Figure 2(b): evidence leg (d), dashed.
+            # Fig. 1(b): evidence type (d), dashed.
             instantiation="not produced",
         ),
         # G6 solutions
@@ -503,12 +522,16 @@ def _build_solutions() -> list[Solution]:
         Solution(
             element_id="Sn-G6-cyber-monitor",
             element_type=None,
-            text="Continuous cybersecurity monitoring (ISO/SAE 21434 Cl.8)",
+            text=(
+                "Cybersecurity monitoring under the continual cybersecurity "
+                "activities (ISO/SAE 21434 Cl.8)"
+            ),
             source_standards=["ISO21434"],
             evidence_type="security_monitoring",
             evidence_description=(
-                "Vulnerability scanning, incident detection and threat "
-                "intelligence feeds."
+                "Collection and triage of cybersecurity information into "
+                "cybersecurity events (Cl.8.3), event evaluation (Cl.8.4), and "
+                "vulnerability analysis and management (Cl.8.5 to 8.6)."
             ),
         ),
         # G7 solutions
@@ -518,12 +541,15 @@ def _build_solutions() -> list[Solution]:
             text="Four-area model evaluation (ISO 21448 Cl.5)",
             source_standards=["ISO21448"],
             evidence_type="risk_evaluation",
-            evidence_description="Evaluation of Area 3 reduction to acceptable level.",
+            evidence_description=(
+                "Evaluation of the reduction of Areas 2 and 3 (known and "
+                "unknown hazardous scenarios) to an acceptable level."
+            ),
         ),
         Solution(
             element_id="Sn-G7-acceptance",
             element_type=None,
-            text="Acceptance criteria assessment (ISO 21448 Cl.6.5, Table A.10)",
+            text="Acceptance criteria evaluation (ISO 21448 Cl.6.5, Table A.10)",
             source_standards=["ISO21448"],
             evidence_type="acceptance_decision",
             evidence_description="Comparison of residual risk to defined acceptance criteria.",
@@ -535,7 +561,10 @@ def _build_solutions() -> list[Solution]:
             text="TARA report (ISO/SAE 21434 Cl.15)",
             source_standards=["ISO21434"],
             evidence_type="threat_analysis",
-            evidence_description="Complete threat analysis and risk assessment.",
+            evidence_description=(
+                "Threat analysis and risk assessment (TARA) of the perception "
+                "component (Cl.15)."
+            ),
         ),
         Solution(
             element_id="Sn-G8-treatment",
@@ -548,12 +577,15 @@ def _build_solutions() -> list[Solution]:
         Solution(
             element_id="Sn-G8-bridge",
             element_type=None,
-            text="Safety-cybersecurity impact assessment (ISO/SAE 21434 [RQ-15-06])",
+            text=(
+                "Safety impact ratings of damage scenarios "
+                "(ISO/SAE 21434 [RQ-15-06])"
+            ),
             source_standards=["ISO21434", "ISO26262"],
             evidence_type="impact_assessment",
             evidence_description=(
-                "Assessment of safety impact of each threat scenario "
-                "using ISO 26262-3 severity classes. ISO 26262 enters here "
+                "Safety impact ratings of damage scenarios, derived from "
+                "ISO 26262-3 Cl.6.4.3 severity classes. ISO 26262 enters here "
                 "as a normative bridge, not as a source of claims at G8."
             ),
         ),

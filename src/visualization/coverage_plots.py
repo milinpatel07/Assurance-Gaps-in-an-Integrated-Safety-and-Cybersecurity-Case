@@ -1,10 +1,11 @@
 """Visualization of coverage matrices, evidence convergence, and evaluation results.
 
-Generates the plots and tables that support the paper's analysis:
-- Coverage matrix heatmap (Table 2)
-- Goal density table (Table 4)
-- Evidence convergence diagram (Figure 3)
-- Weather evaluation results
+Generates the repository's own plots. None of them is a figure or table of
+either paper; both papers draw their figures in TikZ.
+- Clause applicability per lifecycle phase (heatmap)
+- Standards contributing claims per goal node (grid)
+- The four evidence types (a) to (d) at G5
+- Seeded synthetic weather illustration (no detector is run)
 """
 
 from __future__ import annotations
@@ -25,16 +26,14 @@ except ImportError:
     MPL_AVAILABLE = False
 
 from src.standards.base import LifecyclePhase
+from src.visualization.standard_colors import STANDARD_COLORS, STANDARD_LABELS
 
 
 def plot_coverage_heatmap(
     matrix: dict[str, dict[str, int]],
     output_path: Optional[str] = None,
 ) -> None:
-    """Plot the clause coverage matrix as a heatmap.
-
-    Corresponds to Table 2 in the paper.
-    """
+    """Plot the number of applicable clauses per standard and lifecycle phase."""
     if not MPL_AVAILABLE:
         print("matplotlib not available; skipping heatmap")
         return
@@ -63,7 +62,7 @@ def plot_coverage_heatmap(
             color = "white" if val > 2 else "black"
             ax.text(j, i, text, ha="center", va="center", fontsize=9, color=color)
 
-    ax.set_title("Clause Applicability per Lifecycle Phase (Table 2)", fontsize=11)
+    ax.set_title("Clause applicability per lifecycle phase", fontsize=11)
     fig.colorbar(im, ax=ax, label="Number of applicable clauses")
     plt.tight_layout()
 
@@ -77,10 +76,7 @@ def plot_goal_density(
     density: dict[str, dict[str, bool]],
     output_path: Optional[str] = None,
 ) -> None:
-    """Plot the standard coverage density per goal as a grid.
-
-    Corresponds to Table 4 in the paper.
-    """
+    """Plot which standards contribute claims to each goal node, as a grid."""
     if not MPL_AVAILABLE:
         print("matplotlib not available; skipping density plot")
         return
@@ -119,7 +115,7 @@ def plot_goal_density(
         ha="center", fontsize=9, fontweight="bold",
     )
 
-    ax.set_title("Standard Coverage Density per Goal Node (Table 4)", fontsize=11)
+    ax.set_title("Standards contributing claims per goal node", fontsize=11)
     plt.tight_layout()
 
     if output_path:
@@ -131,96 +127,81 @@ def plot_goal_density(
 def plot_evidence_convergence(
     output_path: Optional[str] = None,
 ) -> None:
-    """Plot the evidence convergence diagram at G5 (Figure 3).
+    """Plot the four evidence types (a) to (d) at G5, one per standard.
 
-    Shows how a single failure event (missed pedestrian detection)
-    enters the integrated argument through three analysis paths.
+    G5 is the verification and validation (V&V) goal, where all four
+    standards contribute claims. Each evidence type comes from one standard
+    and has its own measurement scale; none of the four standards prescribes
+    how they combine into a single sufficiency claim at G5 (decision point
+    DP-2). The WAISE paper shows the same four evidence types in Fig. 1(b);
+    this plot is a repository rendering, not that figure.
     """
     if not MPL_AVAILABLE:
         print("matplotlib not available; skipping convergence plot")
         return
 
-    fig, ax = plt.subplots(figsize=(14, 8))
-    ax.set_xlim(0, 14)
-    ax.set_ylim(0, 10)
+    fig, ax = plt.subplots(figsize=(14, 6.5))
+    ax.set_xlim(0, 16)
+    ax.set_ylim(0, 7.8)
     ax.axis("off")
 
-    # Event box
-    event_box = mpatches.FancyBboxPatch(
-        (5, 8.5), 4, 1, boxstyle="round,pad=0.2",
-        facecolor="#E0E0E0", edgecolor="black", linewidth=1.5,
-    )
-    ax.add_patch(event_box)
-    ax.text(7, 9, "LiDAR detector misses\na pedestrian",
-            ha="center", va="center", fontsize=10, fontweight="bold")
-
-    # Three analysis paths
-    paths = [
+    # One evidence type per standard, in the order (a) to (d).
+    types = [
         {
-            "x": 2, "color": "#BBDEFB", "border": "#1565C0",
-            "standard": "ISO 26262",
-            "method": "HARA (Part 3, Cl.6)\n-> ASIL D",
-            "evidence": "MC/DC coverage\n(deterministic, binary)",
+            "key": "ISO26262", "letter": "(a)",
+            "evidence": "MC/DC structural\ncoverage of the\nnon-AI software",
+            "scale": "Scale: coverage ratio",
         },
         {
-            "x": 7, "color": "#FFE0B2", "border": "#E65100",
-            "standard": "ISO 21448",
-            "method": "Triggering condition\n(Cl.9-11)",
-            "evidence": "Scenario coverage +\nensemble uncertainty\n(statistical)",
+            "key": "ISO21448", "letter": "(b)",
+            "evidence": "Triggering-condition\ncoverage in\nscenario testing",
+            "scale": "Scale: coverage of\ntriggering conditions",
         },
         {
-            "x": 12, "color": "#FFCDD2", "border": "#C62828",
-            "standard": "ISO/SAE 21434",
-            "method": "Threat scenario\n(Cl.15)",
-            "evidence": "Penetration testing\n(attack success rate)",
+            "key": "ISOPAS8800", "letter": "(c)",
+            "evidence": "Deep-ensemble\ndisagreement as\nuncertainty indicator",
+            "scale": "Scale: AUROC",
+        },
+        {
+            "key": "ISO21434", "letter": "(d)",
+            "evidence": "Adversarial penetration\ntesting (LiDAR spoofing,\nperturbation)",
+            "scale": "Scale: attack\nsuccess rate",
         },
     ]
+    xs = [2.0, 6.0, 10.0, 14.0]
 
-    for p in paths:
-        # Analysis method box
-        method_box = mpatches.FancyBboxPatch(
-            (p["x"] - 1.5, 5.5), 3, 1.5, boxstyle="round,pad=0.15",
-            facecolor=p["color"], edgecolor=p["border"], linewidth=1.2,
+    for x, t in zip(xs, types):
+        colour = STANDARD_COLORS[t["key"]]
+        box = mpatches.FancyBboxPatch(
+            (x - 1.7, 4.55), 3.4, 2.7, boxstyle="round,pad=0.15",
+            facecolor="white", edgecolor=colour, linewidth=2.0,
         )
-        ax.add_patch(method_box)
-        ax.text(p["x"], 6.8, p["standard"], ha="center", va="center",
-                fontsize=8, fontweight="bold", color=p["border"])
-        ax.text(p["x"], 6.1, p["method"], ha="center", va="center", fontsize=7)
+        ax.add_patch(box)
+        ax.text(x, 6.95, f"{t['letter']} {STANDARD_LABELS[t['key']]}",
+                ha="center", va="center", fontsize=10, fontweight="bold",
+                color=colour)
+        ax.text(x, 6.0, t["evidence"], ha="center", va="center", fontsize=9)
+        ax.text(x, 5.0, t["scale"], ha="center", va="center", fontsize=8.5,
+                fontstyle="italic", color="#333333")
+        ax.annotate("", xy=(8, 2.75), xytext=(x, 4.4),
+                    arrowprops=dict(arrowstyle="->", lw=1.4, color=colour))
 
-        # Evidence box
-        ev_box = mpatches.FancyBboxPatch(
-            (p["x"] - 1.5, 3), 3, 1.5, boxstyle="round,pad=0.15",
-            facecolor=p["color"], edgecolor=p["border"], linewidth=1.0,
-            linestyle="dashed",
-        )
-        ax.add_patch(ev_box)
-        ax.text(p["x"], 3.75, p["evidence"], ha="center", va="center", fontsize=7)
-
-        # Arrows: event -> method -> evidence -> G5
-        ax.annotate("", xy=(p["x"], 7.0), xytext=(7, 8.5),
-                     arrowprops=dict(arrowstyle="->", lw=1.2, color="black"))
-        ax.annotate("", xy=(p["x"], 4.5), xytext=(p["x"], 5.5),
-                     arrowprops=dict(arrowstyle="->", lw=1.2, color="black"))
-        ax.annotate("", xy=(7, 1.8), xytext=(p["x"], 3.0),
-                     arrowprops=dict(arrowstyle="->", lw=1.2, color="black"))
-
-    # G5 box
     g5_box = mpatches.FancyBboxPatch(
-        (5, 0.8), 4, 1, boxstyle="round,pad=0.2",
-        facecolor="#E8E8E8", edgecolor="black", linewidth=2.0,
+        (5.2, 1.65), 5.6, 1.1, boxstyle="round,pad=0.2",
+        facecolor="#F5F5F5", edgecolor="black", linewidth=2.0,
     )
     ax.add_patch(g5_box)
-    ax.text(7, 1.3, "G5: V&V sufficiency", ha="center", va="center",
-            fontsize=11, fontweight="bold")
+    ax.text(8, 2.2, "G5: V&V evidence is sufficient\nacross all assurance domains",
+            ha="center", va="center", fontsize=10.5, fontweight="bold")
 
-    # Key finding text
-    ax.text(7, 0.2,
-            "No standard defines how to combine these four evidence types.",
-            ha="center", va="center", fontsize=9, fontstyle="italic",
-            color="#C62828")
+    ax.text(8, 0.75,
+            "Each evidence type has its own measurement scale. None of the four "
+            "standards prescribes how they combine\ninto a single sufficiency "
+            "claim at G5 (decision point DP-2).",
+            ha="center", va="center", fontsize=9, color="#333333")
 
-    ax.set_title("Evidence Convergence at G5 for a Single Failure Event (Figure 3)",
-                 fontsize=12, fontweight="bold", pad=20)
+    ax.set_title("The four evidence types (a) to (d) at G5, one per standard",
+                 fontsize=12, fontweight="bold", pad=12)
 
     plt.tight_layout()
     if output_path:
@@ -265,7 +246,8 @@ def plot_weather_evaluation(
         ax2.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
                  f"{val:.3f}", ha="center", fontsize=10)
 
-    plt.suptitle("CARLA Evaluation: SOTIF Triggering vs Non-Triggering Conditions",
+    plt.suptitle("Synthetic illustration (seed 42, no detector): "
+                 "triggering vs non-triggering weather conditions",
                  fontsize=11, fontweight="bold")
     plt.tight_layout()
 
@@ -278,12 +260,16 @@ def plot_weather_evaluation(
 def plot_weather_heatmap(
     weather_results: list,
     output_path: Optional[str] = None,
+    seed: int = 42,
 ) -> None:
     """Plot recall and divergence as 2D heatmaps over the rain x fog grid.
 
     Each cell in the grid corresponds to one weather combination.
     The left panel shows mean recall; the right shows mean divergence.
-    SOTIF triggering conditions are marked with a border.
+    Cells that meet the case study's triggering-condition thresholds
+    (rain > 20 mm/h or visibility < 200 m) are marked with a red border.
+    These thresholds are case-study choices, not values from ISO 21448. The
+    data are a seeded synthetic illustration; no detector is run.
     """
     if not MPL_AVAILABLE:
         print("matplotlib not available; skipping weather heatmap")
@@ -353,8 +339,10 @@ def plot_weather_heatmap(
                                           linewidth=2, linestyle="--")
                     ax2.add_patch(rect)
 
-    plt.suptitle("Detection Performance across Weather Grid\n"
-                 "(red border = SOTIF triggering condition per ISO 21448 Cl.7)",
+    plt.suptitle(f"Synthetic illustration (seed {seed}, no detector): "
+                 "red border = case-study thresholds\n"
+                 "rain > 20 mm/h or visibility < 200 m "
+                 "(case-study choices, not ISO 21448 values)",
                  fontsize=11, fontweight="bold")
     plt.tight_layout()
 
@@ -367,7 +355,7 @@ def plot_weather_heatmap(
 def plot_inconsistency_distribution(
     output_path: Optional[str] = None,
 ) -> None:
-    """Plot the distribution of inconsistencies across GSN nodes and types."""
+    """Plot the number of decision points per GSN goal node, by type."""
     if not MPL_AVAILABLE:
         print("matplotlib not available; skipping inconsistency plot")
         return
@@ -406,8 +394,8 @@ def plot_inconsistency_distribution(
     ax.set_xticks(x)
     ax.set_xticklabels(nodes)
     ax.set_xlabel("GSN Goal Node")
-    ax.set_ylabel("Number of Inconsistencies")
-    ax.set_title("Distribution of Requirement Inconsistencies across GSN Nodes")
+    ax.set_ylabel("Number of decision points")
+    ax.set_title("Decision points per GSN goal node, by type")
     ax.legend()
     ax.set_ylim(0, max(max(s_vals), max(t_vals), max(m_vals)) + 1)
 
@@ -421,12 +409,12 @@ def plot_inconsistency_distribution(
 def plot_gap_lifecycle_distribution(
     output_path: Optional[str] = None,
 ) -> None:
-    """Plot gap distribution across lifecycle phases."""
+    """Plot the findings per lifecycle phase, by category."""
     if not MPL_AVAILABLE:
         print("matplotlib not available; skipping gap distribution plot")
         return
 
-    from src.analysis.gaps import GapClassification
+    from src.analysis.findings import GapClassification
 
     gaps_cls = GapClassification()
 
@@ -448,16 +436,16 @@ def plot_gap_lifecycle_distribution(
     width = 0.35
 
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.bar(x - width / 2, std_vals, width, label="Standard gap",
+    ax.bar(x - width / 2, std_vals, width, label="Open methodological problem",
            color="#7E57C2", edgecolor="black")
-    ax.bar(x + width / 2, int_vals, width, label="Integration-induced",
+    ax.bar(x + width / 2, int_vals, width, label="Integration-induced finding",
            color="#FF7043", edgecolor="black", hatch="//")
 
     ax.set_xticks(x)
     ax.set_xticklabels(phases_present, rotation=20, ha="right")
     ax.set_xlabel("Lifecycle Phase")
-    ax.set_ylabel("Number of Gaps")
-    ax.set_title("Assurance Gap Distribution across Lifecycle Phases")
+    ax.set_ylabel("Number of findings")
+    ax.set_title("Findings per lifecycle phase, by category")
     ax.legend()
 
     plt.tight_layout()

@@ -152,10 +152,10 @@ class TestDeterminism:
 
 class TestNotebook:
     def test_committed_notebook_is_current(self):
-        assert os.path.exists(OUTPUT_PATH), "notebooks/anomaly_walk.ipynb missing"
+        assert os.path.exists(OUTPUT_PATH), "notebooks/3_runtime_anomaly.ipynb missing"
         with open(OUTPUT_PATH, encoding="utf-8") as handle:
             assert handle.read() == build_notebook(), (
-                "notebooks/anomaly_walk.ipynb is stale. "
+                "notebooks/3_runtime_anomaly.ipynb is stale. "
                 "Run: python -m src.visualization.anomaly_notebook"
             )
 
@@ -210,5 +210,5 @@ class TestNotebook:
             for output in cell.get("outputs", [])
             if output.output_type == "stream"
         )
-        assert "assigned to: None" in text
+        assert "assigned to: not assigned" in text
         assert "assigned to: ISO26262" in text

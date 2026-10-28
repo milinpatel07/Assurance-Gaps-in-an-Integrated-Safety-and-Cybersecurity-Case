@@ -80,7 +80,7 @@ class StandardsRegistry:
         return result
 
     def compute_coverage_matrix(self) -> dict[str, dict[str, int]]:
-        """Compute the clause coverage matrix (Table 2 in the paper).
+        """Compute the clause coverage matrix (repository analysis, not in the camera-ready).
 
         Returns a dict mapping standard_id -> {phase_name: clause_count}.
         """
@@ -94,7 +94,7 @@ class StandardsRegistry:
         return matrix
 
     def compute_goal_density(self) -> dict[str, dict[str, bool]]:
-        """Compute the standard coverage density per goal (Table 4).
+        """Compute the standard coverage density per goal (repository analysis, not in the camera-ready).
 
         Returns a dict mapping goal_id -> {standard_id: contributes}.
         """
@@ -151,7 +151,7 @@ class StandardsRegistry:
 
         print()
         print("=" * 70)
-        print("GOAL COVERAGE DENSITY (Table 4)")
+        print("GOAL COVERAGE DENSITY (repository analysis, not in the camera-ready)")
         print("=" * 70)
 
         density = self.compute_goal_density()

@@ -101,8 +101,8 @@ class Solution(GSNElement):
 
     Attributes:
         instantiation: Whether the paper's case study produced this evidence.
-            The WAISE paper's Figure 2(b) marks the G5 evidence legs: one
-            "provided (simulated)", three "not produced". Empty string means
+            Fig. 1(b) of the WAISE paper marks the four G5 evidence types:
+            one "provided (simulated)", three "not produced". Empty string means
             the paper states no status for this solution.
     """
 

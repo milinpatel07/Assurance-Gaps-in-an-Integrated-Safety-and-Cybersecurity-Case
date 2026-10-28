@@ -1,11 +1,11 @@
 """Sensitivity analysis: how evaluation metrics change across random seeds.
 
-Runs the synthetic CARLA evaluation across multiple seeds to demonstrate
-that the qualitative findings (triggering conditions degrade performance)
-are robust and not artefacts of a single random initialisation.
+Runs the seeded synthetic weather illustration across several seeds to show
+that the degradation it illustrates under triggering conditions, which the
+generating formula builds in, does not depend on the noise seed. No detector
+runs; these are not measurements.
 
-Results show the mean and standard deviation of key metrics across seeds,
-confirming that the triggering/non-triggering gap is statistically stable.
+Results show the mean and standard deviation of the metrics across seeds.
 """
 
 from __future__ import annotations
@@ -238,7 +238,8 @@ def print_sensitivity_report(result: SensitivityResult):
     print(f"  Recall gap (non-trig - trig): {s['recall_gap_mean']:.4f} +/- {s['recall_gap_std']:.4f}")
     print()
     if s['recall_gap_std'] < 0.05:
-        print("  Conclusion: The triggering condition degradation is robust.")
+        print("  Conclusion: the illustrated degradation, which the generating "
+              "formula builds in, is not an artefact of the noise seed.")
         print("  The recall gap is stable across seeds (std < 0.05).")
     else:
         print("  Note: Some variability observed. Consider increasing scenes_per_weather.")

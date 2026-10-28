@@ -1,4 +1,5 @@
-# Evidence Convergence at G5 (Figure 3)
+# Evidence convergence at G5 (repository rendering; the WAISE paper's
+# equivalent is Fig. 1(b))
 # Shows how a single failure event enters the integrated argument
 # through three analysis paths, each producing a different evidence type
 #
@@ -8,9 +9,9 @@
 G5:
   text: |
     V&V evidence sufficient across
-    all assurance domains
-    — No standard defines how to combine
-    the four evidence types below
+    all assurance domains.
+    No standard prescribes how the four
+    evidence types below combine (DP-2)
   supportedBy: [S_26262, S_21448, S_21434, S_8800]
 
 S_26262:
@@ -28,8 +29,8 @@ C_hara:
 Sn_mcdc:
   text: |
     MC/DC structural coverage
-    of non-AI wrapper code
-    Scale: binary (pass/fail)
+    of surrounding non-AI software
+    Scale: coverage ratio
 
 S_21448:
   text: |
@@ -46,10 +47,10 @@ C_trigger:
 
 Sn_scenario:
   text: |
-    Scenario coverage + ensemble
-    uncertainty under 25 weather
-    combinations in CARLA
-    Scale: count + statistical
+    Triggering condition coverage
+    + ensemble uncertainty under 25
+    weather combinations in CARLA
+    Scale: coverage fraction + AUROC
 
 S_21434:
   text: |
@@ -79,7 +80,7 @@ S_8800:
 
 Sn_ensemble:
   text: |
-    Deep ensemble geometric
-    divergence metric (AUROC
-    for OOD detection)
-    Scale: statistical distribution
+    Deep ensemble disagreement as
+    uncertainty indicator (AUROC of
+    correct vs incorrect detections)
+    Scale: AUROC, a scalar in [0, 1]

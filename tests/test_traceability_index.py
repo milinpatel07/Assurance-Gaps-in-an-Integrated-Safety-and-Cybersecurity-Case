@@ -13,7 +13,7 @@ import os
 import pytest
 
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.results.traceability_index import OUTPUT_PATH, build_index
 from src.standards.registry import StandardsRegistry
 
@@ -75,16 +75,26 @@ class TestIndexCoversWhatItPromises:
         for kind in ("**PAPER**", "**CLAUSE**", "**COMMAND**"):
             assert kind in generated
 
-    def test_both_papers_are_named_by_path(self, generated):
-        assert "paper/waise2026/" in generated
-        assert "paper/safecomp2026-position/" in generated
+    def test_both_papers_are_cited_with_published_numbering(self, generated):
+        """The WAISE paper has one figure (Fig. 1); its decision points are
+        Table 4 and its findings Table 5. The position paper's table is Table I."""
+        assert "doi:10.1007/978-3-032-35506-5_55" in generated
+        assert "Operational Safety and Cybersecurity Assurance" in generated
+        assert "paper/" not in generated
+        for stale in ("Figure 2", "Figure 3", "Table 1 footnote"):
+            assert stale not in generated, f"stale paper reference: {stale}"
+        assert "Table 4 of the WAISE paper." in generated
+        assert "Table 5 of the WAISE paper." in generated
 
     def test_position_paper_is_marked_as_having_no_code(self, generated):
         assert "No file in `src/` supports it" in generated
 
-    def test_known_inconsistencies_are_listed(self, generated):
-        for marker in ("DP-2", "193 tests", "PointPillars", "G8 and G9"):
-            assert marker in generated, f"missing known inconsistency: {marker}"
+    def test_repository_notes_are_listed(self, generated):
+        """The two repository-internal notes stay in the index: the G8 and G9
+        exceptions between the two goal-source representations, and the
+        SECOND-to-PointPillars substitution in the measured results."""
+        for marker in ("PointPillars", "G8 and G9"):
+            assert marker in generated, f"missing repository note: {marker}"
 
 
 ERRATA_PATH = os.path.join(os.path.dirname(OUTPUT_PATH), "ERRATA.md")
@@ -103,9 +113,13 @@ class TestErrataIsNotDuplicated:
     restating them, so the two files cannot drift. The pointer must resolve, and
     the detail must live in exactly one place."""
 
-    def test_section_9_points_at_errata(self, generated):
-        section = generated[generated.index("## 9. Known inconsistencies"):]
-        assert "ERRATA.md" in section
+    def test_section_9_points_at_errata(self, generated, errata):
+        """Section 9 is a pointer only; ERRATA.md carries the entries, including
+        the DP-2 typing and the 193-test count."""
+        section = generated[generated.index("## 9. Known discrepancies with the papers"):]
+        assert "[ERRATA.md](ERRATA.md)" in section
+        for marker in ("DP-2", "193 tests"):
+            assert marker in errata, f"ERRATA.md lost: {marker}"
 
     def test_errata_carries_the_entries_the_pointer_names(self, errata):
         for number in range(1, 8):

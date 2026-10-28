@@ -1,13 +1,15 @@
-"""CARLA evaluation runner.
+"""Runner for the synthetic weather-grid illustration (no detector, no CARLA).
 
-Provides both synthetic evaluation (for demonstration without CARLA)
-and the interface for real CARLA evaluation with a running server.
+Prints the weather grid and the summary of the seeded synthetic illustration,
+and saves a plot. Live CARLA evaluation is not implemented in this repository;
+`--mode carla` exits with an error instead of pretending to run it.
 """
 
 from __future__ import annotations
 
 import argparse
 import os
+import sys
 
 from src.evaluation.carla_evaluator import generate_synthetic_illustration
 from src.seeds import DEFAULT_SEED
@@ -17,22 +19,34 @@ from src.evaluation.weather_conditions import (
     get_triggering_conditions,
 )
 
+CARLA_NOT_IMPLEMENTED = (
+    "Live CARLA evaluation is not implemented in this repository. Only the "
+    "synthetic weather-grid illustration (no detector, no CARLA) is available: "
+    "run without --mode, or with --mode synthetic."
+)
+
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Run CARLA evaluation for the deep ensemble under weather conditions"
+        description=(
+            "Synthetic weather-grid illustration (no detector, no CARLA). "
+            "The output is seeded and illustrative, not a measurement."
+        )
     )
     parser.add_argument(
         "--mode",
         choices=["synthetic", "carla"],
         default="synthetic",
-        help="Evaluation mode: 'synthetic' for demonstration, 'carla' for live evaluation",
+        help=(
+            "'synthetic' (the default) runs the seeded illustration; 'carla' "
+            "exits with an error, because live CARLA evaluation is not implemented"
+        ),
     )
     parser.add_argument(
         "--scenes-per-weather",
         type=int,
         default=10,
-        help="Number of scenes per weather condition",
+        help="Number of synthetic scenes per weather condition",
     )
     parser.add_argument(
         "--output-dir",
@@ -44,9 +58,13 @@ def main():
         "--seed",
         type=int,
         default=DEFAULT_SEED,
-        help="Random seed for synthetic evaluation",
+        help="Random seed for the synthetic illustration",
     )
     args = parser.parse_args()
+
+    if args.mode == "carla":
+        print(CARLA_NOT_IMPLEMENTED, file=sys.stderr)
+        sys.exit(2)
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -59,30 +77,21 @@ def main():
     print(f"  Triggering: {len(triggering)}")
     print(f"  Coverage: {coverage}")
 
-    if args.mode == "synthetic":
-        print("\nRunning synthetic evaluation (no CARLA required)...")
-        result = generate_synthetic_illustration(
-            num_scenes_per_weather=args.scenes_per_weather,
-            seed=args.seed,
-        )
-    else:
-        print("\nCARLA mode requires a running CARLA server.")
-        print("To start CARLA: ./CarlaUE4.sh -quality-level=Epic -world-port=2000")
-        print("Falling back to synthetic evaluation.")
-        result = generate_synthetic_illustration(
-            num_scenes_per_weather=args.scenes_per_weather,
-            seed=args.seed,
-        )
+    print("\nSynthetic weather-grid illustration (no detector, no CARLA)...")
+    result = generate_synthetic_illustration(
+        num_scenes_per_weather=args.scenes_per_weather,
+        seed=args.seed,
+    )
 
     summary = result.compute_summary()
-    print("\nEvaluation Summary:")
+    print("\nIllustration summary (seeded, not a measurement):")
     for key, value in summary.items():
         if isinstance(value, float):
             print(f"  {key}: {value:.4f}")
         else:
             print(f"  {key}: {value}")
 
-    # Generate visualization
+    # Generate the plot
     try:
         from src.visualization.coverage_plots import plot_weather_evaluation
         plot_weather_evaluation(

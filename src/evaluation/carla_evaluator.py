@@ -1,19 +1,21 @@
-"""CARLA evaluation pipeline for the deep ensemble under weather conditions.
+"""Synthetic weather-grid illustration (no detector, no CARLA).
 
-This module defines the evaluation protocol and result structures for the
-deep ensemble under parametrically controlled weather conditions, together
-with a synthetic illustration routine.
+This module defines the result structures for evaluating the deep ensemble
+across the weather grid of src/evaluation/weather_conditions.py, and one
+routine that fills them with seeded synthetic values.
 
-CARLA (Dosovitskiy et al., 2017) provides weather and sensor degradation
-parameters that can be varied independently, allowing controlled coverage of
-the triggering conditions that ISO 21448 Clauses 9-11 require.
+Live CARLA evaluation is not implemented in this repository. Nothing here
+connects to CARLA (Dosovitskiy et al., 2017) or runs a detector. The module
+name records the simulator the case study names; the code does not use it.
 
-The `generate_synthetic_illustration` function in this module produces
-illustration output, not measurements: it does not connect to CARLA and does
-not run a detector. It generates deterministic seeded values that demonstrate
-the pipeline format. Real empirical evaluation results are in
-`data/empirical_results/`. A live CARLA connection requires a running CARLA
-instance and the carla Python package.
+`generate_synthetic_illustration` produces illustration output, not
+measurements: a weather-severity term drives recall, precision and divergence
+through fixed formulas plus seeded Gaussian noise. See
+data/synthetic_illustrations/README.md.
+
+The measured results in data/empirical_results/ are a different thing: a
+trained PointPillars deep ensemble on KITTI and nuScenes, not CARLA weather
+data, and neither paper claims them.
 """
 
 from __future__ import annotations
@@ -126,8 +128,9 @@ class WeatherEvaluation:
 class FullEvaluationResult:
     """Complete evaluation across all weather conditions.
 
-    This is the primary output of the CARLA evaluation pipeline,
-    providing the evidence required at G5 for ISO 21448 Cl.9-11.
+    The structure is the one a weather-grid evaluation would fill as evidence
+    at G5 for ISO 21448 Cl.9-11. In this repository it is filled only by
+    generate_synthetic_illustration, so its numbers are not evidence.
     """
 
     weather_results: list[WeatherEvaluation] = field(default_factory=list)
@@ -193,15 +196,13 @@ def generate_synthetic_illustration(
     num_scenes_per_weather: int = 10,
     seed: int = DEFAULT_SEED,
 ) -> FullEvaluationResult:
-    """Generate a synthetic illustration of the evaluation output.
+    """Generate the synthetic weather-grid illustration (no detector, no CARLA).
 
-    This produces deterministic seeded values that demonstrate the evaluation
-    pipeline structure and the relationship between weather severity,
-    detection performance, and ensemble uncertainty. The output is an
-    illustration of the pipeline format, not a measurement: no detector is
-    run and CARLA is not contacted.
-
-    Real empirical evaluation results are in `data/empirical_results/`.
+    This produces deterministic seeded values that show the structure of the
+    evaluation output and an assumed relationship between weather severity,
+    detection performance and ensemble uncertainty. The relationship is set
+    by the formulas below, so the output is an illustration, not a
+    measurement: no detector is run and CARLA is not contacted.
     """
     rng = np.random.RandomState(seed)
     conditions = generate_weather_grid()

@@ -37,7 +37,7 @@ def notebook(request) -> dict:
 def test_every_notebook_is_covered():
     """Guard the list: a new notebook joins these tests automatically."""
     assert NOTEBOOKS, "no notebooks found"
-    assert "anomaly_walk.ipynb" in NOTEBOOKS
+    assert "3_runtime_anomaly.ipynb" in NOTEBOOKS
 
 
 class TestClaims:

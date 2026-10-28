@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design time and operation: the two papers side by side</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #fff; color: #111;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px; line-height: 1.5;
+}
+header, main, footer { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+header { padding-top: 22px; }
+h1 { font-size: 1.4rem; line-height: 1.25; margin: 0 0 10px; }
+h2 { font-size: 1.1rem; margin: 0 0 6px; }
+h3 { font-size: 1rem; margin: 18px 0 6px; }
+.papers { margin: 0 0 10px; color: #222; }
+.synthesis {
+  border: 2px solid #111; border-radius: 8px; padding: 10px 12px;
+  margin: 12px 0; background: #fafafa;
+}
+figure { margin: 18px 0; }
+figcaption { font-size: 0.85rem; color: #444; margin-top: 6px; }
+.point {
+  border: 2px solid #222; border-radius: 8px; padding: 12px 14px; margin: 14px 0;
+}
+.question { font-style: italic; margin: 0 0 10px; }
+ul.scales { list-style: none; margin: 0 0 10px; padding: 0; }
+ul.scales li { margin-bottom: 8px; }
+ul.plain { margin: 4px 0 10px; padding-left: 20px; }
+.dot {
+  display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+  background: var(--c); border: 1px solid #111; margin-right: 6px;
+  vertical-align: -1px;
+}
+.kind { font-size: 0.85rem; color: #555; }
+.missing {
+  border: 2px dashed #757575; background: #f5f5f5;
+  padding: 8px 10px; font-weight: 600; margin: 10px 0;
+}
+.src { font-size: 0.85rem; color: #444; margin: 8px 0 0; }
+code {
+  background: #f2f2f2; border: 1px solid #ddd; border-radius: 4px;
+  padding: 1px 5px; font-size: 0.85rem;
+}
+footer {
+  border-top: 1px solid #ccc; margin-top: 22px; padding-top: 12px;
+  padding-bottom: 28px; font-size: 0.85rem; color: #333;
+}
+a { color: #111; }
+</style>
+</head>
+<body>
+<header>
+<h1>Design time and operation: the two papers side by side</h1>
+<p class="papers">The WAISE paper (<em>Integrating Cybersecurity Into the AI Safety Assurance Argument</em>, WAISE 2026) covers design time. The position paper (<em>Operational Safety and Cybersecurity Assurance of AI-Based Perception in Highly Automated Driving</em>, SAFECOMP 2026) covers operation.</p><div class="synthesis"><p><strong>What this page does.</strong> Each paper reports, for its own phase, that results from several standards have to support one claim, are expressed on different measurement scales, and that no clause says how to combine them. This page sets the two reports side by side. The comparison is a synthesis drawn in this repository; neither paper states it, and the page adds no evidence beyond what each paper says.</p></div>
+</header>
+<main>
+<figure><svg viewBox="0 0 380 524" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Measurement scales that have to support one claim, at design time (G5, the V&amp;V goal) and in operation (re-evaluation after a runtime anomaly), with no clause saying how to combine them."><style>.t-lifecycle{font:700 15px system-ui,sans-serif;fill:#111}.t-where{font:12px system-ui,sans-serif;fill:#444}.t-scale{font:12px system-ui,sans-serif;fill:#111}.t-kind{font:11px system-ui,sans-serif;fill:#555}.t-gap{font:700 12px system-ui,sans-serif;fill:#333}.t-link{font:italic 12px system-ui,sans-serif;fill:#333}</style><text x="14" y="24" class="t-lifecycle">Design time</text><text x="14" y="41" class="t-where">G5, the verification and validation (V&amp;V) goal</text><rect x="14" y="54" width="12" height="12" rx="2" fill="#2E7D32" stroke="#111" stroke-width="1"/><text x="33" y="64" class="t-scale">MC/DC coverage of the surrounding non-AI software</text><text x="33" y="75" class="t-kind">scale: MC/DC coverage ratio</text><rect x="14" y="90" width="12" height="12" rx="2" fill="#E65100" stroke="#111" stroke-width="1"/><text x="33" y="100" class="t-scale">SOTIF triggering condition coverage in scenario testing</text><text x="33" y="111" class="t-kind">scale: triggering-condition coverage fraction</text><rect x="14" y="126" width="12" height="12" rx="2" fill="#1565C0" stroke="#111" stroke-width="1"/><text x="33" y="136" class="t-scale">Deep ensemble disagreement, measured by AUROC</text><text x="33" y="147" class="t-kind">scale: AUROC of ensemble disagreement</text><rect x="14" y="162" width="12" height="12" rx="2" fill="#C62828" stroke="#111" stroke-width="1"/><text x="33" y="172" class="t-scale">Adversarial penetration testing against LiDAR spoofing</text><text x="33" y="183" class="t-kind">scale: attack success rate</text><rect x="14" y="197" width="352" height="30" rx="4" fill="#f5f5f5" stroke="#757575" stroke-width="2" stroke-dasharray="6 4"/><text x="190" y="216" class="t-gap" text-anchor="middle">No clause says how to combine them</text><line x1="190" y1="231" x2="190" y2="261" stroke="#111" stroke-width="2" stroke-dasharray="3 3"/><text x="190" y="279" class="t-link" text-anchor="middle">Set side by side on this page</text><text x="14" y="307" class="t-lifecycle">Operation</text><text x="14" y="324" class="t-where">Re-evaluation of the assurance argument after a runtime anomaly</text><rect x="14" y="337" width="12" height="12" rx="2" fill="#757575" stroke="#111" stroke-width="1"/><text x="33" y="347" class="t-scale">Calibrated probability</text><text x="33" y="358" class="t-kind">scale: probability</text><rect x="14" y="373" width="12" height="12" rx="2" fill="#757575" stroke="#111" stroke-width="1"/><text x="33" y="383" class="t-scale">Ensemble disagreement value</text><text x="33" y="394" class="t-kind">scale: disagreement value per detection</text><rect x="14" y="409" width="12" height="12" rx="2" fill="#757575" stroke="#111" stroke-width="1"/><text x="33" y="419" class="t-scale">Binary event indicator</text><text x="33" y="430" class="t-kind">scale: binary indicator</text><rect x="14" y="445" width="12" height="12" rx="2" fill="#757575" stroke="#111" stroke-width="1"/><text x="33" y="455" class="t-scale">Risk rating</text><text x="33" y="466" class="t-kind">scale: risk rating</text><rect x="14" y="480" width="352" height="30" rx="4" fill="#f5f5f5" stroke="#757575" stroke-width="2" stroke-dasharray="6 4"/><text x="190" y="499" class="t-gap" text-anchor="middle">No clause says how to combine them</text></svg><figcaption>Top: the four evidence types at G5 (WAISE paper). Bottom: the four example scales the position paper gives for operation. The dashed bar marks the missing combination rule, following the papers' convention for an absence; nothing is drawn through it. MC/DC is modified condition/decision coverage. Data: <code>src/analysis/design_time_vs_operation.py</code>.</figcaption></figure>
+<section class="point"><h2>Design time: G5, the verification and validation (V&amp;V) goal</h2><p class="question">Suppose every prescribed verification activity is complete. Is the V&amp;V evidence, taken together, sufficient?</p><ul class="scales"><li><span class="dot" style="--c:#2E7D32"></span><strong>MC/DC coverage of the surrounding non-AI software</strong><br><span class="kind">Scale: MC/DC coverage ratio. Source: ISO 26262.</span></li><li><span class="dot" style="--c:#E65100"></span><strong>SOTIF triggering condition coverage in scenario testing</strong><br><span class="kind">Scale: triggering-condition coverage fraction. Source: ISO 21448.</span></li><li><span class="dot" style="--c:#1565C0"></span><strong>Deep ensemble disagreement, measured by AUROC</strong><br><span class="kind">Scale: AUROC of ensemble disagreement. Source: ISO/PAS 8800.</span></li><li><span class="dot" style="--c:#C62828"></span><strong>Adversarial penetration testing against LiDAR spoofing</strong><br><span class="kind">Scale: attack success rate. Source: ISO/SAE 21434.</span></li></ul><p class="missing">No standard defines how the disjoint evidence types combine to support a single sufficiency claim at G5.</p><p class="src">WAISE paper, decision point DP-2 (Evidence type asymmetry at V&amp;V), Table 4. A related finding concerns the release decision, F-4 (Table 5): No cross-domain release decision criteria: a component can satisfy each standard individually, yet no standard requires evaluating the combined residual risk across domains. Source: WAISE paper, SAFECOMP 2026 Workshops (LNCS), doi:10.1007/978-3-032-35506-5_55.</p></section><section class="point"><h2>Operation: Re-evaluation of the assurance argument after a runtime anomaly</h2><p class="question">A runtime monitor output is abnormal and each concern has re-evaluated. Does the assurance argument still hold?</p><ul class="scales"><li><span class="dot" style="--c:#757575"></span><strong>Calibrated probability</strong><br><span class="kind">Scale: probability.</span></li><li><span class="dot" style="--c:#757575"></span><strong>Ensemble disagreement value</strong><br><span class="kind">Scale: disagreement value per detection.</span></li><li><span class="dot" style="--c:#757575"></span><strong>Binary event indicator</strong><br><span class="kind">Scale: binary indicator.</span></li><li><span class="dot" style="--c:#757575"></span><strong>Risk rating</strong><br><span class="kind">Scale: risk rating.</span></li><li class="note">The position paper gives these scales as examples and attributes none of them to a single standard.</li></ul><p class="missing">The concern-specific results meet at the top claim on different measurement scales, and no rule combines them.</p><p>Conditions that operation adds (position paper):</p><ul class='plain'><li>Evidence arrives asynchronously</li><li>The component changes under updates</li><li>The reporting duty requires a current judgement on demand</li></ul><p class="src">Position paper, missing step 2 (resolution): no clause resolves the concern-specific results into one judgement on the assurance argument. The four scales above are the paper&#x27;s examples. Source: Position paper, SAFECOMP 2026 (to appear).</p></section><h3>What the two phases have in common</h3><ul><li>Each assurance domain or concern completes its own activity within its own scope</li><li>The results are expressed on different measurement scales</li><li>The results have to support a single claim</li><li>No clause in the standards examined says how to combine them</li></ul><h3>What differs</h3><ul><li>At design time the question arises before release and again after each modification (G9); in operation it recurs whenever a runtime monitor output is abnormal</li><li>At design time the evidence is assembled deliberately; in operation it arrives asynchronously and the component may have changed under an update</li><li>Operation carries a reporting duty that requires a current judgement on demand</li><li>In operation the cause of an anomaly is unknown, so it must first be assigned to a concern; at design time the cause is known, although its allocation between G7 and G8 can still be open (DP-5)</li></ul><h3>A second comparison: cases that fall between two standards</h3><p>Before results can be combined, each case has to belong to a concern. Each paper reports a case that falls between the scopes of the standards (SOTIF is the safety of the intended functionality, ISO 21448).</p><p><strong>Design time, F-3.</strong> Adversarial-SOTIF boundary unowned: adversarial inputs that exploit functional insufficiencies fall between G7 and G8 without belonging to either.</p><p><strong>Operation, Missing step 1, assignment.</strong> An anomaly in operational evidence carries no concern label and does not show whether the cause falls under SOTIF, AI safety or cybersecurity, and no clause performs the assignment.</p><p>This comparison is looser than the first, because the two cases differ. In the WAISE paper&#x27;s F-3 the cause is known: an adversarial input that exploits a functional insufficiency is both a threat scenario and a triggering condition, yet belongs to neither G7 nor G8, because no standard allocates it. In the position paper&#x27;s missing step 1 the cause is unknown: the anomaly carries no concern label at all. What they share is that a case falls between the standards&#x27; scopes and no clause assigns it.</p></main>
+<footer>
+<p>Generated page; do not edit by hand. The design-time side is read from the analysis code; the operation side is transcribed from the position paper, which has no code behind it. Sources: WAISE paper, SAFECOMP 2026 Workshops (LNCS), doi:10.1007/978-3-032-35506-5_55; Position paper, SAFECOMP 2026 (to appear). Rebuild: <code>python -m src.visualization.comparison_page</code></p>
+<p>Each identifier is traced in <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/TRACEABILITY.md">TRACEABILITY.md</a>. Known discrepancies with the papers: <a href="https://github.com/milinpatel07/Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main/ERRATA.md">ERRATA.md</a>.</p>
+<p><a href="index.html">Start page</a> · <a href="argument.html#G5">G5 in the integrated GSN argument</a> · <a href="g5-playground.html">G5 playground</a> · <a href="numbers.html">Where the numbers come from</a></p>
+</footer>
+</body>
+</html>

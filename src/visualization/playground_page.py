@@ -1,19 +1,20 @@
-"""Build the G5 playground: drag the four scales, watch the verdict flip.
+"""Build the G5 playground: set acceptance lines for the four evidence types.
 
-Writes ``docs/g5_playground.html``, an interactive page for the poster reader on
-a phone, no install. At G5 four standards each require verification evidence on
-a scale that does not convert into the others. The page hands the reader the
-four scales and an acceptance line for each, and lets them try to combine the
-four into one release verdict. Every line they draw is one no clause draws, and
-moving any line flips the verdict, so the reader reaches the finding by playing
-rather than by reading it: no standard says how to combine the four (F-4).
+Writes ``docs/g5-playground.html``, an interactive page for a reader on a phone,
+no install. At G5, the verification and validation (V&V) goal of the WAISE
+paper, each of the four standards contributes one evidence type, each on its own
+measurement scale, and no standard prescribes how they combine into a single
+sufficiency claim (decision point DP-2). The page gives the reader the four
+evidence types and an acceptance line for each, applies one possible rule (all
+four must pass) and shows the result. No clause sets any of the lines, and
+moving one changes the result.
 
-The page asserts no combination rule. The live verdict is explicitly the
-reader's own, reached from lines they set; the point is that any verdict is
-reachable, which is why the rule is missing. This is the web twin of
-``notebooks/g5_evidence_walk.ipynb``.
+The page states which rule it applies and that the rule is the reader's, not a
+standard's. This is the browser counterpart of
+``notebooks/2_g5_evidence_types.ipynb``.
 
-The four legs, their standards and scales are read from the built argument via
+The four evidence types, their standards and scales are read from the built
+argument via
 ``src/analysis/g5_evidence.py`` so the page cannot drift from it. The illustrative
 values and slider ranges are the page's own, declared as illustrative, not
 measurements. Colours come from ``standard_colors.py``.
@@ -39,7 +40,7 @@ from src.analysis.g5_evidence import g5_legs
 from src.visualization.standard_colors import STANDARD_COLORS, STANDARD_LABELS
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-OUTPUT_PATH = os.path.join(REPO_ROOT, "docs", "g5_playground.html")
+OUTPUT_PATH = os.path.join(REPO_ROOT, "docs", "g5-playground.html")
 REBUILD_COMMAND = "python -m src.visualization.playground_page"
 
 BLOB_URL = (
@@ -47,14 +48,14 @@ BLOB_URL = (
     "Assurance-Gaps-in-an-Integrated-Safety-and-Cybersecurity-Case/blob/main"
 )
 
-# Illustrative value, slider range and starting acceptance line for each leg,
-# keyed by the standard that owns it. These are the page's own numbers for the
-# reader to move, not measurements: three of the four legs were not produced in
-# the case study at all. Range and step suit each scale.
+# Illustrative value, slider range and starting acceptance line for each
+# evidence type, keyed by the standard that contributes it. These are the page's
+# own numbers for the reader to move, not measurements: three of the four
+# evidence types were not produced in the case study at all. Range and step suit each scale.
 _DIALS = {
     "ISO26262": {"value": 0.97, "min": 0.0, "max": 1.0, "step": 0.01, "line": 0.95, "unit": ""},
-    "ISO21448": {"value": 1200, "min": 0, "max": 3000, "step": 50, "line": 1000, "unit": " scenarios"},
-    "ISOPAS8800": {"value": 0.95, "min": 0.5, "max": 1.0, "step": 0.01, "line": 0.90, "unit": " AUROC"},
+    "ISO21448": {"value": 0.90, "min": 0.0, "max": 1.0, "step": 0.01, "line": 0.85, "unit": ""},
+    "ISOPAS8800": {"value": 0.95, "min": 0.5, "max": 1.0, "step": 0.01, "line": 0.90, "unit": ""},
     "ISO21434": {"value": 0.15, "min": 0.0, "max": 1.0, "step": 0.01, "line": 0.20, "unit": ""},
 }
 
@@ -199,14 +200,14 @@ JS_TEMPLATE = """
     });
     if (allPass) {
       verdict.className = "verdict release";
-      word.textContent = "RELEASE";
+      word.textContent = "SUFFICIENT";
     } else {
       verdict.className = "verdict hold";
-      word.textContent = "HOLD";
+      word.textContent = "NOT SUFFICIENT";
     }
-    why.textContent = "You reached this by drawing four acceptance lines. "
-      + "No clause draws any of them; move one and the verdict changes. "
-      + "That no standard sets these lines is finding F-4.";
+    why.textContent = "Result under your rule: all four evidence types must "
+      + "pass your acceptance lines. No clause sets these lines or this rule "
+      + "(decision point DP-2). Move one line and the result can change.";
   }
 
   rows.forEach(function (row) {
@@ -231,45 +232,57 @@ def build_html() -> str:
         "<!doctype html>\n"
         '<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        "<title>Try to combine the four scales at G5</title>\n"
+        "<title>G5 playground: set acceptance lines for the four evidence "
+        "types</title>\n"
         f"<style>{CSS}</style>\n</head>\n<body>\n"
         "<header>\n"
-        "<h1>Try to combine the four scales</h1>\n"
-        '<p class="intro">At G5, the goal that verification and validation are '
-        "sufficient, four standards each require their own kind of evidence on a "
-        "scale that does not convert into the others. Every prescribed activity "
-        "is complete. You decide: is the evidence together enough to release?</p>\n"
-        '<p class="intro">To decide, draw an acceptance line for each scale below '
-        "and read the verdict. Only leg (c) was produced in the case study, on "
-        "simulated outputs; the four values are illustrative, so move the lines "
-        "and watch what happens.</p>\n"
+        "<h1>G5 playground: set acceptance lines for the four evidence types</h1>\n"
+        '<p class="intro">In the WAISE paper\'s integrated GSN argument, G5 is the '
+        "verification and validation (V&amp;V) goal: it claims that the V&amp;V "
+        "evidence is sufficient. G5 is the one goal to which all four standards "
+        "contribute, and each contributes one evidence type, (a) to (d) below, "
+        "on its own measurement scale. No standard prescribes how the four "
+        "combine into a single sufficiency claim; the paper records this as "
+        "decision point DP-2.</p>\n"
+        '<p class="intro">Suppose every prescribed activity is complete. Set an '
+        "acceptance line for each evidence type and read the result. The page "
+        "applies one possible rule, that all four must pass; no standard "
+        "prescribes it. In the case study only evidence type (c) was produced, "
+        "on simulated outputs (AUROC 0.982 in the paper); the four values here "
+        "are illustrative.</p>\n"
         "</header>\n<main>\n"
         '<div class="verdict release" id="verdict" role="status" aria-live="polite">'
-        '<div class="word" id="verdict-word">RELEASE</div>'
+        '<div class="word" id="verdict-word">SUFFICIENT</div>'
         '<p class="why" id="verdict-why"></p></div>\n'
         + _leg_rows(legs)
         + '<div class="controls"><button id="reset" type="button">Reset the '
         "lines</button></div>\n"
-        '<p class="note">Whatever verdict you reach, you reached it by choosing '
-        "four lines no clause draws, on four scales that share no common unit. "
-        "That is the point: the release decision at G5 is underdetermined by the "
-        "standards, and whoever combines the evidence supplies a rule no clause "
-        "authorises. The design-time paper records this as decision point DP-2 "
-        "and finding F-4; the position paper reports the same shape in service. "
-        'This page draws the four scales from <code>src/analysis/g5_evidence.py</code>; '
-        "it defines no combination rule, because none exists to define.</p>\n"
+        '<p class="note">Whatever result you reach depends on four lines and a '
+        "rule that you chose, on four scales with no common unit. The standards "
+        "do not determine the sufficiency judgement at G5. The WAISE paper "
+        "assigns the choice to the project: an evidence admissibility policy "
+        "with documented rationale, following the precedent in ISO 26262 Parts "
+        "4 and 6 for replacing a recommended verification method, which the "
+        "paper says can be extended to combining evidence across domains. "
+        "The position paper reports a corresponding problem in operation (see "
+        'the <a href="design-time-and-operation.html">comparison page</a>). The four evidence types '
+        "are read from <code>src/analysis/g5_evidence.py</code>.</p>\n"
         "</main>\n<footer>\n"
-        "<p>Generated page; do not edit by hand. The four legs, their standards "
-        "and scales come from the built argument via "
+        "<p>Generated page; do not edit by hand. The four evidence types, their "
+        "standards and scales come from the built argument via "
         "<code>src/analysis/g5_evidence.py</code>; the values and ranges are "
         "illustrative. Rebuild: <code>" + REBUILD_COMMAND + "</code></p>\n"
-        "<p>Trace the four legs in "
-        f'<a href="{BLOB_URL}/TRACEABILITY.md">TRACEABILITY.md</a>, and see what '
-        "this work found about the papers in "
-        f'<a href="{BLOB_URL}/ERRATA.md">ERRATA.md</a>.</p>\n'
-        '<p><a href="index.html">Back to the start</a> · '
-        '<a href="seam.html">One problem at two lifecycle points</a> · '
-        '<a href="gsn_view.html">The argument, one node at a time</a></p>\n'
+        "<p>Each evidence type is traced in "
+        f'<a href="{BLOB_URL}/TRACEABILITY.md">TRACEABILITY.md</a>. Known '
+        "discrepancies with the papers: "
+        f'<a href="{BLOB_URL}/ERRATA.md">ERRATA.md</a>. The same exercise in '
+        "Python, with a weighted score as a second rule: "
+        f'<a href="{BLOB_URL}/notebooks/2_g5_evidence_types.ipynb">the G5 '
+        "notebook</a>.</p>\n"
+        '<p><a href="index.html">Start page</a> · '
+        '<a href="argument.html#G5">G5 in the integrated GSN argument</a> · '
+        '<a href="design-time-and-operation.html">Design time and operation side by side</a> · '
+        '<a href="numbers.html">Where the numbers come from</a></p>\n'
         "</footer>\n"
         f"<script>{js}</script>\n"
         "</body>\n</html>\n"
@@ -279,7 +292,7 @@ def build_html() -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--check", action="store_true", help="exit 1 if docs/g5_playground.html is out of date"
+        "--check", action="store_true", help="exit 1 if docs/g5-playground.html is out of date"
     )
     args = parser.parse_args(argv)
 

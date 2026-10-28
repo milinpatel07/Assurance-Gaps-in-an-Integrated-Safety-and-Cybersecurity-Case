@@ -5,31 +5,31 @@
   "standards": [
     {
       "code": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true
     },
     {
       "code": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true
     },
     {
       "code": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true
     },
     {
       "code": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true
     },
     {
       "code": "TR5469",
-      "edition_as_cited": "ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems",
+      "edition_as_cited": "ISO/IEC TR 5469:2024 (Artificial intelligence: Functional safety and AI systems)",
       "year": 2024,
       "normative": false
     }
@@ -37,7 +37,7 @@
   "claims": [
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "Cl.10",
@@ -49,7 +49,7 @@
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "Cl.10",
@@ -57,11 +57,11 @@
       "node": "G5",
       "lifecycle_phase": "Verification & Validation",
       "out_of_scope": false,
-      "text": "Vulnerability analysis and penetration testing shall verify cybersecurity controls."
+      "text": "Cybersecurity verification, including penetration testing, shall verify the cybersecurity controls."
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "Cl.15",
@@ -73,7 +73,7 @@
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "Cl.15",
@@ -85,7 +85,7 @@
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "Cl.15.8",
@@ -97,7 +97,7 @@
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "Cl.3.1.11",
@@ -109,7 +109,7 @@
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "Cl.8",
@@ -117,11 +117,11 @@
       "node": "G6",
       "lifecycle_phase": "Operation / Monitoring",
       "out_of_scope": false,
-      "text": "Continuous cybersecurity monitoring shall detect vulnerabilities and incidents post-deployment."
+      "text": "Continual cybersecurity monitoring shall collect cybersecurity information, evaluate cybersecurity events and manage vulnerabilities in operation."
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "[RQ-06-01]",
@@ -133,7 +133,7 @@
     },
     {
       "standard": "ISO21434",
-      "edition_as_cited": "ISO/SAE 21434:2021 — Road vehicles — Cybersecurity engineering",
+      "edition_as_cited": "ISO/SAE 21434:2021 (Road vehicles: Cybersecurity engineering)",
       "year": 2021,
       "normative": true,
       "clause": "[RQ-15-06]",
@@ -141,11 +141,11 @@
       "node": "G8",
       "lifecycle_phase": "Concept / Requirements",
       "out_of_scope": false,
-      "text": "The safety impact of each threat scenario shall be assessed using ISO 26262-3 severity classes."
+      "text": "Safety impact ratings of damage scenarios shall be derived from ISO 26262-3 severity classes."
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.10",
@@ -157,7 +157,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.11",
@@ -169,7 +169,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.12",
@@ -181,7 +181,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.13",
@@ -193,7 +193,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.5",
@@ -201,11 +201,11 @@
       "node": "G7",
       "lifecycle_phase": "Concept / Requirements",
       "out_of_scope": false,
-      "text": "The operational space shall be partitioned using the four-area model, and Area 3 (unknown potentially hazardous) shall be reduced to an acceptable level."
+      "text": "The operational space shall be partitioned using the four-area model, and Areas 2 and 3 (known and unknown hazardous scenarios) shall be reduced to an acceptable level."
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.6.5",
@@ -217,7 +217,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.7",
@@ -229,7 +229,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Cl.9",
@@ -241,7 +241,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Table A.10",
@@ -253,7 +253,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Table A.8",
@@ -265,7 +265,7 @@
     },
     {
       "standard": "ISO21448",
-      "edition_as_cited": "ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+      "edition_as_cited": "ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
       "year": 2022,
       "normative": true,
       "clause": "Table A.9",
@@ -277,7 +277,7 @@
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 2, Cl.6.4",
@@ -289,7 +289,7 @@
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 3, Cl.6",
@@ -301,7 +301,7 @@
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 3, Cl.6.4.3",
@@ -309,11 +309,11 @@
       "node": "G1",
       "lifecycle_phase": "Concept / Requirements",
       "out_of_scope": false,
-      "text": "At SAE Level 4+, controllability shall be classified as C3 because no human driver is available to intervene."
+      "text": "At SAE Level 4 and above, controllability is commonly rated C3 because no human driver is available to intervene."
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 4, Cl.6.4.3",
@@ -325,7 +325,7 @@
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 4, Cl.7",
@@ -337,7 +337,7 @@
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 4, Cl.8",
@@ -349,19 +349,19 @@
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
-      "clause": "Part 5, Cl.9",
+      "clause": "Part 5, Cl.8-9",
       "claim_id": "CLM-26262-HWMET-01",
       "node": "G5",
       "lifecycle_phase": "Verification & Validation",
       "out_of_scope": false,
-      "text": "Hardware architectural metrics shall meet ASIL D targets: SPFM >= 99%, LFM >= 90%, PMHF < 10^-8 h^-1."
+      "text": "The hardware architectural metrics (Cl.8: SPFM >= 99%, LFM >= 90%) and the random hardware failure target (Cl.9: PMHF < 10^-8 h^-1) shall meet ASIL D targets."
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 6, Cl.9",
@@ -369,11 +369,11 @@
       "node": "G5",
       "lifecycle_phase": "Verification & Validation",
       "out_of_scope": false,
-      "text": "At ASIL D, modified condition/decision coverage (MC/DC) shall be achieved for software unit testing."
+      "text": "At ASIL D, structural coverage shall be measured in software unit verification, with modified condition/decision coverage (MC/DC) highly recommended."
     },
     {
       "standard": "ISO26262",
-      "edition_as_cited": "ISO 26262:2018 — Road vehicles — Functional safety",
+      "edition_as_cited": "ISO 26262:2018 (Road vehicles: Functional safety)",
       "year": 2018,
       "normative": true,
       "clause": "Part 8, Cl.8",
@@ -385,7 +385,7 @@
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Annex B",
@@ -397,7 +397,7 @@
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Annex B",
@@ -409,7 +409,7 @@
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Cl.14",
@@ -421,7 +421,7 @@
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Cl.14.8.3",
@@ -429,11 +429,11 @@
       "node": "G9",
       "lifecycle_phase": "Modification / Re-assurance",
       "out_of_scope": false,
-      "text": "Partial re-approval shall be performed after AI model modification."
+      "text": "Re-assurance shall be performed after AI model modification; the clause does not define when partial re-assurance is sufficient."
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Cl.5",
@@ -445,7 +445,7 @@
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Cl.7",
@@ -457,7 +457,7 @@
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Cl.8.4",
@@ -469,7 +469,7 @@
     },
     {
       "standard": "ISOPAS8800",
-      "edition_as_cited": "ISO/PAS 8800:2024 — Road vehicles — Safety and artificial intelligence",
+      "edition_as_cited": "ISO/PAS 8800:2024 (Road vehicles: Safety and artificial intelligence)",
       "year": 2024,
       "normative": true,
       "clause": "Cl.9",
@@ -481,7 +481,7 @@
     },
     {
       "standard": "TR5469",
-      "edition_as_cited": "ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems",
+      "edition_as_cited": "ISO/IEC TR 5469:2024 (Artificial intelligence: Functional safety and AI systems)",
       "year": 2024,
       "normative": false,
       "clause": "Cl.9.3.2",
@@ -493,7 +493,7 @@
     },
     {
       "standard": "TR5469",
-      "edition_as_cited": "ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems",
+      "edition_as_cited": "ISO/IEC TR 5469:2024 (Artificial intelligence: Functional safety and AI systems)",
       "year": 2024,
       "normative": false,
       "clause": "Cl.9.3.3",
@@ -505,7 +505,7 @@
     },
     {
       "standard": "TR5469",
-      "edition_as_cited": "ISO/IEC TR 5469:2024 — AI — Functional safety and AI systems",
+      "edition_as_cited": "ISO/IEC TR 5469:2024 (Artificial intelligence: Functional safety and AI systems)",
       "year": 2024,
       "normative": false,
       "clause": "Table A.8",

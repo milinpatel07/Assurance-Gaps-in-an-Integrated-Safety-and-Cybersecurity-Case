@@ -1,12 +1,22 @@
-"""Assurance gap identification and classification (Step 5 of the methodology).
+"""Finding identification and classification (Step 5 of the method).
 
-Identifies nodes in the integrated GSN where no applicable standard provides
-the required claim or evidence.
+Identifies the findings F-1 to F-5 of the WAISE paper (Table 5), written
+`Gap-1` to `Gap-5` in the code. The paper's Step 5 (Section 3.2) uses two
+categories:
+- integration-induced finding (II): emerges only between the scopes of
+  individual standards and is not detectable from any single standard in
+  isolation (F-3, F-4);
+- open methodological problem (OM): the standards prescribe a framework, but no
+  published method specifies application-specific values for AI components
+  (F-1, F-2, F-5).
 
-Three gap types (Section 3.2, Step 5):
-- Missing Claim (MC): argument requires a claim but no standard contains it
-- Missing Evidence (ME): claim exists but no standard prescribes evidence for AI
-- Unresolved Inconsistency (UI): inconsistency requires resolution no standard provides
+The category is held in `AssuranceGap.integration_induced` (True for II).
+
+Each finding also carries a `gap_type` code (MC missing claim, ME missing
+evidence, UI unresolved inconsistency). That code is an older
+repository-only classification. It is not in either paper, is kept only
+because tests and filters in the code use it, and is not exported to the
+committed findings file.
 """
 
 from __future__ import annotations
@@ -28,10 +38,11 @@ GAP_GOAL_MAP: dict[str, list[str]] = {
 
 
 class GapClassification:
-    """The five assurance gaps identified in the analysis.
+    """The five findings F-1 to F-5 (code ids Gap-1 to Gap-5).
 
-    Each finding corresponds to a row in the paper's findings table (tab:gaps).
-    Two gaps (Gap-3, Gap-4) are integration-induced.
+    Each finding corresponds to a row of WAISE Table 5. Two are
+    integration-induced findings (F-3, F-4); three are open methodological
+    problems (F-1, F-2, F-5).
     """
 
     def __init__(self):
@@ -41,22 +52,24 @@ class GapClassification:
         return [
             AssuranceGap(
                 gap_id="Gap-1",
-                # Camera-ready title (tab:gaps): "Quantitative acceptance
+                # Camera-ready title (WAISE Table 5): "Quantitative acceptance
                 # criteria for AI components". The paper's claim is a deferral
                 # plus a research gap, not a flat absence: the standards
                 # establish frameworks but defer values to context, and no
                 # published method derives application-specific targets.
                 description=(
-                    "Quantitative acceptance criteria for AI components "
-                    "undefined; the standards defer values to context"
+                    "Quantitative acceptance criteria for AI components: ISO "
+                    "21448 Cl.6.5 establishes the framework but defers "
+                    "quantitative values to context, and no published method "
+                    "derives application-specific targets for an AI component"
                 ),
                 gap_type=GapType.MISSING_EVIDENCE,
                 lifecycle_phase=LifecyclePhase.VERIFICATION,
-                # The camera-ready findings table (tab:gaps) gives "Concept, Verification".
+                # The camera-ready findings table (WAISE Table 5) gives "Concept, Verification".
                 additional_lifecycle_phases=[LifecyclePhase.CONCEPT],
                 partial_coverage=[
-                    "ISO 26262-5 Cl.9 (HW metrics: SPFM >= 99%, LFM >= 90%, "
-                    "PMHF < 10^-8 h^-1, hardware only)",
+                    "ISO 26262-5 Cl.8 (SPFM >= 99%, LFM >= 90%) and Cl.9 "
+                    "(PMHF < 10^-8 h^-1), ASIL D, hardware only",
                     "ISO 21448 Cl.6.5 (establishes the acceptance-criteria framework, "
                     "including risk tolerability principles, but defers "
                     "quantitative values to context)",
@@ -67,15 +80,17 @@ class GapClassification:
             AssuranceGap(
                 gap_id="Gap-2",
                 description=(
-                    "No complete over-the-air (OTA) re-assurance workflow "
-                    "for AI"
+                    "Over-the-air (OTA) re-assurance workflow (partial "
+                    "coverage): no single standard prescribes the complete "
+                    "re-assurance workflow for a modified AI model"
                 ),
                 gap_type=GapType.MISSING_CLAIM,
                 lifecycle_phase=LifecyclePhase.MODIFICATION,
                 partial_coverage=[
                     "ISO 26262-8 Cl.8 (change management, assumes conventional "
                     "software)",
-                    "ISO/PAS 8800 Cl.14.8.3 (partial re-approval, incomplete)",
+                    "ISO/PAS 8800 Cl.14.8.3 (does not define when partial "
+                    "re-assurance is sufficient)",
                     "ISO 24089 (software update engineering; specifies the update "
                     "process, not re-assurance of a modified AI model's argument)",
                     "ISO/IEC TR 5469 Table A.8 (change protocols, informative "
@@ -87,24 +102,27 @@ class GapClassification:
                 gap_id="Gap-3",
                 description=(
                     "Adversarial-SOTIF boundary unowned: adversarial inputs that "
-                    "exploit functional insufficiencies fall between G7 and G8"
+                    "exploit functional insufficiencies fall between G7 and G8 "
+                    "without belonging to either"
                 ),
                 gap_type=GapType.UNRESOLVED_INCONSISTENCY,
                 lifecycle_phase=LifecyclePhase.VERIFICATION,
-                # The camera-ready findings table (tab:gaps) gives "Verification, Operation".
+                # The camera-ready findings table (WAISE Table 5) gives "Verification, Operation".
                 additional_lifecycle_phases=[LifecyclePhase.OPERATION],
                 partial_coverage=[
                     "ISO 21448 Cl.1 (explicitly excludes cybersecurity threats)",
-                    "ISO/SAE 21434 Cl.15 (includes adversarial scenarios)",
+                    "ISO/SAE 21434 Cl.15 (includes threat scenarios such as "
+                    "LiDAR spoofing)",
                 ],
                 integration_induced=True,
             ),
             AssuranceGap(
                 gap_id="Gap-4",
                 description=(
-                    "No cross-domain release decision criteria: no standard "
-                    "defines how the per-domain residual risks combine into "
-                    "one release decision"
+                    "No cross-domain release decision criteria: a component "
+                    "can satisfy each standard individually, yet no standard "
+                    "requires evaluating the combined residual risk across "
+                    "domains"
                 ),
                 gap_type=GapType.MISSING_CLAIM,
                 lifecycle_phase=LifecyclePhase.INTEGRATION,
@@ -113,20 +131,22 @@ class GapClassification:
                     "the per-domain assessments but does not define how their "
                     "residual risks combine into one release decision)",
                     "ISO/SAE 21434 Cl.3.1.11 (cybersecurity case)",
-                    "ISO 21448 Cl.12 (SOTIF release decision)",
+                    "ISO 21448 Cl.12 (evaluation of the achievement of SOTIF; "
+                    "release recommendation)",
                 ],
                 integration_induced=True,
             ),
             AssuranceGap(
                 gap_id="Gap-5",
-                # Camera-ready title (tab:gaps): "Data acceptance criteria for
+                # Camera-ready title (WAISE Table 5): "Data acceptance criteria for
                 # AI components". As with Gap-1, the paper's claim is a
                 # deferral: ISO/PAS 8800 Cl.8.4 and TR 5469 Cl.9.3.3 prescribe
                 # frameworks and criteria but defer thresholds to context.
                 description=(
-                    "Data acceptance criteria for AI components undefined; the "
-                    "standards prescribe frameworks but defer thresholds to "
-                    "context"
+                    "Data acceptance criteria for AI components: ISO/PAS 8800 "
+                    "Cl.8.4 prescribes data quality requirements but defers "
+                    "thresholds to context, and no published method derives an "
+                    "application-specific threshold"
                 ),
                 gap_type=GapType.MISSING_EVIDENCE,
                 lifecycle_phase=LifecyclePhase.DESIGN,
@@ -154,45 +174,42 @@ class GapClassification:
 
     def get_by_phase(self, phase: LifecyclePhase) -> list[AssuranceGap]:
         # Match any phase the paper lists for the finding, not only the primary
-        # one. tab:gaps gives two phases each for F-1 and F-3.
+        # one. WAISE Table 5 gives two phases each for F-1 and F-3.
         return [g for g in self.gaps if phase in g.lifecycle_phases]
 
     def print_classification(self):
-        """Print the findings classification (paper table tab:gaps)."""
+        """Print the findings in the paper's two categories (WAISE Table 5)."""
         print("=" * 80)
-        print("FINDINGS (Step 5 output; paper table tab:gaps)")
+        print("FINDINGS (Step 5 output; WAISE Table 5)")
         print("=" * 80)
-
-        type_labels = {
-            GapType.MISSING_CLAIM: "MC",
-            GapType.MISSING_EVIDENCE: "ME",
-            GapType.UNRESOLVED_INCONSISTENCY: "UI",
-        }
+        print("II = integration-induced finding, OM = open methodological problem")
 
         for gap in self.gaps:
-            tl = type_labels[gap.gap_type]
-            ind = " [INTEGRATION-INDUCED]" if gap.integration_induced else ""
-            print(f"\n{gap.gap_id} [{tl}]{ind} — {gap.description}")
-            print(f"  Lifecycle phase: {gap.lifecycle_phase.display_name}")
-            print(f"  Partial coverage:")
+            finding_id = gap.gap_id.replace("Gap-", "F-", 1)
+            category = "II" if gap.integration_induced else "OM"
+            print(f"\n{finding_id} ({gap.gap_id}) [{category}]: {gap.description}")
+            print(f"  Lifecycle phase: {gap.lifecycle_phase_label}")
+            print("  Partial coverage:")
             for pc in gap.partial_coverage:
                 print(f"    - {pc}")
 
     def severity_scores(self) -> list[dict]:
-        """Compute severity scores for each gap.
+        """Compute severity scores for each finding.
+
+        Repository analysis, not in either paper.
 
         Scoring dimensions (each 1-5):
-        - Safety impact: potential harm if gap is not addressed
-        - Exploitability: how likely the gap leads to a real failure
-        - Detectability: how hard the gap is to detect without integration
-        - Remediation complexity: effort needed to close the gap
+        - Safety impact: potential harm if the finding is not addressed
+        - Exploitability: how likely the finding leads to a real failure
+        - Detectability: how hard the finding is to detect without integration
+        - Remediation complexity: effort needed to close the finding
 
         Overall severity = mean of the four dimensions.
         """
         scores = {
             "Gap-1": {
                 "gap_id": "Gap-1",
-                "description": "No AI-specific quantitative reliability target",
+                "description": "Quantitative acceptance criteria for AI components",
                 "safety_impact": 4,
                 "exploitability": 3,
                 "detectability": 2,
@@ -206,7 +223,7 @@ class GapClassification:
             },
             "Gap-2": {
                 "gap_id": "Gap-2",
-                "description": "No complete OTA re-assurance workflow",
+                "description": "OTA re-assurance workflow (partial coverage)",
                 "safety_impact": 4,
                 "exploitability": 4,
                 "detectability": 2,
@@ -226,10 +243,10 @@ class GapClassification:
                 "detectability": 5,
                 "remediation_complexity": 4,
                 "rationale": (
-                    "Critical safety impact (adversarial attacks that exploit functional "
-                    "insufficiency are unowned — neither standard takes responsibility). "
+                    "Critical safety impact (adversarial attacks that exploit a functional "
+                    "insufficiency fall between G7 and G8, and no standard assigns them). "
                     "High exploitability (adversarial LiDAR attacks are demonstrated). "
-                    "Very hard to detect (requires integration to see the scope gap). "
+                    "Very hard to detect (visible only when the standards are integrated). "
                     "Hard to remediate (requires ISO 21448/21434 scope alignment)."
                 ),
             },
@@ -241,16 +258,18 @@ class GapClassification:
                 "detectability": 4,
                 "remediation_complexity": 5,
                 "rationale": (
-                    "Critical safety impact (release without combined evaluation). "
+                    "Critical safety impact (release without evaluating the combined "
+                    "residual risk). "
                     "Very high exploitability (every release decision is affected). "
                     "Hard to detect (each standard has its own release criteria). "
-                    "Very hard to remediate (requires new combined sufficiency definition "
-                    "at G5 — the evidence type asymmetry problem)."
+                    "Very hard to remediate (requires a cross-domain release criterion "
+                    "for combined residual risk; distinct from the G5 evidence-combination "
+                    "decision point DP-2)."
                 ),
             },
             "Gap-5": {
                 "gap_id": "Gap-5",
-                "description": "Data acceptance threshold undefined",
+                "description": "Data acceptance criteria for AI components",
                 "safety_impact": 3,
                 "exploitability": 3,
                 "detectability": 2,

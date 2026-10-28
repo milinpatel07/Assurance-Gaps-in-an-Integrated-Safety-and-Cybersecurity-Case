@@ -1,22 +1,20 @@
-"""The four kinds of V&V evidence at G5, and why they do not combine.
+"""The four V&V evidence types at G5, and the missing rule for combining them.
 
-This backs the G5 notebook. The point the WAISE paper makes at G5 (decision
-point DP-2, finding F-4) is that four standards each require their own kind of
-verification evidence there, on four measurement scales that do not convert into
-one another, and no standard says how to combine them into one release verdict.
+This backs the G5 notebook and the G5 playground. At G5, the verification and
+validation (V&V) goal, each of the four standards contributes one evidence
+type on its own measurement scale. The WAISE paper's decision point DP-2 is that
+the types are disjoint by design and no standard prescribes how they combine
+into a single sufficiency claim at G5.
 
-The functions here let a reader try the combination and watch it fail: any single
-verdict they reach is a property of the thresholds, weights and normalisation
-they themselves supplied, none of which any standard prescribes. Changing those
-inputs flips the verdict, which is the lesson.
+The functions here let a reader try two possible rules (all must pass; a
+weighted score). Any result depends on the thresholds, weights and normalisation
+the reader supplies, none of which a standard prescribes, and changing those
+inputs can change the result.
 
-The four legs are read from ``build_integrated_gsn()`` so this module cannot
-drift from the argument. Each leg is sourced by exactly one standard, which is
-why ``no_standard_combines_the_scales()`` returns that no standard spans more
-than one scale, so none of them combines the four.
-
-Nothing here asserts a combination rule exists. That is the finding, and building
-one would destroy it.
+The evidence types are read from ``build_integrated_gsn()`` so this module
+cannot drift from the argument. Nothing here proposes a combination rule as the
+standards' own; the WAISE paper leaves the method to future work and assigns the
+choice to a project-level evidence admissibility policy.
 """
 
 from __future__ import annotations
@@ -30,7 +28,7 @@ G5_LEG_LETTERS = ["(a)", "(b)", "(c)", "(d)"]
 
 @dataclass(frozen=True)
 class EvidenceLeg:
-    """One kind of V&V evidence required at G5, on its own measurement scale."""
+    """One V&V evidence type at G5, on its own measurement scale."""
 
     letter: str
     standard_id: str
@@ -48,14 +46,14 @@ class EvidenceLeg:
 # states.
 _BETTER = {
     "ISO26262": "higher",  # structural coverage fraction
-    "ISO21448": "higher",  # scenario coverage count
+    "ISO21448": "higher",  # triggering-condition coverage fraction
     "ISOPAS8800": "higher",  # AUROC
     "ISO21434": "lower",  # attack success rate
 }
 
 
 def g5_legs() -> list[EvidenceLeg]:
-    """The four G5 evidence legs, in the paper's Figure 2(b) order (a) to (d)."""
+    """The four G5 evidence types, in the paper's Fig. 1(b) order (a) to (d)."""
     gsn = build_integrated_gsn()
     g5 = gsn.get_element("G5")
     legs = []
@@ -76,7 +74,7 @@ def g5_legs() -> list[EvidenceLeg]:
 
 
 def scales(legs: list[EvidenceLeg] | None = None) -> list[tuple[str, str]]:
-    """The four (leg, scale) pairs, to show they share no common unit."""
+    """The four (evidence type, scale) pairs, to show they share no common unit."""
     legs = legs or g5_legs()
     return [(leg.letter, leg.scale) for leg in legs]
 
@@ -87,7 +85,7 @@ def combine_all_must_pass(
     """Attempt a verdict by requiring every leg to pass its own threshold.
 
     The reader supplies one value and one threshold per standard id, and the
-    reading direction comes from the leg. The verdict is 'release' only if every
+    reading direction comes from the evidence type. The result is 'sufficient' only if every
     leg passes. Every threshold here is the reader's choice; no clause defines
     one, which is the point.
     """
@@ -104,9 +102,9 @@ def combine_all_must_pass(
             "passed": passed,
         }
     return {
-        "verdict": "release" if all(p["passed"] for p in per_leg.values()) else "hold",
+        "verdict": "sufficient" if all(p["passed"] for p in per_leg.values()) else "not sufficient",
         "per_leg": per_leg,
-        "rule": "every leg must pass a threshold the assessor chose",
+        "rule": "every evidence type must pass a threshold the engineer chose",
     }
 
 
@@ -116,8 +114,8 @@ def combine_weighted(
     """Attempt a verdict by a weighted sum of normalised leg values.
 
     This needs two things no clause supplies: a normalisation putting four
-    incommensurable scales onto one 0-to-1 axis, and a set of weights. Both are
-    the reader's. Change either and the score changes.
+    different measurement scales onto one 0-to-1 axis, and a set of weights. Both
+    are the reader's. Change either and the score changes.
     """
     total_weight = sum(weights.values())
     score = sum(normalised[sid] * weights[sid] for sid in normalised) / total_weight
@@ -126,17 +124,19 @@ def combine_weighted(
         "weights": dict(weights),
         "rule": (
             "weighted sum of normalised legs; the normalisation and the weights "
-            "are the assessor's, not any standard's"
+            "are the engineer's, not any standard's"
         ),
     }
 
 
 def no_standard_combines_the_scales() -> dict:
-    """Derive that no single standard spans more than one G5 scale.
+    """Check that no single standard contributes more than one G5 scale.
 
-    Each leg is sourced by one standard, so no standard provides two of the four
-    scales, so none of them defines how the four combine. This is F-4 (Gap-4)
-    read off the argument rather than asserted.
+    A repository check, consistent with decision point DP-2: in this encoding
+    each evidence type at G5 is contributed by exactly one standard, so no
+    standard covers two of the four scales. The paper's statement that no
+    standard prescribes the combination is read from the clauses, not derived
+    from this check.
     """
     legs = g5_legs()
     per_standard: dict[str, list[str]] = {}
@@ -148,8 +148,9 @@ def no_standard_combines_the_scales() -> dict:
         "standards_spanning_more_than_one_scale": sorted(spanning),
         "any_standard_combines": bool(spanning),
         "derivation": (
-            "Each G5 evidence leg is sourced by exactly one standard, so no "
-            "standard provides more than one of the four scales, so none of them "
-            "combines the four. The combining rule is missing (F-4)."
+            "Each G5 evidence type is contributed by exactly one standard, so no "
+            "standard covers more than one of the four scales. This is "
+            "consistent with decision point DP-2: no standard prescribes how "
+            "the four combine."
         ),
     }

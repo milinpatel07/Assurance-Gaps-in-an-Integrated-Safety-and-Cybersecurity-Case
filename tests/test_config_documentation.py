@@ -1,6 +1,6 @@
 """Check that the descriptive YAML files still match the values the code uses.
 
-The YAML files under ``docs/standards-reference/`` and ``data/carla_configs/``
+The YAML files under ``data/standards_reference/`` and ``data/case_study_parameters/``
 document parameters
 for readers. No module loads them, so nothing else stops them drifting away from
 the constants in ``src/``. These tests are that stop.
@@ -35,17 +35,17 @@ def _load(*parts: str) -> dict:
 
 @pytest.fixture(scope="module")
 def weather_yaml() -> dict:
-    return _load("data", "carla_configs", "weather_grid.yaml")["weather_grid"]
+    return _load("data", "case_study_parameters", "weather_grid.yaml")["weather_grid"]
 
 
 @pytest.fixture(scope="module")
 def detector_yaml() -> dict:
-    return _load("data", "carla_configs", "detector_config.yaml")
+    return _load("data", "case_study_parameters", "detector_config.yaml")
 
 
 @pytest.fixture(scope="module")
 def case_study_yaml() -> dict:
-    return _load("docs", "standards-reference", "case_study.yaml")
+    return _load("data", "standards_reference", "case_study.yaml")
 
 
 class TestWeatherGridDocumentation:
@@ -114,7 +114,7 @@ class TestDetectorDocumentation:
 
 
 class TestCaseStudyDocumentation:
-    """docs/standards-reference/case_study.yaml against the case study values."""
+    """data/standards_reference/case_study.yaml against the case study values."""
 
     def test_detector_geometry_agrees_with_code(self, case_study_yaml):
         detector = case_study_yaml["detector"]

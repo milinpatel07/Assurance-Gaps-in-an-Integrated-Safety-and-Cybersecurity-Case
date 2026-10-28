@@ -1,7 +1,7 @@
 """The G5 evidence-combination notebook, and the module it runs on.
 
 The notebook restates DP-2 and F-4: the four V&V evidence scales at G5 do not
-combine, so any single release verdict is one the assessor supplied. These tests
+combine, so any single sufficiency judgement is one the engineer supplied. These tests
 hold the module to that (each leg is one standard's, no standard spans two
 scales, and a changed threshold flips the verdict), and rebuild the notebook,
 check it is current, and execute it end to end.
@@ -43,9 +43,9 @@ class TestTheFourLegs:
     def test_the_four_scales_share_no_common_unit(self):
         kinds = {scale for _, scale in scales()}
         assert kinds == {
-            "deterministic coverage",
-            "scenario coverage",
-            "statistical metric",
+            "MC/DC coverage ratio",
+            "triggering-condition coverage fraction",
+            "AUROC of ensemble disagreement",
             "attack success rate",
         }
 
@@ -72,16 +72,16 @@ class TestNoRuleIsAuthorised:
         }
         lenient = {"ISO26262": 0.95, "ISO21448": 1000, "ISOPAS8800": 0.90, "ISO21434": 0.20}
         strict = dict(lenient, ISO26262=0.99)
-        assert combine_all_must_pass(values, lenient)["verdict"] == "release"
-        assert combine_all_must_pass(values, strict)["verdict"] == "hold"
+        assert combine_all_must_pass(values, lenient)["verdict"] == "sufficient"
+        assert combine_all_must_pass(values, strict)["verdict"] == "not sufficient"
 
 
 class TestNotebook:
     def test_committed_notebook_is_current(self):
-        assert os.path.exists(OUTPUT_PATH), "notebooks/g5_evidence_walk.ipynb missing"
+        assert os.path.exists(OUTPUT_PATH), "notebooks/2_g5_evidence_types.ipynb missing"
         with open(OUTPUT_PATH, encoding="utf-8") as handle:
             assert handle.read() == build_notebook(), (
-                "notebooks/g5_evidence_walk.ipynb is stale. "
+                "notebooks/2_g5_evidence_types.ipynb is stale. "
                 "Run: python -m src.visualization.g5_notebook"
             )
 
@@ -133,5 +133,5 @@ class TestNotebook:
             for output in cell.get("outputs", [])
             if output.output_type == "stream"
         )
-        assert "lenient ISO26262 threshold: release" in text
-        assert "strict  ISO26262 threshold: hold" in text
+        assert "lenient ISO26262 threshold: sufficient" in text
+        assert "strict  ISO26262 threshold: not sufficient" in text

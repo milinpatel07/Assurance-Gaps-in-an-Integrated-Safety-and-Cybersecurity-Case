@@ -1,8 +1,12 @@
-"""Tests that validate every numbered claim in the paper.
+"""Tests that validate every numbered claim in the WAISE paper.
 
 These tests serve as machine-checkable proof that the implementation
 faithfully represents the paper's findings. Each test references the
-specific section, table, or figure it validates.
+specific section, table, or figure it validates. Table and figure numbers
+follow the compiled camera-ready PDF: Fig. 1 (the integrated GSN pattern),
+Table 2 (goals), Table 4 (decision points, tab:inconsistencies) and Table 5
+(findings, tab:gaps). Tests of repository analysis that has no counterpart in
+the camera-ready say so.
 """
 
 import pytest
@@ -12,7 +16,7 @@ from src.gsn.model import Goal, Strategy, Context, Assumption, GoalStatus
 from src.standards.registry import StandardsRegistry
 from src.standards.base import InconsistencyType, GapType, LifecyclePhase
 from src.analysis.decision_points import DecisionPointCatalogue
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.analysis.evidence_convergence import EvidenceConvergenceAnalysis
 from src.analysis.completeness import check_gsn_completeness
 from src.analysis.counterfactual import CounterfactualAnalysis
@@ -280,14 +284,15 @@ class TestGapClaims:
         assert gap5.lifecycle_phase == LifecyclePhase.DESIGN
 
     def test_gap_type_counts_match_table6(self, gaps):
-        """Table 6: MC=2, ME=2, UI=1."""
+        """The code's gap-type counts MC=2, ME=2, UI=1 (repository analysis,
+        not in the camera-ready)."""
         stats = gaps.summary_statistics()
         assert stats["missing_claim"] == 2
         assert stats["missing_evidence"] == 2
         assert stats["unresolved_inconsistency"] == 1
 
     def test_all_lifecycle_phases_have_at_least_one_gap(self, gaps):
-        """Section 5.2 / Table 6: gaps span multiple phases."""
+        """Section 5.2 / Table 5: findings span multiple phases."""
         phases_with_gaps = {g.lifecycle_phase for g in gaps.gaps}
         # Paper claims gaps in: Verification, Modification, Integration, Concept, Design
         assert len(phases_with_gaps) >= 4
@@ -316,11 +321,12 @@ class TestEvidenceConvergenceClaims:
         assert len(methods) == 4
 
     def test_failure_event_three_analysis_paths(self, analysis):
-        """Figure 3: single failure event enters through three paths."""
+        """A single failure event enters through three paths (repository
+        analysis, not in the camera-ready)."""
         assert len(analysis.failure_event.analysis_paths) == 3
 
     def test_all_paths_converge_at_g5(self, analysis):
-        """Figure 3: all paths lead to G5."""
+        """All paths lead to G5 (repository analysis, not in the camera-ready)."""
         for path in analysis.failure_event.analysis_paths:
             assert path.gsn_node == "G5"
 
@@ -418,8 +424,8 @@ class TestCounterfactualValidation:
 class TestCameraReadyClassifications:
     """Classifications the camera-ready carries that the code had not absorbed.
 
-    Table 4 gives two lifecycle phases for F-1 and F-3, and adds ISO 24089 to
-    F-2's coverage row. Table 3 tags DP-2 "S, M" while the prose calls it
+    Table 5 gives two lifecycle phases for F-1 and F-3, and adds ISO 24089 to
+    F-2's coverage row. Table 4 tags DP-2 "S, M" while the prose calls it
     structural in three places; the authors resolved that in favour of the prose,
     so I-2 stays structural and the reasoning sits in decision_points.py.
     """
@@ -429,20 +435,20 @@ class TestCameraReadyClassifications:
         return GapClassification()
 
     def test_f1_spans_concept_and_verification(self, gaps):
-        """Table 4, F-1: 'Concept, Verification'."""
+        """Table 5, F-1: 'Concept, Verification'."""
         assert gaps.get_by_id("Gap-1").lifecycle_phase_label == "Concept, Verification"
 
     def test_f3_spans_verification_and_operation(self, gaps):
-        """Table 4, F-3: 'Verification, Operation'."""
+        """Table 5, F-3: 'Verification, Operation'."""
         assert gaps.get_by_id("Gap-3").lifecycle_phase_label == "Verification, Operation"
 
     def test_f2_coverage_includes_iso_24089(self, gaps):
-        """Table 4, F-2, camera-ready addition."""
+        """Table 5, F-2, camera-ready addition."""
         coverage = " ".join(gaps.get_by_id("Gap-2").partial_coverage)
         assert "24089" in coverage
 
     def test_f2_stays_single_phase(self, gaps):
-        """Table 4 gives F-2 'Modification' alone."""
+        """Table 5 gives F-2 'Modification' alone."""
         assert gaps.get_by_id("Gap-2").lifecycle_phase_label == "Modification"
 
     def test_primary_phase_is_unchanged_for_every_finding(self, gaps):
@@ -455,8 +461,9 @@ class TestCameraReadyClassifications:
         assert primary["Gap-5"] == LifecyclePhase.DESIGN
 
     def test_i2_follows_the_prose_not_the_table(self):
-        """DP-2 is structural per the prose; Table 3's 'S, M' is a known
-        inconsistency inside the camera-ready, not a repository defect."""
+        """DP-2 is structural per the prose; Table 4's 'S, M' is a known
+        discrepancy inside the camera-ready (ERRATA.md entry 1), not a
+        repository defect."""
         catalogue = DecisionPointCatalogue()
         assert catalogue.get_by_id("I-2").inconsistency_type == InconsistencyType.STRUCTURAL
         stats = catalogue.summary_statistics()
@@ -528,7 +535,7 @@ class TestCounterfactualDerivation:
 
     def test_gap3_boundary_goals_come_from_the_shared_map(self):
         """counterfactual.py must not keep its own copy of the gap-to-goal map."""
-        from src.analysis.gaps import GAP_GOAL_MAP
+        from src.analysis.findings import GAP_GOAL_MAP
 
         result = CounterfactualAnalysis.derive_gap3_invisibility()
         assert result["boundary_goals"] == GAP_GOAL_MAP["Gap-3"]
@@ -632,7 +639,8 @@ class TestTraceabilityMatrix:
 
 
 class TestTableConsistency:
-    """Validate that Table 5 and Table 6 data are internally consistent."""
+    """Validate that the decision-point and findings data (WAISE Tables 4 and 5;
+    repository LaTeX tables 5 and 6) are internally consistent."""
 
     def test_table5_inconsistency_ids_sequential(self):
         """I-1 through I-7 should be present."""
@@ -647,13 +655,15 @@ class TestTableConsistency:
         assert ids == [f"Gap-{n}" for n in range(1, 6)]
 
     def test_coverage_matrix_all_standards(self):
-        """Table 2: all five standards should appear."""
+        """Coverage matrix (repository analysis, not in the camera-ready): all
+        five documents, the four standards and ISO/IEC TR 5469, should appear."""
         registry = StandardsRegistry()
         matrix = registry.compute_coverage_matrix()
         assert len(matrix) == 5
 
     def test_goal_density_g5_is_most_dense(self):
-        """Table 4: G5 should have the most contributing standards."""
+        """Goal density (repository analysis, not in the camera-ready): G5
+        should have the most contributing standards."""
         registry = StandardsRegistry()
         density = registry.compute_goal_density()
         g5_count = sum(1 for v in density["G5"].values() if v)

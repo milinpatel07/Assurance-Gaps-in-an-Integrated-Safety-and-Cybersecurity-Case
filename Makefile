@@ -2,24 +2,14 @@
 # Assurance Gaps in an Integrated Safety and Cybersecurity Case
 # for an AI-Based Perception Component in Highly Automated Driving
 #
-# Usage:
-#   make install      — Install dependencies
-#   make results      — Generate all results (JSON, CSV, LaTeX, figures)
-#   make test         — Run the test suite
-#   make gsn          — Render GSN diagrams from YAML (requires gsn2x)
-#   make figures      — Generate figures only
-#   make latex        — Generate LaTeX tables only
-#   make traceability — Regenerate the traceability index
-#   make gsn-view     — Regenerate the interactive GSN view
-#   make pages        — Regenerate every reader-facing generated page
-#   make reproduce    — Generate everything, then verify against references
-#   make clean        — Remove generated output
-#   make all          — Install, test, and generate results
+# Run `make help` for every target and parameter.
 #
 # Reproducibility:
-#   All evaluation results are deterministic given SEED=42 and SCENES=50.
-#   To reproduce with different parameters:
+#   All outputs are deterministic given SEED=42 and SCENES=50.
+#   To generate with different parameters:
 #     make results SEED=123 SCENES=100
+#   results, figures and latex always rerun the generator, so the new
+#   parameters take effect even when output/ already exists.
 
 PYTHON   ?= python
 SEED     ?= 42
@@ -28,33 +18,37 @@ OUTDIR   ?= output
 GSN2X    ?= gsn/gsn2x
 
 .PHONY: all install test results figures latex gsn gsn-install traceability \
-        gsn-view landing seam notebook playground pages reproduce verify-refs \
-        clean help
+        argument landing comparison playground numbers notebook pages reproduce \
+        verify-refs clean help
 
 all: install test results
 
 help:
 	@echo "Available targets:"
-	@echo "  install      — Install project dependencies"
-	@echo "  test         — Run test suite (pytest)"
-	@echo "  results      — Generate all results (JSON, CSV, LaTeX, figures)"
-	@echo "  gsn          — Render GSN diagrams from YAML via gsn2x"
-	@echo "  gsn-install  — Download the gsn2x binary for this platform"
-	@echo "  figures      — Generate visualization figures only"
-	@echo "  latex        — Generate LaTeX tables only"
-	@echo "  traceability — Regenerate TRACEABILITY.md"
-	@echo "  gsn-view     — Regenerate docs/gsn_view.html (interactive GSN)"
-	@echo "  landing      — Regenerate docs/index.html (GitHub Pages landing page)"
-	@echo "  playground   — Regenerate docs/g5_playground.html (interactive G5 page)"
-	@echo "  numbers      — Regenerate docs/numbers.html (where each count comes from)"
-	@echo "  pages        — Regenerate every reader-facing generated page"
-	@echo "  reproduce    — Generate everything, then verify against committed references"
-	@echo "  clean        — Remove generated output directory"
-	@echo "  all          — install + test + results"
+	@echo "  install        Install project dependencies (editable, with dev extras)"
+	@echo "  test           Run the test suite (pytest)"
+	@echo "  results        Generate all results (JSON, CSV, LaTeX, figures) into OUTDIR"
+	@echo "  figures        Same as results: the generator writes figures with everything else"
+	@echo "  latex          Same as results: the generator writes LaTeX tables with everything else"
+	@echo "  gsn            Render the GSN diagrams from YAML via gsn2x"
+	@echo "  gsn-install    Download the gsn2x binary for this platform"
+	@echo "  traceability   Regenerate TRACEABILITY.md and its machine-readable export"
+	@echo "  argument       Regenerate docs/argument.html (interactive GSN view)"
+	@echo "  landing        Regenerate docs/index.html (start page)"
+	@echo "  comparison     Regenerate docs/design-time-and-operation.html"
+	@echo "  playground     Regenerate docs/g5-playground.html (G5 playground)"
+	@echo "  numbers        Regenerate docs/numbers.html (where the numbers come from)"
+	@echo "  notebook       Regenerate the G5 and runtime-anomaly notebooks"
+	@echo "  pages          Regenerate every reader-facing generated page"
+	@echo "  verify-refs    Regenerate into OUTDIR/_refcheck and diff against the committed references"
+	@echo "  reproduce      results, then verify-refs"
+	@echo "  clean          Remove the output directory, rendered GSN SVGs and Python caches"
+	@echo "  all            install, test, results"
+	@echo "  help           Show this list"
 	@echo ""
 	@echo "Parameters:"
-	@echo "  SEED=$(SEED)       Random seed for evaluation"
-	@echo "  SCENES=$(SCENES)     Scenes per weather condition"
+	@echo "  SEED=$(SEED)       Random seed for the synthetic weather-grid illustration"
+	@echo "  SCENES=$(SCENES)     Synthetic scenes per weather condition"
 	@echo "  OUTDIR=$(OUTDIR)    Output directory"
 
 install:
@@ -70,16 +64,16 @@ traceability:
 	$(PYTHON) -m src.results.traceability_export
 
 # Regenerate the interactive GSN view. Use --check in CI to fail on a stale copy.
-gsn-view:
-	$(PYTHON) -m src.visualization.interactive_view
+argument:
+	$(PYTHON) -m src.visualization.argument_page
 
-# Regenerate the GitHub Pages landing page (the poster's QR target).
+# Regenerate the start page (the poster's QR target).
 landing:
 	$(PYTHON) -m src.visualization.landing_page
 
-# Regenerate the seam page and its figure.
-seam:
-	$(PYTHON) -m src.visualization.seam_page
+# Regenerate the design-time and operation comparison page.
+comparison:
+	$(PYTHON) -m src.visualization.comparison_page
 
 # Regenerate the interactive G5 playground.
 playground:
@@ -95,11 +89,12 @@ notebook:
 	$(PYTHON) -m src.visualization.g5_notebook
 
 # Every reader-facing generated page.
-pages: gsn-view landing seam playground numbers notebook
+pages: argument landing comparison playground numbers notebook
 
-# ── Reproducibility (Gate 3) ─────────────────────────────────────
-# One command from clone to every artefact both papers use, then prove the
-# committed references match what the code generates today. A non-empty diff
+# ── Reproducibility ──────────────────────────────────────────────
+# One command from clone to every artefact the WAISE paper uses and every
+# generated page, then check that the committed references match what the code
+# generates today. A non-empty diff
 # means a source changed without its references: fix the cause; never edit a
 # reference by hand. data/empirical_results/ is excluded by declaration: its
 # inputs belong to a paper in preparation (see that directory's README).
@@ -114,34 +109,18 @@ verify-refs:
 	diff $(OUTDIR)/_refcheck/summary_report.txt data/synthetic_illustrations/summary_report_seed42.txt
 	$(PYTHON) -m src.results.traceability_index --check
 	$(PYTHON) -m src.results.traceability_export --check
-	$(PYTHON) -m src.visualization.interactive_view --check
+	$(PYTHON) -m src.visualization.argument_page --check
 	$(PYTHON) -m src.visualization.landing_page --check
-	$(PYTHON) -m src.visualization.seam_page --check
+	$(PYTHON) -m src.visualization.comparison_page --check
 	$(PYTHON) -m src.visualization.playground_page --check
 	$(PYTHON) -m src.visualization.numbers_page --check
 	$(PYTHON) -m src.visualization.anomaly_notebook --check
 	$(PYTHON) -m src.visualization.g5_notebook --check
 	@echo "All committed references match regeneration."
 
-results: $(OUTDIR)/analysis_results.json
-
-$(OUTDIR)/analysis_results.json:
-	$(PYTHON) -m src.results.generate_all \
-		--seed $(SEED) \
-		--scenes $(SCENES) \
-		--output $(OUTDIR)
-
-figures: $(OUTDIR)/figures/integrated_gsn.png
-
-$(OUTDIR)/figures/integrated_gsn.png:
-	$(PYTHON) -m src.results.generate_all \
-		--seed $(SEED) \
-		--scenes $(SCENES) \
-		--output $(OUTDIR)
-
-latex: $(OUTDIR)/latex/table1_standards.tex
-
-$(OUTDIR)/latex/table1_standards.tex:
+# results, figures and latex are phony: each run regenerates everything, so a
+# changed SEED or SCENES always takes effect.
+results figures latex:
 	$(PYTHON) -m src.results.generate_all \
 		--seed $(SEED) \
 		--scenes $(SCENES) \
@@ -153,8 +132,7 @@ $(OUTDIR)/latex/table1_standards.tex:
 # GSN Community Standard v3.
 
 # The release publishes one binary per platform: gsn2x-Linux, gsn2x-macOS and
-# gsn2x-Windows.exe. Earlier versions of this target fetched gsn2x-Linux on every
-# platform, which produced a file that could not run on Windows or macOS.
+# gsn2x-Windows.exe. The asset below is chosen for the current platform.
 GSN2X_VERSION ?= v4.2.3
 
 UNAME_S := $(shell uname -s)

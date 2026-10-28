@@ -17,7 +17,7 @@ from src.analysis.practitioner_guidance import (
 )
 from src.analysis.completeness import check_gsn_completeness
 from src.analysis.counterfactual import CounterfactualAnalysis
-from src.analysis.gaps import GapClassification
+from src.analysis.findings import GapClassification
 from src.analysis.decision_points import DecisionPointCatalogue
 
 

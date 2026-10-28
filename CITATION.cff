@@ -1,15 +1,16 @@
 cff-version: 1.2.0
 message: >-
-  Cite the two papers rather than this repository. Both are listed under
-  preferred-citation and references below.
+  To cite the research, cite the two papers, listed under preferred-citation
+  and references below. To cite this repository (code and data), use its DOI.
 title: >-
   Assurance Gaps in an Integrated Safety and Cybersecurity Case for an
   AI-Based Perception Component in Highly Automated Driving
 abstract: >-
-  Supplementary material for two SAFECOMP 2026 papers. Builds the single GSN
-  argument that ISO 26262, ISO 21448, ISO/SAE 21434 and ISO/PAS 8800 jointly
-  imply for an AI-based perception component, and reports the decision points
-  and findings the combination exposes.
+  Supplementary material for a WAISE 2026 workshop paper and a SAFECOMP 2026
+  position paper. Builds an integrated GSN argument pattern that combines claims
+  from ISO 26262, ISO 21448, ISO/SAE 21434 and ISO/PAS 8800 for an AI-based
+  perception component, a structure none of the standards prescribes, and
+  reports the decision points and findings the integration exposes.
 type: software
 license: MIT
 version: 1.0.0
@@ -34,6 +35,7 @@ authors:
     affiliation: Kempten University of Applied Sciences
   - family-names: Jung
     given-names: Rolf
+    orcid: https://orcid.org/0000-0002-0366-4844
     affiliation: Kempten University of Applied Sciences
 keywords:
   - safety assurance
@@ -45,7 +47,7 @@ keywords:
 preferred-citation:
   type: conference-paper
   title: >-
-    Integrating Cybersecurity into the AI Safety Assurance Argument: A GSN
+    Integrating Cybersecurity Into the AI Safety Assurance Argument: A GSN
     Pattern for AI-Based Perception Components in Highly Automated Driving
   authors:
     - family-names: Patel
@@ -54,11 +56,18 @@ preferred-citation:
       affiliation: Kempten University of Applied Sciences
     - family-names: Jung
       given-names: Rolf
+      orcid: https://orcid.org/0000-0002-0366-4844
       affiliation: Kempten University of Applied Sciences
-  collection-title: WAISE 2026 Workshop at SAFECOMP 2026
+  collection-title: >-
+    Computer Safety, Reliability, and Security. SAFECOMP 2026 Workshops
   collection-type: proceedings
+  conference:
+    name: WAISE 2026, workshop at SAFECOMP 2026
   publisher:
     name: Springer
+  start: 763
+  end: 779
+  doi: 10.1007/978-3-032-35506-5_55
   year: 2026
 references:
   - type: conference-paper
@@ -72,7 +81,9 @@ references:
         affiliation: Kempten University of Applied Sciences
       - family-names: Jung
         given-names: Rolf
+        orcid: https://orcid.org/0000-0002-0366-4844
         affiliation: Kempten University of Applied Sciences
     collection-title: SAFECOMP 2026
     collection-type: proceedings
+    status: in-press
     year: 2026

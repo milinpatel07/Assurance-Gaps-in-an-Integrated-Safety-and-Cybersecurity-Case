@@ -1,4 +1,4 @@
-"""ISO 21448:2022 — Road vehicles — Safety of the intended functionality (SOTIF).
+"""ISO 21448:2022 (Road vehicles: Safety of the intended functionality, SOTIF).
 
 This module implements the claim extraction (Step 1) and lifecycle mapping
 (Step 2) for ISO 21448 as applied to an AI-based perception component.
@@ -34,7 +34,8 @@ def _build_clauses() -> list[Clause]:
                 "The four-area model partitions operational space into: "
                 "Area 1 (known safe), Area 2 (known potentially hazardous), "
                 "Area 3 (unknown potentially hazardous), Area 4 (unknown safe). "
-                "Objective: reduce Area 3 to an acceptable level."
+                "Objective: reduce Areas 2 and 3 (known and unknown hazardous "
+                "scenarios) to an acceptable level."
             ),
         ),
         Clause(
@@ -53,8 +54,9 @@ def _build_clauses() -> list[Clause]:
             normative=True,
             ai_applicable=True,
             ai_applicability_note=(
-                "Defines qualitative acceptance criteria but provides no "
-                "quantitative formula. This contributes to Gap-1."
+                "Establishes the framework for residual-risk acceptance "
+                "criteria, including risk tolerability principles, but defers "
+                "quantitative values to context (finding F-1)."
             ),
         ),
         Clause(
@@ -100,7 +102,10 @@ def _build_clauses() -> list[Clause]:
         Clause(
             standard_id="ISO21448",
             reference="Cl.12",
-            title="SOTIF evaluation criteria and release decision",
+            title=(
+                "Evaluation of the achievement of the SOTIF (release "
+                "recommendation)"
+            ),
             lifecycle_phases=[LifecyclePhase.INTEGRATION],
             normative=True,
             ai_applicable=True,
@@ -122,14 +127,15 @@ def _build_clauses() -> list[Clause]:
             ai_applicable=True,
             ai_applicability_note=(
                 "Clause 1 explicitly excludes threats from cybersecurity. "
-                "This creates the cybersecurity-SOTIF boundary ambiguity (I-5)."
+                "This leaves the cybersecurity-SOTIF boundary unbridged "
+                "(decision point DP-5)."
             ),
         ),
         # Annex A.1 (informative)
         Clause(
             standard_id="ISO21448",
             reference="Annex A.1",
-            title="GSN argument structure — Example 2",
+            title="GSN argument structure: Example 2",
             lifecycle_phases=[
                 LifecyclePhase.CONCEPT,
                 LifecyclePhase.VERIFICATION,
@@ -189,8 +195,8 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
             claim_id="CLM-21448-AREA-01",
             text=(
                 "The operational space shall be partitioned using the four-area "
-                "model, and Area 3 (unknown potentially hazardous) shall be "
-                "reduced to an acceptable level."
+                "model, and Areas 2 and 3 (known and unknown hazardous "
+                "scenarios) shall be reduced to an acceptable level."
             ),
             source_clause=clause_map["Cl.5"],
             claim_type=ClaimType.NORMATIVE_REQUIREMENT,
@@ -322,7 +328,7 @@ def _build_claims(clauses: list[Clause]) -> list[Claim]:
 
 
 class ISO21448(Standard):
-    """ISO 21448:2022 — Road vehicles — Safety of the intended functionality.
+    """ISO 21448:2022 (Road vehicles: Safety of the intended functionality).
 
     Provides the SOTIF four-area model, triggering condition analysis,
     and residual risk acceptance framework.
@@ -333,7 +339,7 @@ class ISO21448(Standard):
         claims = _build_claims(clauses)
         super().__init__(
             standard_id="ISO21448",
-            full_name="ISO 21448:2022 — Road vehicles — Safety of the intended functionality",
+            full_name="ISO 21448:2022 (Road vehicles: Safety of the intended functionality)",
             year=2022,
             scope=(
                 "Safety of the intended functionality for road vehicles. "
