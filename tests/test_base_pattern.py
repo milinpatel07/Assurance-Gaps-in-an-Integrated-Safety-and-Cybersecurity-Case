@@ -4,7 +4,7 @@ The WAISE paper's headline is that the integrated pattern extends ISO/PAS 8800
 Annex B from six goals to nine. These tests hold that claim to two independent
 encodings: the base pattern in ``annex_b_base.py`` and the integrated pattern in
 ``integrated_pattern.py``. The delta is computed from the difference, so "six to
-nine" is checked rather than narrated, and the per-goal augmentation must agree
+nine" is computed, not just stated, and the per-goal augmentation must agree
 with the ``augmented_from`` field the integrated builder records separately.
 """
 

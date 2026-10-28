@@ -75,7 +75,7 @@ class TestExportIsComplete:
         for standard in document["standards"]:
             assert standard["edition_as_cited"]
 
-    def test_the_edition_field_does_not_overclaim(self):
+    def test_the_edition_field_claims_no_more_than_the_source(self):
         """The edition is the one cited, not a claim of re-analysis against it."""
         note = json.loads(build_json())["note"]
         assert "cited under" in note

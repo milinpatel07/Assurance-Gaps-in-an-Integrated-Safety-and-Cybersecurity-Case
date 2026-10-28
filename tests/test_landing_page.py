@@ -1,4 +1,4 @@
-"""The landing page: generated, current, self-contained, honest about counts.
+"""The landing page: generated, current, self-contained, and its counts taken from code.
 
 ``docs/index.html`` is what the poster's QR code resolves to. These tests
 rebuild it and fail if the committed copy differs, and they hold it to the

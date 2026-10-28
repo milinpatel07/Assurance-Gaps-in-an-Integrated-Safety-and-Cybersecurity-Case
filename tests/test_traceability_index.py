@@ -1,4 +1,4 @@
-"""Keep TRACEABILITY.md honest.
+"""Keep TRACEABILITY.md in step with the code it indexes.
 
 The index is generated from the same objects it describes, so it cannot drift
 from them by accident. What it can do is sit stale in the repository after

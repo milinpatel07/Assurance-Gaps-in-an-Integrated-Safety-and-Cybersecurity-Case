@@ -60,7 +60,7 @@ class DecisionPointCatalogue:
             # camera-ready, not a defect in this repository, and the authors
             # resolved it in favour of the prose.
             #
-            # The prose is not merely more numerous, it is load-bearing: the same
+            # The prose also carries more weight than the table: the same
             # sentence partitions the seven decision points as two terminological,
             # two methodological and three structural. Counting DP-2 twice breaks
             # that sentence, not only summary_statistics().
